@@ -65,10 +65,22 @@ def make_request(url, data=None, headers=None):
 
 
 def gamepass_login():
-    url = 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
-    post_data = {'username': username, 'vendor_id': password}
+    url = 'https://id.s.nfl.com/login'
+    post_data = {
+        'username': username,
+        'password': password,
+        'vendor_id': 'nflptnrnln',
+        'error_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
+        'success_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
+    }
     login_data = make_request(url, urllib.urlencode(post_data))
-    addon_log('login responce: %s' %login_data)
+    addon_log('login response: %s' %login_data)
+
+    # searching for magic strings is brittle; we need a more future-proof way to do this
+    if login_data.find('launchApp') >= 0:
+        addon_log('login success!')
+    else:
+        addon_log('login failed.')
 
 
 def add_dir(name, url, mode, iconimage):
