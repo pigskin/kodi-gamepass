@@ -12,6 +12,7 @@ import StorageServer
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulStoneSoup 
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
@@ -82,6 +83,20 @@ def gamepass_login():
     else:
         addon_log('login failed.')
 
+    get_weeks_games('2013','204')
+
+# season is in format: YYYY
+# week is in format 101 (1st week preseason) or 213 (13th week of regular season)
+def get_weeks_games(season, week):
+    url = 'https://gamepass.nfl.com/nflgp/servlets/games'
+    post_data = {
+        'isFlex': 'true',
+        'season': season,
+        'week': week
+    }
+    week_data = make_request(url, urllib.urlencode(post_data))
+    addon_log('login response: %s' %week_data)
+
 
 def add_dir(name, url, mode, iconimage):
     params = {'name': name, 'url': url, 'mode': mode}
@@ -109,7 +124,7 @@ except:
     mode = None
 
 if mode == None:
-    add_dir('Login', 'login', 1, icon)
+    add_dir('Login', 'login', 1, icon) 
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
