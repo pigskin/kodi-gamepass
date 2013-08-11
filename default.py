@@ -77,13 +77,14 @@ def gamepass_login():
     login_data = make_request(url, urllib.urlencode(post_data))
     addon_log('login response: %s' %login_data)
 
-    # searching for magic strings is brittle; we need a more future-proof way to do this
-    if login_data.find('launchApp') >= 0:
-        addon_log('login success!')
+    # check if we can get game data, to see if login is valid
+    week_data = get_weeks_games('2013','204')
+    if week_data.find('noAccess') >= 0:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
+        addon_log('login failed')
     else:
-        addon_log('login failed.')
-
-    get_weeks_games('2013','204')
+        addon_log('login success')
 
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
@@ -96,6 +97,7 @@ def get_weeks_games(season, week):
     }
     week_data = make_request(url, urllib.urlencode(post_data))
     addon_log('login response: %s' %week_data)
+    return week_data
 
 
 def add_dir(name, url, mode, iconimage):
