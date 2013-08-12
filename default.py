@@ -96,8 +96,40 @@ def get_weeks_games(season, week):
         'week': week
     }
     week_data = make_request(url, urllib.urlencode(post_data))
-    addon_log('login response: %s' %week_data)
-    return week_data
+    # addon_log('login response: %s' %week_data)
+    soup = BeautifulStoneSoup(week_data, convertEntities=BeautifulSoup.XML_ENTITIES)
+    for i in soup('game'):
+        try:
+            program_id = i.programid.string
+        except AttributeError:
+            addon_log('No program id: %s' %i)
+            # the first item doen't seem to be a game, so continue to the next item
+            continue
+        # for example, likely don't need to init all these variables 
+        game_id = i.id.string
+        season = i.season.string
+        week = i.week.string
+        game_type = i.type.string
+        elias = i.elias.string
+        hasprogram = i.hasprogram.string
+        condensed_id = i.condensedid.string
+        game_date = i.date.string
+        start_gmt = i.gametimegmt.string
+        end_gmt = i.gameendtimegmt.string
+        hometeam_name = i.hometeam('name')[0].string
+        hometeam_id = i.hometeam('id')[0].string
+        hometeam_city = i.hometeam('city')[0].string
+        hometeam_score = i.hometeam('score')[0].string
+        awayteam_name = i.awayteam('name')[0].string
+        awayteam_id = i.awayteam('id')[0].string
+        awayteam_city = i.awayteam('city')[0].string
+        awayteam_score = i.awayteam('score')[0].string
+        print '---------------------------------------------------------------------------------'
+        print (game_id, date, program_id, season, week, game_type, elias, hasprogram, condensed_id)
+        print (start_gmt, end_gmt)
+        print (hometeam_name, hometeam_id, hometeam_city, hometeam_score)
+        print (awayteam_name, awayteam_id, awayteam_city, awayteam_score)
+        return week_data
 
 
 def add_dir(name, url, mode, iconimage):
