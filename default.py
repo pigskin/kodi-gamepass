@@ -75,16 +75,25 @@ def gamepass_login():
         'success_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
     }
     login_data = make_request(url, urllib.urlencode(post_data))
-    addon_log('login response: %s' %login_data)
 
-    # check if we can get game data, to see if login is valid
-    week_data = get_weeks_games('2013','204')
-    if week_data.find('noAccess') >= 0:
+    soup = BeautifulSoup(login_data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    seasons = soup.find('select', id='seasonSelect').findChildren()
+    gp_seasons = []
+
+    for season in seasons:
+        gp_seasons.append(season.string)
+
+    # if the seasons list is empty, then login didn't go well
+    # or the login page changed
+    if not gp_seasons:
         dialog = xbmcgui.Dialog()
         dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
         addon_log('login failed')
     else:
         addon_log('login success')
+
+    return gp_seasons
+
 
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
@@ -132,6 +141,11 @@ def get_weeks_games(season, week):
         return week_data
 
 
+def display_seasons(gp_seasons):
+    for season in gp_seasons:
+        add_dir(season, season, 1, icon)
+
+
 def add_dir(name, url, mode, iconimage):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
@@ -158,11 +172,12 @@ except:
     mode = None
 
 if mode == None:
-    add_dir('Login', 'login', 1, icon) 
+    add_dir('Login', 'login', 1, icon)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
-    gamepass_login()
+    gp_seasons = gamepass_login()
+    display_seasons(gp_seasons)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 2:
