@@ -12,7 +12,7 @@ import StorageServer
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
-from BeautifulSoup import BeautifulStoneSoup 
+from BeautifulSoup import BeautifulStoneSoup
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
@@ -24,7 +24,7 @@ fanart = os.path.join(addon_path, 'fanart.jpg')
 base_url = ''
 debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
-cache = StorageServer.StorageServer("nfl_gamepass", 24)
+cache = StorageServer.StorageServer("nfl_game_pass", 24)
 username = addon.getSetting('email')
 password = addon.getSetting('password')
 
@@ -33,6 +33,102 @@ def addon_log(string):
     if debug == 'true':
         xbmc.log("[addon.nfl.gamepass-%s]: %s" %(addon_version, string))
 
+def cache_seasons_and_weeks(login_data):
+    soup = BeautifulSoup(login_data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+    try:
+        seasons_soup = soup.find('select', id='seasonSelect').findChildren()
+        seasons = []
+        for season in seasons_soup:
+            seasons.append(season.string)
+        cache.set('seasons', repr(seasons))
+        addon_log('Seasons cached')
+    except:
+        addon_log('Season cache failed')
+        return False
+
+    try:
+        weeks_soup = soup.find('select', id='weekSelect').findChildren()
+        weeks = {}
+        for week in weeks_soup:
+            week_code = week['value']
+            weeks[week_code] = week.string
+        cache.set('weeks', repr(weeks))
+        addon_log('Weeks cached')
+    except:
+        addon_log('Week cache failed')
+        return False
+
+    return True
+
+def display_games(season, week_code):
+    games = get_weeks_games(season, week_code)
+    if games:
+        for game_id, game_name in games.iteritems():
+            add_dir(game_name, game_id, 4, icon)
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
+        addon_log('Fetching games failed.')
+
+def display_seasons(seasons):
+    for season in seasons:
+        add_dir(season, season, 2, icon)
+
+def display_weeks(season, weeks):
+    for week_code, week_name in sorted(weeks.iteritems()):
+        add_dir(week_name, season + ';' + week_code, 3, icon)
+
+# logs in and returns a list of available seasons
+def gamepass_login():
+    url = 'https://id.s.nfl.com/login'
+    post_data = {
+        'username': username,
+        'password': password,
+        'vendor_id': 'nflptnrnln',
+        'error_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
+        'success_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
+    }
+    login_data = make_request(url, urllib.urlencode(post_data))
+
+    cache_success = cache_seasons_and_weeks(login_data)
+
+    if cache_success:
+        addon_log('login success')
+    else: # if cache failed, then login failed or the login page's HTML changed
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
+        addon_log('login failed')
+
+# season is in format: YYYY
+# week is in format 101 (1st week preseason) or 213 (13th week of regular season)
+def get_weeks_games(season, week):
+    url = 'https://gamepass.nfl.com/nflgp/servlets/games'
+    post_data = {
+        'isFlex': 'true',
+        'season': season,
+        'week': week
+    }
+    games = {}
+    game_data = make_request(url, urllib.urlencode(post_data))
+
+    soup = BeautifulStoneSoup(game_data, convertEntities=BeautifulSoup.XML_ENTITIES)
+    games_soup = soup.find('games').findChildren()
+    for game in games_soup:
+        game_id = ''
+        try:
+            game_id = game.programid.string
+            games[game_id] = ''
+        except AttributeError:
+            addon_log('No program id: %s' %game)
+            # the first item doen't seem to be a game, so continue to the next item
+            continue
+
+        away_team = game.awayteam('city')[0].string + ' ' + game.awayteam('name')[0].string
+        home_team = game.hometeam('city')[0].string + ' ' + game.hometeam('name')[0].string
+        games[game_id] = away_team + ' at ' + home_team
+
+    return games
 
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
@@ -64,95 +160,12 @@ def make_request(url, data=None, headers=None):
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
 
-
-def gamepass_login():
-    url = 'https://id.s.nfl.com/login'
-    post_data = {
-        'username': username,
-        'password': password,
-        'vendor_id': 'nflptnrnln',
-        'error_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
-        'success_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
-    }
-    login_data = make_request(url, urllib.urlencode(post_data))
-
-    soup = BeautifulSoup(login_data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    seasons = soup.find('select', id='seasonSelect').findChildren()
-    gp_seasons = []
-
-    for season in seasons:
-        gp_seasons.append(season.string)
-
-    # if the seasons list is empty, then login didn't go well
-    # or the login page changed
-    if not gp_seasons:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
-        addon_log('login failed')
-    else:
-        addon_log('login success')
-
-    return gp_seasons
-
-
-# season is in format: YYYY
-# week is in format 101 (1st week preseason) or 213 (13th week of regular season)
-def get_weeks_games(season, week):
-    url = 'https://gamepass.nfl.com/nflgp/servlets/games'
-    post_data = {
-        'isFlex': 'true',
-        'season': season,
-        'week': week
-    }
-    week_data = make_request(url, urllib.urlencode(post_data))
-    # addon_log('login response: %s' %week_data)
-    soup = BeautifulStoneSoup(week_data, convertEntities=BeautifulSoup.XML_ENTITIES)
-    for i in soup('game'):
-        try:
-            program_id = i.programid.string
-        except AttributeError:
-            addon_log('No program id: %s' %i)
-            # the first item doen't seem to be a game, so continue to the next item
-            continue
-        # for example, likely don't need to init all these variables 
-        game_id = i.id.string
-        season = i.season.string
-        week = i.week.string
-        game_type = i.type.string
-        elias = i.elias.string
-        hasprogram = i.hasprogram.string
-        condensed_id = i.condensedid.string
-        game_date = i.date.string
-        start_gmt = i.gametimegmt.string
-        end_gmt = i.gameendtimegmt.string
-        hometeam_name = i.hometeam('name')[0].string
-        hometeam_id = i.hometeam('id')[0].string
-        hometeam_city = i.hometeam('city')[0].string
-        hometeam_score = i.hometeam('score')[0].string
-        awayteam_name = i.awayteam('name')[0].string
-        awayteam_id = i.awayteam('id')[0].string
-        awayteam_city = i.awayteam('city')[0].string
-        awayteam_score = i.awayteam('score')[0].string
-        print '---------------------------------------------------------------------------------'
-        print (game_id, date, program_id, season, week, game_type, elias, hasprogram, condensed_id)
-        print (start_gmt, end_gmt)
-        print (hometeam_name, hometeam_id, hometeam_city, hometeam_score)
-        print (awayteam_name, awayteam_id, awayteam_city, awayteam_score)
-        return week_data
-
-
-def display_seasons(gp_seasons):
-    for season in gp_seasons:
-        add_dir(season, season, 1, icon)
-
-
 def add_dir(name, url, mode, iconimage):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
     listitem = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
     listitem.setProperty("Fanart_Image", fanart)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, True)
-
 
 def get_params():
     p = parse_qs(sys.argv[2][1:])
@@ -176,13 +189,22 @@ if mode == None:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
-    gp_seasons = gamepass_login()
-    display_seasons(gp_seasons)
+    gamepass_login()
+    seasons = eval(cache.get('seasons'))
+    display_seasons(seasons)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 2:
+    weeks = eval(cache.get('weeks'))
+    season = params['name']
+    display_weeks(season, weeks)
     # add_plugin dir
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 3:
-    resolve_url(params['url'])
+    season, week_code = params['url'].split(';', 1)
+    display_games(season, week_code)
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+elif mode == 4:
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
