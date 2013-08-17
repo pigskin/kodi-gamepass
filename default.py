@@ -4,11 +4,13 @@ import re
 import os
 import json
 import cookielib
+import time
 import xbmcplugin
 import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
+from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
@@ -64,8 +66,8 @@ def cache_seasons_and_weeks(login_data):
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
     if games:
-        for game_id, game_name in games.iteritems():
-            add_dir(game_name, game_id, 4, icon)
+        for game_id, game_info in games.iteritems():
+            add_dir(game_info[0], game_id, 4, icon, game_info[1], game_info[2], False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
@@ -113,7 +115,8 @@ def get_weeks_games(season, week):
     game_data = make_request(url, urllib.urlencode(post_data))
 
     soup = BeautifulStoneSoup(game_data, convertEntities=BeautifulSoup.XML_ENTITIES)
-    games_soup = soup.find('games').findChildren()
+    # games_soup = soup.find('games').findChildren() # this doesn't work for me?? haven't looked into why.
+    games_soup = soup('game')
     for game in games_soup:
         game_id = ''
         try:
@@ -121,12 +124,35 @@ def get_weeks_games(season, week):
             games[game_id] = ''
         except AttributeError:
             addon_log('No program id: %s' %game)
-            # the first item doen't seem to be a game, so continue to the next item
+            format_exc()
+            # the first item doesn't seem to be a game, so continue to the next item
             continue
 
         away_team = game.awayteam('city')[0].string + ' ' + game.awayteam('name')[0].string
         home_team = game.hometeam('city')[0].string + ' ' + game.hometeam('name')[0].string
-        games[game_id] = away_team + ' at ' + home_team
+
+        try:
+            start_time = datetime.fromtimestamp(time.mktime(time.strptime(game.gametimegmt.string, '%Y-%m-%dT%H:%M:%S.000')))
+            end_time = datetime.fromtimestamp(time.mktime(time.strptime(game.gameendtimegmt.string, '%Y-%m-%dT%H:%M:%S.000')))
+            duration = (end_time - start_time).seconds / 60
+        except:
+            addon_log(format_exc())
+            duration = None
+            
+        try:
+            game_datetime = datetime.fromtimestamp(time.mktime(time.strptime(game.date.string, '%Y-%m-%dT%H:%M:%S.000')))
+            game_date_string = game_datetime.strftime('%A, %b %d %I:%M %p')
+        except:
+            addon_log(format_exc())
+            game_date_string = ''
+        try:
+            scores = '%s %s\n%s %s' %(away_team, game.awayteam('score')[0].string, home_team, game.hometeam('score')[0].string)
+        except:
+            addon_log(format_exc())
+            scores = ''
+        
+        description = "%s\n\n %s" %(game_date_string, scores)
+        games[game_id] = (away_team + ' at ' + home_team, description, duration)
 
     return games
 
@@ -160,12 +186,16 @@ def make_request(url, data=None, headers=None):
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
 
-def add_dir(name, url, mode, iconimage):
+def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
     listitem = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
     listitem.setProperty("Fanart_Image", fanart)
-    xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, True)
+    if not isfolder:
+        # IsPlayable tells xbmc that there is more work to be done to resolve a playable url
+        listitem.setProperty('IsPlayable', 'true')
+        listitem.setInfo(type="Video", infoLabels={"Title": name, "Plot": discription, "Duration": duration})
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, isfolder)
 
 def get_params():
     p = parse_qs(sys.argv[2][1:])
