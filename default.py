@@ -156,7 +156,6 @@ def get_weeks_games(season, week):
     game_data = make_request(url, urllib.urlencode(post_data))
 
     soup = BeautifulStoneSoup(game_data, convertEntities=BeautifulSoup.XML_ENTITIES)
-    # games_soup = soup.find('games').findChildren() # this doesn't work for me?? haven't looked into why.
     games_soup = soup('game')
     for game in games_soup:
         game_id = ''
