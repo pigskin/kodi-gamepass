@@ -156,7 +156,7 @@ def make_request(url, data=None, headers=None):
         addon_log('We failed to open "%s".' %url)
         if hasattr(e, 'reason'):
             addon_log('We failed to reach a server.')
-            addon_log('Reason: ', e.reason)
+            addon_log('Reason: %s' %e.reason)
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
 
