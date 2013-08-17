@@ -189,6 +189,7 @@ def get_weeks_games(season, week):
         except:
             addon_log(format_exc())
             game_date_string = ''
+        
         try:
             scores = '%s %s\n%s %s' %(away_team, game.awayteam('score')[0].string, home_team, game.hometeam('score')[0].string)
         except:
@@ -296,7 +297,6 @@ elif mode == 2:
     weeks = eval(cache.get('weeks'))
     season = params['name']
     display_weeks(season, weeks)
-    # add_plugin dir
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 3:
