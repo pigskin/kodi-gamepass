@@ -10,6 +10,7 @@ import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
+import xml.etree.ElementTree as ET
 import random
 import md5
 from uuid import getnode as get_mac
@@ -115,14 +116,15 @@ def gen_plid():
     m = md5.new(str(rand) + mac_address)
     return m.hexdigest()
 
-# the XML manifest of all availabel streams for a game
+# the XML manifest of all available streams for a game
 def get_manifest(video_path):
     url, port, path = video_path.partition(':443')
     path = path.replace('?', '&')
     url = url.replace('adaptive://', 'http://') + port + '/play?' + urllib.quote_plus('url=' + path, ':&=')
 
     manifest_data = make_request(url)
-    addon_log('Manifest Data: %s' %manifest_data)
+
+    return manifest_data
 
 # the "video path" provides the info neccesary to request the stream's manifest
 def get_video_path(game_id):
@@ -228,9 +230,29 @@ def make_request(url, data=None, headers=None):
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
 
+def parse_manifest(manifest):
+    try:
+        xml_root = ET.fromstring(manifest)
+        stream_data = ''
+        stream_server = ''
+
+        for stream in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]'):
+            stream_data = stream.get('url')
+        
+        for httpserver in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]/httpservers/httpserver'):
+            stream_server = httpserver.get('name')
+
+        stream_url = 'http://' + stream_server + stream_data
+        addon_log('Stream URL: %s' %stream_url)
+        return stream_url
+    except:
+        return False
+
 def play_game(game_id):
     video_path = get_video_path(game_id)
-    get_manifest(video_path)
+    manifest = get_manifest(video_path)
+    stream_url = parse_manifest(manifest)
+    return stream_url
 
 def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
@@ -284,8 +306,8 @@ elif mode == 3:
 
 elif mode == 4:
     game_id = params['url']
-    play_game(game_id)
     # instead of endofDirectory, setResolvedUrl
-    resolved_url = ''
+    resolved_url = play_game(game_id)
+    addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
