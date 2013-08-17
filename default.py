@@ -283,4 +283,7 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     play_game(game_id)
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    # instead of endofDirectory, setResolvedUrl
+    resolved_url = ''
+    item = xbmcgui.ListItem(path=resolved_url)
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
