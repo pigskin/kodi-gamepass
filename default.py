@@ -12,6 +12,7 @@ import xbmcaddon
 import StorageServer
 import random
 import md5
+from uuid import getnode as get_mac
 from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
@@ -110,7 +111,8 @@ def gamepass_login():
 # This, pseudorandom approach seems to work for now.
 def gen_plid():
     rand = random.getrandbits(10)
-    m = md5.new(str(rand))
+    mac_address = str(get_mac())
+    m = md5.new(str(rand) + mac_address)
     return m.hexdigest()
 
 # the XML manifest of all availabel streams for a game
