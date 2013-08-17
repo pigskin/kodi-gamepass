@@ -9,6 +9,8 @@ import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
+import random
+import md5
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
@@ -100,6 +102,45 @@ def gamepass_login():
         dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
         addon_log('login failed')
 
+# The plid parameter used when requesting the video path appears to be an MD5 of... something.
+# However, I don't knwo what it is an "id" of, since the value seems to change constantly.
+# Reusing a plid doesn't work, so, I assume it's a unique identifier for the player as we request a stream.
+# This, pseudorandom approach seems to work for now.
+def gen_plid():
+    rand = random.getrandbits(10)
+    m = md5.new(str(rand))
+    return m.hexdigest()
+
+# the XML manifest of all availabel streams for a game
+def get_manifest(video_path):
+    url, port, path = video_path.partition(':443')
+    path = path.replace('?', '&')
+    url = url.replace('adaptive://', 'http://') + port + '/play?' + urllib.quote_plus('url=' + path, ':&=')
+
+    manifest_data = make_request(url)
+    addon_log('Manifest Data: %s' %manifest_data)
+
+# the "video path" provides the info neccesary to request the stream's manifest
+def get_video_path(game_id):
+    url = 'https://gamepass.nfl.com/nflgp/servlets/encryptvideopath'
+    plid = gen_plid()
+    post_data = {
+        'path': game_id,
+        'plid': plid,
+        'type': 'fgpa',
+        'isFlex': 'true'
+    }
+    video_path_data = make_request(url, urllib.urlencode(post_data))
+
+    try:
+        soup = BeautifulStoneSoup(video_path_data, convertEntities=BeautifulSoup.XML_ENTITIES)
+        video_path = soup.find('path')
+        addon_log('Video Path Acquired Successfully.')
+        return video_path.string
+    except:
+        addon_log('Video Path Acquisition Failed.')
+        return False
+
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
 def get_weeks_games(season, week):
@@ -160,6 +201,10 @@ def make_request(url, data=None, headers=None):
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
 
+def play_game(game_id):
+    video_path = get_video_path(game_id)
+    get_manifest(video_path)
+
 def add_dir(name, url, mode, iconimage):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
@@ -207,4 +252,6 @@ elif mode == 3:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 4:
+    game_id = params['url']
+    play_game(game_id)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
