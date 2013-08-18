@@ -103,7 +103,7 @@ def gamepass_login():
         addon_log('login success')
     else: # if cache failed, then login failed or the login page's HTML changed
         dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL GamePass failed. Make sure your account information is correct.")
+        dialog.ok("Login Failed", "Logging into NFL Game Pass failed. Make sure your account information is correct.")
         addon_log('login failed')
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
