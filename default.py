@@ -233,20 +233,33 @@ def make_request(url, data=None, headers=None):
 
 def parse_manifest(manifest):
     try:
-        xml_root = ET.fromstring(manifest)
-        stream_data = ''
-        stream_server = ''
+        # xml_root = ET.fromstring(manifest)
+        # stream_data = ''
+        # stream_server = ''
 
-        for stream in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]'):
-            stream_data = stream.get('url')
+        # for stream in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]'):
+            # stream_data = stream.get('url')
         
-        for httpserver in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]/httpservers/httpserver'):
-            stream_server = httpserver.get('name')
+        # for httpserver in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]/httpservers/httpserver'):
+            # stream_server = httpserver.get('name')
 
-        stream_url = 'http://' + stream_server + stream_data
-        addon_log('Stream URL: %s' %stream_url)
-        return stream_url
+        # stream_url = 'http://' + stream_server + stream_data
+        soup = BeautifulStoneSoup(manifest, convertEntities=BeautifulStoneSoup.XML_ENTITIES)
+        items = [{'servers': [{'name': x['name'], 'port': x['port']} for x in i('httpserver')],
+                  'url': i['url'],
+                  'info': '%sx%s Bitrate: %s' %(i.video['height'], i.video['width'], i['bitrate'])}
+                 for i in soup('streamdata')]
+        # if addon.getSetting('bitrate') == 'choose':
+        dialog = xbmcgui.Dialog()
+        ret = dialog.select('Choose a stream', [i['info'] for i in items])
+        if ret >= 0:
+            addon_log('Selected: %s' %items[ret])
+            stream_url = 'http://%s%s' %(items[ret]['servers'][0]['name'], items[ret]['url'])
+            addon_log('Stream URL: %s' %stream_url)
+            return stream_url
+        else: raise
     except:
+        addon_log(format_exc())
         return False
 
 def play_game(game_id):
