@@ -1,0 +1,5 @@
+18 Aug 2013 v0.1.0
++ Initial development release (divingmule, Alexqw)
++ Only supports normal game streams (no coaches film, NFL TV, etc)
++ Can select stream bit rate
++ Sexy icon (thanks to dahlSTROM!)
