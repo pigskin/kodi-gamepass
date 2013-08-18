@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.nfl.gamepass"
-       name="NFL Gamepass"
+       name="NFL Game Pass"
        version="0.0.1"
        provider-name="Alexqw|divingmule">
   <requires>
@@ -14,7 +14,7 @@
   <extension point="xbmc.addon.metadata">
     <summary>NFL Gamepass</summary>
     <description>
-    Watch NFL Gamepass streams.
+    Watch NFL Game Pass streams.
     </description>
     <platform>all</platform>
     <language>en</language>
