@@ -254,7 +254,7 @@ def parse_manifest(manifest):
         ret = dialog.select('Choose a stream', [i['info'] for i in items])
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
-            stream_url = 'http://%s%s' %(items[ret]['servers'][0]['name'], items[ret]['url'])
+            stream_url = 'http://%s%s' %(items[ret]['servers'][1]['name'], items[ret]['url'])
             addon_log('Stream URL: %s' %stream_url)
             return stream_url
         else: raise
