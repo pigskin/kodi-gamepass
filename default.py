@@ -188,20 +188,20 @@ def get_weeks_games(season, week):
         except:
             addon_log(format_exc())
             duration = None
-            
+
         try:
             game_datetime = datetime.fromtimestamp(time.mktime(time.strptime(game.date.string, '%Y-%m-%dT%H:%M:%S.000')))
             game_date_string = game_datetime.strftime('%A, %b %d %I:%M %p')
         except:
             addon_log(format_exc())
             game_date_string = ''
-        
+
         try:
             scores = '%s %s\n%s %s' %(away_team, game.awayteam('score')[0].string, home_team, game.hometeam('score')[0].string)
         except:
             addon_log(format_exc())
             scores = ''
-        
+
         description = "%s\n\n %s" %(game_date_string, scores)
         games[game_id] = (away_team + ' at ' + home_team, description, duration)
 
@@ -239,25 +239,15 @@ def make_request(url, data=None, headers=None):
 
 def parse_manifest(manifest):
     try:
-        # xml_root = ET.fromstring(manifest)
-        # stream_data = ''
-        # stream_server = ''
-
-        # for stream in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]'):
-            # stream_data = stream.get('url')
-        
-        # for httpserver in xml_root.iterfind('streamDatas/streamData[@bitrate="4608000"]/httpservers/httpserver'):
-            # stream_server = httpserver.get('name')
-
-        # stream_url = 'http://' + stream_server + stream_data
         soup = BeautifulStoneSoup(manifest, convertEntities=BeautifulStoneSoup.XML_ENTITIES)
         items = [{'servers': [{'name': x['name'], 'port': x['port']} for x in i('httpserver')],
                   'url': i['url'],
                   'info': '%sx%s Bitrate: %s' %(i.video['height'], i.video['width'], i['bitrate'])}
                  for i in soup('streamdata')]
-        # if addon.getSetting('bitrate') == 'choose':
+
         dialog = xbmcgui.Dialog()
         ret = dialog.select('Choose a stream', [i['info'] for i in items])
+
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
             stream_url = 'http://%s%s' %(items[ret]['servers'][1]['name'], items[ret]['url'])
@@ -319,7 +309,6 @@ elif mode == 3:
 
 elif mode == 4:
     game_id = params['url']
-    # instead of endofDirectory, setResolvedUrl
     resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
