@@ -1,6 +1,6 @@
 # NFL Game Pass Plugin for XBMC #
 by Alex Waite and divingmule
-Version: 0.1.0
+Version: 0.1.1
 
 Before reading any further, please understand that while this plugin does
 work, consider it to be an alpha release. It may crash, spay your puppy,
