@@ -126,6 +126,12 @@ def get_manifest(video_path):
 
     return manifest_data
 
+def get_stream_url(game_id):
+    video_path = get_video_path(game_id)
+    manifest = get_manifest(video_path)
+    stream_url = parse_manifest(manifest)
+    return stream_url
+
 # the "video path" provides the info neccesary to request the stream's manifest
 def get_video_path(game_id):
     url = 'https://gamepass.nfl.com/nflgp/servlets/encryptvideopath'
@@ -262,12 +268,6 @@ def parse_manifest(manifest):
         addon_log(format_exc())
         return False
 
-def play_game(game_id):
-    video_path = get_video_path(game_id)
-    manifest = get_manifest(video_path)
-    stream_url = parse_manifest(manifest)
-    return stream_url
-
 def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
@@ -320,7 +320,7 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     # instead of endofDirectory, setResolvedUrl
-    resolved_url = play_game(game_id)
+    resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
