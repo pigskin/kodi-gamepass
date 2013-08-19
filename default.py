@@ -100,10 +100,12 @@ def gamepass_login():
 
     if cache_success:
         addon_log('login success')
+        return True
     else: # if cache failed, then login failed or the login page's HTML changed
         dialog = xbmcgui.Dialog()
         dialog.ok("Login Failed", "Logging into NFL Game Pass failed. Make sure your account information is correct.")
         addon_log('login failed')
+        return False
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
 # However, I don't knwo what it is an "id" of, since the value seems to change constantly.
@@ -285,13 +287,20 @@ except:
     mode = None
 
 if mode == None:
-    add_dir('Login', 'login', 1, icon)
+    if username and password:
+        login_success = gamepass_login()
+        if login_success:
+            seasons = eval(cache.get('seasons'))
+            display_seasons(seasons)
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
+        addon_log('No account settings detected.')
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
-    gamepass_login()
-    seasons = eval(cache.get('seasons'))
-    display_seasons(seasons)
+    # unused for the time being
+    # will be used later when/if NFL Network and NFL RedZone support is added
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 2:
