@@ -85,7 +85,6 @@ def display_weeks(season, weeks):
     for week_code, week_name in sorted(weeks.iteritems()):
         add_dir(week_name, season + ';' + week_code, 3, icon)
 
-# logs in and returns a list of available seasons
 def gamepass_login():
     url = 'https://id.s.nfl.com/login'
     post_data = {
@@ -175,7 +174,6 @@ def get_weeks_games(season, week):
         except AttributeError:
             addon_log('No program id: %s' %game)
             format_exc()
-            # the first item doesn't seem to be a game, so continue to the next item
             continue
 
         away_team = game.awayteam('city')[0].string + ' ' + game.awayteam('name')[0].string
