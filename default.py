@@ -287,11 +287,24 @@ except:
     mode = None
 
 if mode == None:
+    seasons = None
     if username and password:
         login_success = gamepass_login()
         if login_success:
             seasons = eval(cache.get('seasons'))
-            display_seasons(seasons)
+    # in some instances logging in is not necessary
+    elif not username:
+        try:
+            seasons = eval(cache.get('seasons'))
+        except SyntaxError:
+            addon_log('No season cache')
+            data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
+            ok = cache_seasons_and_weeks(data)
+            if ok:
+                seasons = eval(cache.get('seasons'))
+        
+    if seasons:
+        display_seasons(seasons)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
