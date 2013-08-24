@@ -19,6 +19,7 @@ from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
 from BeautifulSoup import BeautifulStoneSoup
+from operator import itemgetter
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
@@ -241,12 +242,11 @@ def parse_manifest(manifest):
     try:
         soup = BeautifulStoneSoup(manifest, convertEntities=BeautifulStoneSoup.XML_ENTITIES)
         items = [{'servers': [{'name': x['name'], 'port': x['port']} for x in i('httpserver')],
-                  'url': i['url'],
+                  'url': i['url'], 'bitrate': int(i['bitrate']),
                   'info': '%sx%s Bitrate: %s' %(i.video['height'], i.video['width'], i['bitrate'])}
                  for i in soup('streamdata')]
 
-        dialog = xbmcgui.Dialog()
-        ret = dialog.select('Choose a stream', [i['info'] for i in items])
+        ret = select_bitrate(items)
 
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
@@ -257,6 +257,19 @@ def parse_manifest(manifest):
     except:
         addon_log(format_exc())
         return False
+
+def select_bitrate(streams):
+    use_highest_bitrate = addon.getSetting('bitrate')
+
+    streams.sort(key=itemgetter('bitrate'), reverse=True)
+    
+    if use_highest_bitrate == 'true':
+        ret = 0
+    else:
+        dialog = xbmcgui.Dialog()
+        ret = dialog.select('Choose a stream', [i['info'] for i in streams])
+    addon_log('ret: %s' %ret)
+    return ret
 
 def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
