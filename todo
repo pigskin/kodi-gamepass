@@ -7,12 +7,14 @@ a very incomplete todo list:
 -note games which user does not have access to
 --for those with team subscriptions
 -show team logos (can download from game pass)
--allow setting a default bit rate
 -watchout for any keep-alive that is neccesary
 -check to see if we're already logged in, before re-authenticating
 -coaches view
 -team audio
 -NFL channel
+-move stuff out of parse_manifest
+-mono spaced font?
+-more informative layout?
 
 bugs:
 -Not always getting all games, I think this is due to the server using chunked mode, and urllib2 not reading all chunks.
