@@ -17,5 +17,5 @@ a very incomplete todo list:
 -more informative layout?
 
 bugs:
--Not always getting all games, I think this is due to the server using chunked mode, and urllib2 not reading all chunks.
 -Skipping by 10 minutes can cause stream to crash -- likely an ffmpeg issue
+-Duration doesn't work after listing games one time

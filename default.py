@@ -10,7 +10,7 @@ import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElementTree
 import random
 import md5
 from uuid import getnode as get_mac
@@ -20,6 +20,7 @@ from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
 from BeautifulSoup import BeautifulStoneSoup
 from operator import itemgetter
+from XmlDict import XmlDictConfig
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
@@ -71,8 +72,20 @@ def cache_seasons_and_weeks(login_data):
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
     if games:
-        for game_id, game_info in games.iteritems():
-            add_dir(game_info[0], game_id, 4, icon, game_info[1], game_info[2], False)
+        for game in games:
+            home_team = game['homeTeam']
+            away_team = game['awayTeam']
+            game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
+
+            try:
+                start_time = datetime.strptime(game['gameTimeGMT'], '%Y-%m-%dT%H:%M:%S.000')
+                end_time = datetime.strptime(game['gameEndTimeGMT'], '%Y-%m-%dT%H:%M:%S.000')
+                duration = (end_time - start_time).seconds / 60
+            except:
+                addon_log(format_exc())
+                duration = None
+
+            add_dir(game_name, game['programId'], 4, icon, '', duration, False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
@@ -164,49 +177,14 @@ def get_weeks_games(season, week):
         'season': season,
         'week': week
     }
-    games = {}
+
     game_data = make_request(url, urllib.urlencode(post_data))
+    
+    root = ElementTree.XML(game_data)
+    game_data_dict = XmlDictConfig(root)
+    games = game_data_dict['games']
 
-    soup = BeautifulStoneSoup(game_data, convertEntities=BeautifulSoup.XML_ENTITIES)
-    games_soup = soup('game')
-    for game in games_soup:
-        game_id = ''
-        try:
-            game_id = game.programid.string
-            games[game_id] = ''
-        except AttributeError:
-            addon_log('No program id: %s' %game)
-            format_exc()
-            continue
-
-        away_team = game.awayteam('city')[0].string + ' ' + game.awayteam('name')[0].string
-        home_team = game.hometeam('city')[0].string + ' ' + game.hometeam('name')[0].string
-
-        try:
-            start_time = datetime.fromtimestamp(time.mktime(time.strptime(game.gametimegmt.string, '%Y-%m-%dT%H:%M:%S.000')))
-            end_time = datetime.fromtimestamp(time.mktime(time.strptime(game.gameendtimegmt.string, '%Y-%m-%dT%H:%M:%S.000')))
-            duration = (end_time - start_time).seconds / 60
-        except:
-            addon_log(format_exc())
-            duration = None
-
-        try:
-            game_datetime = datetime.fromtimestamp(time.mktime(time.strptime(game.date.string, '%Y-%m-%dT%H:%M:%S.000')))
-            game_date_string = game_datetime.strftime('%A, %b %d %I:%M %p')
-        except:
-            addon_log(format_exc())
-            game_date_string = ''
-
-        try:
-            scores = '%s %s\n%s %s' %(away_team, game.awayteam('score')[0].string, home_team, game.hometeam('score')[0].string)
-        except:
-            addon_log(format_exc())
-            scores = ''
-
-        description = "%s\n\n %s" %(game_date_string, scores)
-        games[game_id] = (away_team + ' at ' + home_team, description, duration)
-
-    return games
+    return games['game']
 
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
