@@ -1,3 +1,7 @@
+24 Aug 2013 v0.1.2
++ Bug fix. All 16 games (rather than 15) are listed now.
++ Add option to always use best bitrate
+
 19 Aug 2013 v0.1.1
 + Critical bug fix. Streams play again.
 
