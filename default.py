@@ -108,8 +108,8 @@ def gamepass_login():
         return False
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
-# However, I don't knwo what it is an "id" of, since the value seems to change constantly.
-# Reusing a plid doesn't work, so, I assume it's a unique identifier for the player as we request a stream.
+# However, I don't know what it is an "id" of, since the value seems to change constantly.
+# Reusing a plid doesn't work, so I assume it's a unique id for the instance of the player.
 # This, pseudorandom approach seems to work for now.
 def gen_plid():
     rand = random.getrandbits(10)
