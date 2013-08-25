@@ -234,7 +234,7 @@ def parse_manifest(manifest):
 
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
-            stream_url = 'http://%s%s' %(items[ret]['servers'][1]['name'], items[ret]['url'])
+            stream_url = 'http://%s%s' %(items[ret]['servers'][-1]['name'], items[ret]['url'])
             addon_log('Stream URL: %s' %stream_url)
             return stream_url
         else: raise
