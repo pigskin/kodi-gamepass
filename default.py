@@ -124,7 +124,7 @@ def gamepass_login():
         return True
     else: # if cache failed, then login failed or the login page's HTML changed
         dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL Game Pass failed. Make sure your account information is correct.")
+        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
         addon_log('login failed')
         return False
 
@@ -286,12 +286,9 @@ except:
 
 if mode == None:
     seasons = None
-    if username and password:
-        login_success = gamepass_login()
-        if login_success:
-            seasons = eval(cache.get('seasons'))
-    # in some instances logging in is not necessary
-    elif not username:
+    sans_login_region = addon.getSetting('sans_login')
+
+    if sans_login_region == 'true':
         try:
             seasons = eval(cache.get('seasons'))
         except SyntaxError:
@@ -300,13 +297,23 @@ if mode == None:
             ok = cache_seasons_and_weeks(data)
             if ok:
                 seasons = eval(cache.get('seasons'))
+    else:
+        if username and password:
+            login_success = gamepass_login()
+            if login_success:
+                seasons = eval(cache.get('seasons'))
+        else:
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
+            addon_log('No account settings detected.')
         
     if seasons:
         display_seasons(seasons)
     else:
         dialog = xbmcgui.Dialog()
-        dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
-        addon_log('No account settings detected.')
+        dialog.ok("Error", "Could not acquire Game Pass metadata.")
+        addon_log('No seasons data.')
+
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
