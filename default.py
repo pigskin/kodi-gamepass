@@ -71,6 +71,12 @@ def cache_seasons_and_weeks(login_data):
 
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
+
+    # super bowl week has only one game, which thus isn't put into a list
+    if isinstance(games, dict):
+        games_list = [games]
+        games = games_list
+    
     if games:
         for game in games:
             home_team = game['homeTeam']
