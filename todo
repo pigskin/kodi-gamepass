@@ -17,5 +17,7 @@ a very incomplete todo list:
 -more informative layout?
 
 bugs:
+-Duration calculation is innacurate, since archived games remove commercials
+--accurate duration is in stream manifest
+--not sure if we care
 -Skipping by 10 minutes can cause stream to crash -- likely an ffmpeg issue
--Duration doesn't work after listing games one time

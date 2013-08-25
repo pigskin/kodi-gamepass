@@ -83,9 +83,10 @@ def display_games(season, week_code):
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
 
+            date_time_format = '%Y-%m-%dT%H:%M:%S.000'
             try:
-                start_time = datetime.strptime(game['gameTimeGMT'], '%Y-%m-%dT%H:%M:%S.000')
-                end_time = datetime.strptime(game['gameEndTimeGMT'], '%Y-%m-%dT%H:%M:%S.000')
+                start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+                end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
                 duration = (end_time - start_time).seconds / 60
             except:
                 addon_log(format_exc())
