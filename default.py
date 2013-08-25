@@ -29,7 +29,6 @@ cookie_file = os.path.join(addon_profile, 'cookie_file')
 cookie_jar = cookielib.LWPCookieJar(cookie_file)
 icon = os.path.join(addon_path, 'icon.png')
 fanart = os.path.join(addon_path, 'fanart.jpg')
-base_url = ''
 debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
 cache = StorageServer.StorageServer("nfl_game_pass", 24)
@@ -186,18 +185,17 @@ def get_weeks_games(season, week):
     }
 
     game_data = make_request(url, urllib.urlencode(post_data))
+    #addon_log('game data: %s' %game_data)
     
     root = ElementTree.XML(game_data)
     game_data_dict = XmlDictConfig(root)
+    #addon_log('game data dict: %s' %game_data_dict)
     games = game_data_dict['games']
 
     return games['game']
 
-def make_request(url, data=None, headers=None):
+def make_request(url, data=None):
     addon_log('Request URL: %s' %url)
-    if headers is None:
-        headers = {'User-agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0',
-                   'Referer' : base_url}
     if not xbmcvfs.exists(cookie_file):
         addon_log('Creating cookie_file!')
         cookie_jar.save()
@@ -205,7 +203,7 @@ def make_request(url, data=None, headers=None):
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
     urllib2.install_opener(opener)
     try:
-        req = urllib2.Request(url, data, headers)
+        req = urllib2.Request(url, data)
         response = urllib2.urlopen(req)
         cookie_jar.save(cookie_file, ignore_discard=True, ignore_expires=False)
         data = response.read()
