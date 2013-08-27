@@ -147,20 +147,24 @@ def get_manifest(video_path):
 
     return manifest_data
 
-def get_stream_url(game_id):
-    video_path = get_video_path(game_id)
+def get_stream_url(game_id, post_data=None):
+    video_path = get_video_path(game_id, post_data)
     manifest = get_manifest(video_path)
     stream_url = parse_manifest(manifest)
     return stream_url
 
 # the "video path" provides the info neccesary to request the stream's manifest
-def get_video_path(game_id):
+def get_video_path(game_id, post_data):
     url = 'https://gamepass.nfl.com/nflgp/servlets/encryptvideopath'
     plid = gen_plid()
+    if post_data is None:
+        type = 'fgpa'
+    elif post_data == 'NFL Network':
+        type = 'channel'
     post_data = {
         'path': game_id,
         'plid': plid,
-        'type': 'fgpa',
+        'type': type,
         'isFlex': 'true'
     }
     video_path_data = make_request(url, urllib.urlencode(post_data))
@@ -311,7 +315,7 @@ if mode == None:
         dialog = xbmcgui.Dialog()
         dialog.ok("Error", "Could not acquire Game Pass metadata.")
         addon_log('No seasons data.')
-
+    add_dir('NFL Network', 'http://nlds21.neulion.com:443/nlds/nfl/nfltv/as/live/nfltv_hd_pc', 4, icon, discription="NFL Network", duration=None, isfolder=False)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
@@ -332,7 +336,14 @@ elif mode == 3:
 
 elif mode == 4:
     game_id = params['url']
-    resolved_url = get_stream_url(game_id)
+    if params['name'] == 'NFL Network':
+        resolved_url = get_stream_url(game_id, 'NFL Network') + '.m3u8'
+        # seems to be a valid m3u8 but it doesn't play for me ???
+        # thinking we need to add parameters to the resolved url
+        # e.g. '?nltid=nflgp&nltdt=8&nltnt=1&hdnea=expires=1377528596~access=/*~md5=967766a4e0e647803020523c8dbba9ca'
+        # maybe same access key that's in the manifest ???
+    else:
+        resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
