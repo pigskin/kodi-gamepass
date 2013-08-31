@@ -390,8 +390,7 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network':
-        resolved_url = game_id.replace('androidtab', '1200') + '|cookie=' + game_id.split('?')[1]
-        # is a valid m3u8, but it cannot open the key file yet :-/
+        resolved_url = game_id.replace('androidtab', '1200')
     else:
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
