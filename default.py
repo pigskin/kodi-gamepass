@@ -215,6 +215,37 @@ def get_weeks_games(season, week):
 
     return games['game']
 
+# parse archives for NFL Network, RedZone, Fantasy
+def parse_archive(cid):
+    url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+    post_data = {
+        'isFlex':'true',
+        'cid': cid,
+        'pm': 0,
+        'ps': 50,
+        'pn': 1
+        }
+    image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
+    data = make_request(url, urllib.urlencode(post_data))
+    root = ElementTree.XML(data)
+    archive_dict = XmlDictConfig(root)
+    count = int(archive_dict['paging']['count'])
+    if count < 1:
+        return
+    else:
+        # we may want to add_dir from here but i'm thinking we could cache these results
+        shows = []
+        items = archive_dict['programs']['program']
+        for i in items:
+            item = {'name': i['name'],
+                    'date': i['releaseDate'],
+                    'id': i['id'],
+                    'image': image_path + i['image'],
+                    'description': i['description'],
+                    'publishPoint': i['publishPoint'],
+                    'duration': i['runtime']}
+            shows.append(item)
+    
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
     if not xbmcvfs.exists(cookie_file):
@@ -359,7 +390,7 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network':
-        resolved_url = game_id.replace('androidtab', '1200')
+        resolved_url = game_id.replace('androidtab', '1200') + '|cookie=' + game_id.split('?')[1]
         # is a valid m3u8, but it cannot open the key file yet :-/
     else:
         resolved_url = get_stream_url(game_id)
