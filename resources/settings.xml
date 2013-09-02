@@ -1,7 +1,7 @@
 <settings>
   <setting id="email" type="text" label="30001" default=""/>
   <setting id="password" type="text" label="30002" default="" option="hidden"/>
-  <setting id="bitrate" type="bool" label="Always Use Highest Bitrate" default="false"/>
+  <setting id="preferred_bitrate" type="select" label="30003" lvalues="30004|30005|30006|30007|30008|30009|30010|30011|30012" default="8"/>
   <setting id="sans_login" type="bool" label="Sans-Login Region" default="false"/>
   <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
 </settings>

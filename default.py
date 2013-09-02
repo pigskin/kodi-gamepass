@@ -297,15 +297,26 @@ def parse_manifest(manifest):
         return False
 
 def select_bitrate(streams):
-    use_highest_bitrate = addon.getSetting('bitrate')
-
-    streams.sort(key=itemgetter('bitrate'), reverse=True)
-    
-    if use_highest_bitrate == 'true':
-        ret = 0
+    preferred_bitrate = addon.getSetting('preferred_bitrate')
+    bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
+    if streams == 'live_stream':
+        if preferred_bitrate == '0' or preferred_bitrate == '1':
+            ret = bitrate_values[0]
+        elif preferred_bitrate != '8':
+            ret = bitrate_values[int(preferred_bitrate) -1]
+        else:
+            dialog = xbmcgui.Dialog()
+            ret = bitrate_values[dialog.select('Choose a bitrate', [i for i in bitrate_values])]
+            
     else:
-        dialog = xbmcgui.Dialog()
-        ret = dialog.select('Choose a stream', [i['info'] for i in streams])
+        streams.sort(key=itemgetter('bitrate'), reverse=True)
+        if preferred_bitrate == '0':
+            ret = 0
+        elif len(streams) == 7 and preferred_bitrate != '8':
+            ret = int(preferred_bitrate) - 1
+        else:
+            dialog = xbmcgui.Dialog()
+            ret = dialog.select('Choose a stream', [i['info'] for i in streams])
     addon_log('ret: %s' %ret)
     return ret
 
@@ -390,7 +401,7 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network':
-        resolved_url = game_id.replace('androidtab', '1200')
+        resolved_url = game_id.replace('androidtab', select_bitrate('live_stream'))
     else:
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
