@@ -35,7 +35,19 @@ cache = StorageServer.StorageServer("nfl_game_pass", 24)
 username = addon.getSetting('email')
 password = addon.getSetting('password')
 
-
+show_archives = {
+    'NFL Gameday': {'2013': '179', '2012': '146'},
+    'Playbook': {'2013': '180', '2012': '147'},
+    'NFL Total Access': {'2013': '181', '2012': '148'},
+    'Sound FX': {'2013': '183', '2012': '150'},
+    'Coaches Show': {'2013': '184', '2012': '151'},
+    'Top 100 Players': {'2013': '185', '2012': '153'},
+    'A Football Life': {'2013': '186', '2012': '154'},
+    'Superbowl Archives': {'2013': '117'}
+     # {'NFL Films Presents': {'2013': '187', '2012': ''}}, isn't showing any episodes
+    }
+     
+     
 def addon_log(string):
     if debug == 'true':
         xbmc.log("[addon.nfl.gamepass-%s]: %s" %(addon_version, string))
@@ -162,7 +174,7 @@ def get_nfl_network_url():
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
 
-    return m3u8_url
+    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
 
 def get_stream_url(game_id, post_data=None):
     video_path = get_video_path(game_id, post_data)
@@ -214,9 +226,16 @@ def get_weeks_games(season, week):
     games = game_data_dict['games']
 
     return games['game']
+    
+def get_nfl_network():
+    add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
+    for i in show_archives.keys():
+        add_dir(i, '2013', 6, icon)
+             
 
 # parse archives for NFL Network, RedZone, Fantasy
-def parse_archive(cid):
+def parse_archive(show_name, season):
+    cid = show_archives[show_name][season]
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
     post_data = {
         'isFlex':'true',
@@ -231,20 +250,15 @@ def parse_archive(cid):
     archive_dict = XmlDictConfig(root)
     count = int(archive_dict['paging']['count'])
     if count < 1:
-        return
+        if season == '2013':
+            return parse_archive(show_name, '2012')
     else:
-        # we may want to add_dir from here but i'm thinking we could cache these results
-        shows = []
         items = archive_dict['programs']['program']
         for i in items:
-            item = {'name': i['name'],
-                    'date': i['releaseDate'],
-                    'id': i['id'],
-                    'image': image_path + i['image'],
-                    'description': i['description'],
-                    'publishPoint': i['publishPoint'],
-                    'duration': i['runtime']}
-            shows.append(item)
+            add_dir(i['name'], i['publishPoint'], 7, image_path + i['image'], '%s\n%s' %(i['description'], i['releaseDate']), i['runtime'], False)
+        if season == '2013':
+            if not show_name == 'Superbowl Archives':
+                add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
     
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
@@ -288,7 +302,7 @@ def parse_manifest(manifest):
 
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
-            stream_url = 'http://%s%s' %(items[ret]['servers'][-1]['name'], items[ret]['url'])
+            stream_url = 'http://%s%s' %(items[ret]['servers'][0]['name'], items[ret]['url'])
             addon_log('Stream URL: %s' %stream_url)
             return stream_url
         else: raise
@@ -378,8 +392,7 @@ if mode == None:
         dialog.ok("Error", "Could not acquire Game Pass metadata.")
         addon_log('No seasons data.')
 
-    nfl_network_url = get_nfl_network_url()
-    add_dir('NFL Network', nfl_network_url, 4, icon, discription="NFL Network", duration=None, isfolder=False)
+    add_dir('NFL Network', 'nfl_network_url', 5, icon)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
@@ -400,10 +413,24 @@ elif mode == 3:
 
 elif mode == 4:
     game_id = params['url']
-    if params['name'] == 'NFL Network':
-        resolved_url = game_id.replace('androidtab', select_bitrate('live_stream'))
+    if params['name'] == 'NFL Network - Live':
+        resolved_url = get_nfl_network_url()
     else:
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
+
+elif mode == 5:
+    get_nfl_network()
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+elif mode == 6:
+    parse_archive(params['name'].split(' - ')[0], params['url'])
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
+elif mode == 7:
+    manifest = get_manifest(params['url'])
+    stream_url = parse_manifest(manifest)
+    item = xbmcgui.ListItem(path=stream_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
