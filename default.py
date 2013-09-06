@@ -91,9 +91,18 @@ def display_games(season, week_code):
     if games:
         for game in games:
             home_team = game['homeTeam']
+            # sometimes the first item is empty
+            if home_team is None:
+                continue
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-
+            game_id = game['programId']
+            try:
+                if game['isLive']:
+                    game_id = game['id']
+                    game_name += ' - Live'
+            except KeyError:
+                pass
             date_time_format = '%Y-%m-%dT%H:%M:%S.000'
             try:
                 start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
@@ -103,7 +112,7 @@ def display_games(season, week_code):
                 addon_log(format_exc())
                 duration = None
 
-            add_dir(game_name, game['programId'], 4, icon, '', duration, False)
+            add_dir(game_name, game_id, 4, icon, '', duration, False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
@@ -159,6 +168,24 @@ def get_manifest(video_path):
 
     return manifest_data
 
+def get_live_game_url(game_id):
+    url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
+    post_data = {
+        'id' : game_id,
+        'type' : 'game',
+        'nt' : '1',
+        'gt' : 'live'
+        }
+    headers = {'User-Agent' : 'Android'}
+    m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
+
+    root = ElementTree.XML(m3u8_data)
+    m3u8_dict = XmlDictConfig(root)
+    addon_log('NFL Dict %s.' %m3u8_dict)
+    m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
+
+    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
+    
 def get_nfl_network_url():
     url = 'http://gamepass.nfl.com/nflgp/servlets/publishpoint'
     post_data = {
@@ -415,6 +442,8 @@ elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network - Live':
         resolved_url = get_nfl_network_url()
+    elif params['name'].endswith('- Live'):
+        resolved_url = get_live_game_url(game_id)
     else:
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
