@@ -168,39 +168,27 @@ def get_manifest(video_path):
 
     return manifest_data
 
-def get_live_game_url(game_id):
+def get_publishpoint_url(game_id):
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
-    post_data = {
-        'id' : game_id,
-        'type' : 'game',
-        'nt' : '1',
-        'gt' : 'live'
-        }
+    if game_id == 'nfl_network':
+        post_data = {
+            'id': '1',
+            'type': 'channel',
+            'nt': '1'
+            }
+    else:
+        post_data = {
+            'id' : game_id,
+            'type' : 'game',
+            'nt' : '1',
+            'gt' : 'live'
+            }
     headers = {'User-Agent' : 'Android'}
     m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
-
     root = ElementTree.XML(m3u8_data)
     m3u8_dict = XmlDictConfig(root)
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-
-    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
-    
-def get_nfl_network_url():
-    url = 'http://gamepass.nfl.com/nflgp/servlets/publishpoint'
-    post_data = {
-        'id': '1',
-        'type': 'channel',
-        'nt': '1'
-    }
-    headers = {'User-Agent' : 'Android'}
-    m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
-
-    root = ElementTree.XML(m3u8_data)
-    m3u8_dict = XmlDictConfig(root)
-    addon_log('NFL Dict %s.' %m3u8_dict)
-    m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
 
 def get_stream_url(game_id, post_data=None):
@@ -441,9 +429,9 @@ elif mode == 3:
 elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network - Live':
-        resolved_url = get_nfl_network_url()
+        resolved_url = get_publishpoint_url('nfl_network')
     elif params['name'].endswith('- Live'):
-        resolved_url = get_live_game_url(game_id)
+        resolved_url = get_publishpoint_url(game_id)
     else:
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
