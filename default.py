@@ -90,29 +90,37 @@ def display_games(season, week_code):
     
     if games:
         for game in games:
+            duration = None
+            mode = 4
+            date_time_format = '%Y-%m-%dT%H:%M:%S.000'
             home_team = game['homeTeam']
             # sometimes the first item is empty
-            if home_team is None:
+            if home_team['name'] is None:
                 continue
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
             game_id = game['programId']
-            try:
-                if game['isLive']:
+            if not game.has_key('hasProgram'):
+                # may want to change this to game['gameTimeGMT'] or do a setting maybe
+                game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                game_date_string = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                game_name += ' - ' + game_date_string + ' ET'
+                mode = 8
+            if game.has_key('isLive'):
+                # sometimes isLive lies
+                if not game.has_key('gameEndTimeGMT'):
                     game_id = game['id']
+                    live = True
                     game_name += ' - Live'
-            except KeyError:
-                pass
-            date_time_format = '%Y-%m-%dT%H:%M:%S.000'
-            try:
-                start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
-                end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
-                duration = (end_time - start_time).seconds / 60
-            except:
-                addon_log(format_exc())
-                duration = None
-
-            add_dir(game_name, game_id, 4, icon, '', duration, False)
+            if game.has_key('gameEndTimeGMT'):
+                try:
+                    start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+                    end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
+                    duration = (end_time - start_time).seconds / 60
+                except:
+                    addon_log(format_exc())
+                    
+            add_dir(game_name, game_id, mode, icon, '', duration, False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
@@ -355,8 +363,9 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
     listitem = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
     listitem.setProperty("Fanart_Image", fanart)
     if not isfolder:
-        # IsPlayable tells xbmc that there is more work to be done to resolve a playable url
-        listitem.setProperty('IsPlayable', 'true')
+        if not mode == 8:
+            # IsPlayable tells xbmc that there is more work to be done to resolve a playable url
+            listitem.setProperty('IsPlayable', 'true')
         listitem.setInfo(type="Video", infoLabels={"Title": name, "Plot": discription, "Duration": duration})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, isfolder)
 
@@ -451,3 +460,7 @@ elif mode == 7:
     stream_url = parse_manifest(manifest)
     item = xbmcgui.ListItem(path=stream_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
+    
+elif mode == 8:
+    # for a do nothing list item
+    pass
