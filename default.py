@@ -458,7 +458,7 @@ elif mode == 4:
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 5:
-    get_cookies = cache.cacheFunction(get_current_week())
+    get_cookies = cache.cacheFunction(get_current_week)
     get_nfl_network()
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
