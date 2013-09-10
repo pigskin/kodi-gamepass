@@ -31,7 +31,7 @@ icon = os.path.join(addon_path, 'icon.png')
 fanart = os.path.join(addon_path, 'fanart.jpg')
 debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
-cache = StorageServer.StorageServer("nfl_game_pass", 24)
+cache = StorageServer.StorageServer("nfl_game_pass", 2)
 username = addon.getSetting('email')
 password = addon.getSetting('password')
 
@@ -46,8 +46,8 @@ show_archives = {
     'Superbowl Archives': {'2013': '117'}
      # {'NFL Films Presents': {'2013': '187', '2012': ''}}, isn't showing any episodes
     }
-     
-     
+
+
 def addon_log(string):
     if debug == 'true':
         xbmc.log("[addon.nfl.gamepass-%s]: %s" %(addon_version, string))
@@ -87,7 +87,7 @@ def display_games(season, week_code):
     if isinstance(games, dict):
         games_list = [games]
         games = games_list
-    
+
     if games:
         for game in games:
             duration = None
@@ -110,7 +110,6 @@ def display_games(season, week_code):
                 # sometimes isLive lies
                 if not game.has_key('gameEndTimeGMT'):
                     game_id = game['id']
-                    live = True
                     game_name += ' - Live'
             if game.has_key('gameEndTimeGMT'):
                 try:
@@ -119,7 +118,7 @@ def display_games(season, week_code):
                     duration = (end_time - start_time).seconds / 60
                 except:
                     addon_log(format_exc())
-                    
+
             add_dir(game_name, game_id, mode, icon, '', duration, False)
     else:
         dialog = xbmcgui.Dialog()
@@ -242,19 +241,18 @@ def get_weeks_games(season, week):
 
     game_data = make_request(url, urllib.urlencode(post_data))
     #addon_log('game data: %s' %game_data)
-    
+
     root = ElementTree.XML(game_data)
     game_data_dict = XmlDictConfig(root)
     #addon_log('game data dict: %s' %game_data_dict)
     games = game_data_dict['games']
 
     return games['game']
-    
+
 def get_nfl_network():
     add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
     for i in show_archives.keys():
         add_dir(i, '2013', 6, icon)
-             
 
 # parse archives for NFL Network, RedZone, Fantasy
 def parse_archive(show_name, season):
@@ -277,12 +275,15 @@ def parse_archive(show_name, season):
             return parse_archive(show_name, '2012')
     else:
         items = archive_dict['programs']['program']
+        if isinstance(items, dict):
+            items_list = [items]
+            items = items_list
         for i in items:
             add_dir(i['name'], i['publishPoint'], 7, image_path + i['image'], '%s\n%s' %(i['description'], i['releaseDate']), i['runtime'], False)
-        if season == '2013':
-            if not show_name == 'Superbowl Archives':
-                add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
-    
+    if season == '2013':
+        if not show_name == 'Superbowl Archives':
+            add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
+
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
     if not xbmcvfs.exists(cookie_file):
@@ -325,7 +326,7 @@ def parse_manifest(manifest):
 
         if ret >= 0:
             addon_log('Selected: %s' %items[ret])
-            stream_url = 'http://%s%s' %(items[ret]['servers'][0]['name'], items[ret]['url'])
+            stream_url = 'http://%s%s.m3u8' %(items[ret]['servers'][0]['name'], items[ret]['url'])
             addon_log('Stream URL: %s' %stream_url)
             return stream_url
         else: raise
@@ -344,7 +345,7 @@ def select_bitrate(streams):
         else:
             dialog = xbmcgui.Dialog()
             ret = bitrate_values[dialog.select('Choose a bitrate', [i for i in bitrate_values])]
-            
+
     else:
         streams.sort(key=itemgetter('bitrate'), reverse=True)
         if preferred_bitrate == '0':
@@ -369,6 +370,13 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
         listitem.setInfo(type="Video", infoLabels={"Title": name, "Plot": discription, "Duration": duration})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, isfolder)
 
+def get_current_week():
+    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+    data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+    if data:
+        return data
+    return 'False'
+
 def get_params():
     p = parse_qs(sys.argv[2][1:])
     for i in p.keys():
@@ -378,6 +386,8 @@ def get_params():
 
 if debug == 'true':
     cache.dbg = True
+
+
 params = get_params()
 addon_log("params: %s" %params)
 
@@ -408,7 +418,7 @@ if mode == None:
             dialog = xbmcgui.Dialog()
             dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
             addon_log('No account settings detected.')
-        
+
     if seasons:
         display_seasons(seasons)
     else:
@@ -448,19 +458,20 @@ elif mode == 4:
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 5:
+    get_cookies = cache.cacheFunction(get_current_week())
     get_nfl_network()
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 6:
     parse_archive(params['name'].split(' - ')[0], params['url'])
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
-    
+
 elif mode == 7:
     manifest = get_manifest(params['url'])
     stream_url = parse_manifest(manifest)
     item = xbmcgui.ListItem(path=stream_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
-    
+
 elif mode == 8:
     # for a do nothing list item
     pass
