@@ -36,6 +36,7 @@ username = addon.getSetting('email')
 password = addon.getSetting('password')
 
 show_archives = {
+    'NFL RedZone': {'2013': '182', '2012': '149'},
     'NFL Gameday': {'2013': '179', '2012': '146'},
     'Playbook': {'2013': '180', '2012': '147'},
     'NFL Total Access': {'2013': '181', '2012': '148'},
@@ -258,11 +259,15 @@ def get_nfl_network():
 def parse_archive(show_name, season):
     cid = show_archives[show_name][season]
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+    if show_name == 'NFL RedZone':
+        ps = 17
+    else:
+        ps = 50
     post_data = {
         'isFlex':'true',
         'cid': cid,
         'pm': 0,
-        'ps': 50,
+        'ps': ps,
         'pn': 1
         }
     image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
