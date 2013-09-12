@@ -1,0 +1,19 @@
+25 Aug 2013 v0.1.3
++ Bug fix: Super Bowl weeks now list properly.
++ Bug fix: Older streams now list (but don't neccesarily play) properly.
++ Bug fix: Duration is now calculated for longer than one dir listing.
++ Bug fix: Fixed misleading popup when login failed
++ New Setting: "Sans Login Region" for those who live in countries where Game Pass is free.
+
+24 Aug 2013 v0.1.2
++ Bug fix. All 16 games (rather than 15) are listed now.
++ New Setting: Always use best bitrate
+
+19 Aug 2013 v0.1.1
++ Critical bug fix. Streams play again.
+
+18 Aug 2013 v0.1.0
++ Initial development release (divingmule, Alexqw)
++ Only supports normal game streams (no coaches film, NFL TV, etc)
++ Can select stream bit rate
++ Sexy icon (thanks to dahlSTROM!)

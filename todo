@@ -2,15 +2,22 @@ a very incomplete todo list:
 
 -display games in order
 --elias vs date vs gameTimeGMT
--play a game, when selected
---build manifest
 -grey out (or otherwise note) unplayed weeks
 -grey out (or otherwise note) unplayed games
 -note games which user does not have access to
 --for those with team subscriptions
 -show team logos (can download from game pass)
--allow setting a default bit rate (I *think* the m3u8 provides a full manifest, regardless of the initial stream's bitrate, so it should adapt accordingly)
 -watchout for any keep-alive that is neccesary
+-check to see if we're already logged in, before re-authenticating
+-coaches view
+-team audio
+-NFL channel
+-move stuff out of parse_manifest
+-mono spaced font?
+-more informative layout?
 
 bugs:
- Not always getting all games, I think this is due to the server using chunked mode, and urllib2 not reading all chunks.
+-Duration calculation is innacurate, since archived games remove commercials
+--accurate duration is in stream manifest
+--not sure if we care
+-Skipping by 10 minutes can cause stream to crash -- likely an ffmpeg issue
