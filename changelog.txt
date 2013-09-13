@@ -1,3 +1,20 @@
+13 Sep 2013 v0.2.0 -- Donald Driver Edition
+Credit goes to divingmule for most of the features added below.
++ New Feature: Live games work (Gotham only)
++ New Feature: NFL Network - Live (Gotham only)
++ New Feature: NFL Total Access
++ New Feature: Sound FX
++ New Feature: NFL Gameday
++ New Feature: NFL RedZone (thanks to msoderberg!)
++ New Feature: Playbook
++ New Feature: A Football Life
++ New Translation: Dutch (thanks to Vulpecula-nl!)
++ New fanart (thanks to dahlSTROM!)
++ Modified Setting: 'Always use best bitrate" is now "Preferred Stream Quality," which lists possible stream values.
++ Untested Features: Superbowl Archives, Top 100 Players, Coaches Show
++ Future games now have date and time listed
++ Live games are noted as such in the interface
+
 25 Aug 2013 v0.1.3
 + Bug fix: Super Bowl weeks now list properly.
 + Bug fix: Older streams now list (but don't neccesarily play) properly.
