@@ -56,10 +56,11 @@ Currently unsupported features:
  * Coaches Show
  * NFL Films Presents
 
-## Can the next release be named after my player/coach of choice? ##
+## Release names ##
 
-Definetely. Contribute in some way to the project, and we'll gladly name a
-future release after them.
+Want a release to be named after your player/coach of choice? Contribute to the
+project in some way (code, art, debugging, beer, brazen -- yet effective
+-- flattery), and we'll gladly name a future release after them.
 
 ## Roadmap ##
 
