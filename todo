@@ -1,17 +1,13 @@
 a very incomplete todo list:
 
--display games in order
---elias vs date vs gameTimeGMT
 -grey out (or otherwise note) unplayed weeks
 -grey out (or otherwise note) unplayed games
 -note games which user does not have access to
 --for those with team subscriptions
 -show team logos (can download from game pass)
--watchout for any keep-alive that is neccesary
 -check to see if we're already logged in, before re-authenticating
 -coaches view
 -team audio
--NFL channel
 -move stuff out of parse_manifest
 -mono spaced font?
 -more informative layout?
