@@ -83,7 +83,8 @@ def cache_seasons_and_weeks(login_data):
 
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
-
+    preferred_version = int(addon.getSetting('preferred_game_version'))
+    addon_log('PREFERRED VERSION: %s' %preferred_version)
     # super bowl week has only one game, which thus isn't put into a list
     if isinstance(games, dict):
         games_list = [games]
@@ -100,7 +101,10 @@ def display_games(season, week_code):
                 continue
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-            game_id = game['programId']
+            if (game.has_key('condensedId') and preferred_version == 1):
+                game_id = game['condensedId']
+            else:
+                game_id = game['programId']
             if not game.has_key('hasProgram'):
                 # may want to change this to game['gameTimeGMT'] or do a setting maybe
                 game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
