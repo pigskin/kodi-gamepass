@@ -36,16 +36,16 @@ username = addon.getSetting('email')
 password = addon.getSetting('password')
 
 show_archives = {
-    'NFL RedZone': {'2013': '182', '2012': '149'},
     'NFL Gameday': {'2013': '179', '2012': '146'},
     'Playbook': {'2013': '180', '2012': '147'},
     'NFL Total Access': {'2013': '181', '2012': '148'},
+    'NFL RedZone': {'2013': '182', '2012': '149'},
     'Sound FX': {'2013': '183', '2012': '150'},
     'Coaches Show': {'2013': '184', '2012': '151'},
     'Top 100 Players': {'2013': '185', '2012': '153'},
     'A Football Life': {'2013': '186', '2012': '154'},
-    'Superbowl Archives': {'2013': '117'}
-     # {'NFL Films Presents': {'2013': '187', '2012': ''}}, isn't showing any episodes
+    'Superbowl Archives': {'2013': '117'},
+    'NFL Films Presents': {'2013': '187'}
     }
 
 
@@ -83,7 +83,7 @@ def cache_seasons_and_weeks(login_data):
 
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
-
+    preferred_version = int(addon.getSetting('preferred_game_version'))
     # super bowl week has only one game, which thus isn't put into a list
     if isinstance(games, dict):
         games_list = [games]
@@ -100,7 +100,10 @@ def display_games(season, week_code):
                 continue
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-            game_id = game['programId']
+            if (game.has_key('condensedId') and preferred_version == 1):
+                game_id = game['condensedId']
+            else:
+                game_id = game['programId']
             if not game.has_key('hasProgram'):
                 # may want to change this to game['gameTimeGMT'] or do a setting maybe
                 game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
@@ -286,7 +289,7 @@ def parse_archive(show_name, season):
         for i in items:
             add_dir(i['name'], i['publishPoint'], 7, image_path + i['image'], '%s\n%s' %(i['description'], i['releaseDate']), i['runtime'], False)
     if season == '2013':
-        if not show_name == 'Superbowl Archives':
+        if not (show_name == 'Superbowl Archives' or show_name == 'NFL Films Presents'):
             add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
 
 def make_request(url, data=None, headers=None):
