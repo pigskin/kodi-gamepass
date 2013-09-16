@@ -2,7 +2,6 @@
 import urllib2
 import re
 import os
-import json
 import cookielib
 import time
 import xbmcplugin
@@ -16,7 +15,6 @@ from uuid import getnode as get_mac
 from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
-from BeautifulSoup import BeautifulSoup
 import xmltodict
 from operator import itemgetter
 
@@ -52,25 +50,25 @@ def addon_log(string):
         xbmc.log("[addon.nfl.gamepass-%s]: %s" %(addon_version, string))
 
 def cache_seasons_and_weeks(login_data):
-    soup = BeautifulSoup(login_data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-
+    for i in ['\r', '\t', '\n']:
+        login_data = login_data.replace(i, '')
     try:
-        seasons_soup = soup.find('select', id='seasonSelect').findChildren()
-        seasons = []
-        for season in seasons_soup:
-            seasons.append(season.string)
+        season_str = re.findall(
+            '<select id="seasonSelect" class="select" onchange="getGameSchedule\(\)">(.+?)</select>', login_data)[0]
+        seasons = re.findall('value="(.+?)"', season_str)
         cache.set('seasons', repr(seasons))
         addon_log('Seasons cached')
     except:
+        print format_exc
         addon_log('Season cache failed')
         return False
 
     try:
-        weeks_soup = soup.find('select', id='weekSelect').findChildren()
+        week_str = re.findall(
+            '<select id="weekSelect" class="select" onchange="getGameSchedule\(\)">(.+?)</select>', login_data)[0]
         weeks = {}
-        for week in weeks_soup:
-            week_code = week['value']
-            weeks[week_code] = week.string
+        for i in re.findall('<option value="(.+?)">(.+?)</option>', week_str):
+            weeks[i[0]] = i[1]
         cache.set('weeks', repr(weeks))
         addon_log('Weeks cached')
     except:
@@ -134,6 +132,24 @@ def display_seasons(seasons):
 def display_weeks(season, weeks):
     for week_code, week_name in sorted(weeks.iteritems()):
         add_dir(week_name, season + ';' + week_code, 3, icon)
+
+def check_login():
+    cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
+    cookies = {}
+    for i in cookie_jar:
+        cookies[i.name] = i.value
+    login_ok = False
+    if cookies.has_key('userId'):
+        data = make_request('https://gamepass.nfl.com/nflgp/secure/myaccount')
+        try:
+            login_ok = re.findall('Update Account Information / Change Password', data)[0]
+        except IndexError:
+            addon_log('Not Logged In')
+    if not login_ok:
+        gamepass_login()
+    else:
+        addon_log('Logged In')
+        return True
 
 def gamepass_login():
     url = 'https://id.s.nfl.com/login'
@@ -259,7 +275,7 @@ def get_nfl_redzone():
     url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
     simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
     simple_dict = xmltodict.parse(simple_data)['result']
-    if simple_dict['rzPhase'] == 'in': 
+    if simple_dict['rzPhase'] == 'in':
         add_dir('NFL RedZone - Live', 'frz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
 
 # parse archives for NFL Network, RedZone, Fantasy
@@ -424,7 +440,7 @@ if mode == None:
                 seasons = eval(cache.get('seasons'))
     else:
         if username and password:
-            login_success = gamepass_login()
+            login_success = check_login()
             if login_success:
                 seasons = eval(cache.get('seasons'))
         else:
