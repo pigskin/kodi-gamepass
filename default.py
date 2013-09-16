@@ -213,6 +213,8 @@ def get_video_path(game_id, post_data):
         type = 'fgpa'
     elif post_data == 'NFL Network':
         type = 'channel'
+    elif post_data == 'NFL RedZone':
+        type = 'frz'
     post_data = {
         'path': game_id,
         'plid': plid,
@@ -252,6 +254,13 @@ def get_nfl_network():
     add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
     for i in show_archives.keys():
         add_dir(i, '2013', 6, icon)
+
+def get_nfl_redzone():
+    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+    simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+    simple_dict = xmltodict.parse(simple_data)['result']
+    if simple_dict['rzPhase'] == 'in': 
+        add_dir('NFL RedZone - Live', 'frz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
 
 # parse archives for NFL Network, RedZone, Fantasy
 def parse_archive(show_name, season):
@@ -431,6 +440,7 @@ if mode == None:
         addon_log('No seasons data.')
 
     add_dir('NFL Network', 'nfl_network_url', 5, icon)
+    get_nfl_redzone()
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
@@ -453,6 +463,8 @@ elif mode == 4:
     game_id = params['url']
     if params['name'] == 'NFL Network - Live':
         resolved_url = get_publishpoint_url('nfl_network')
+    elif params['name'] == 'NFL RedZone - Live':
+        resolved_url = get_stream_url(game_id, 'NFL RedZone')
     elif params['name'].endswith('- Live'):
         resolved_url = get_publishpoint_url(game_id)
     else:
