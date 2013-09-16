@@ -10,6 +10,12 @@ a whole lot of love.
 If you're interested in helping out, just drop us an email or send a pull
 request. Patches and (constructive) input are always welcome.
 
+## Any Dependencies? ##
+Until this addon is part of an official XBMC repository, dependencies will not
+be installed automatically.
+ * xmltodict (mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
+ * plugin.cache (just install the YouTube addon, which uses it)
+
 ## What is NFL Game Pass? ##
 
 NFL Game Pass is website that allows those of us outside of the US (or with IPs
