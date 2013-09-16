@@ -10,7 +10,6 @@ import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
-import xml.etree.ElementTree as ElementTree
 import random
 import md5
 from uuid import getnode as get_mac
@@ -20,7 +19,6 @@ from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
 import xmltodict
 from operator import itemgetter
-from XmlDict import XmlDictConfig
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
@@ -196,8 +194,7 @@ def get_publishpoint_url(game_id):
             }
     headers = {'User-Agent' : 'Android'}
     m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
-    root = ElementTree.XML(m3u8_data)
-    m3u8_dict = XmlDictConfig(root)
+    m3u8_dict = xmltodict.parse(m3u8_data)['result']
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
@@ -245,12 +242,11 @@ def get_weeks_games(season, week):
     game_data = make_request(url, urllib.urlencode(post_data))
     #addon_log('game data: %s' %game_data)
 
-    root = ElementTree.XML(game_data)
-    game_data_dict = XmlDictConfig(root)
+    game_data_dict = xmltodict.parse(game_data)['result']
     #addon_log('game data dict: %s' %game_data_dict)
-    games = game_data_dict['games']
+    games = game_data_dict['games']['game']
 
-    return games['game']
+    return games
 
 def get_nfl_network():
     add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
@@ -273,9 +269,10 @@ def parse_archive(show_name, season):
         'pn': 1
         }
     image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
-    data = make_request(url, urllib.urlencode(post_data))
-    root = ElementTree.XML(data)
-    archive_dict = XmlDictConfig(root)
+    archive_data = make_request(url, urllib.urlencode(post_data))
+    archive_dict = xmltodict.parse(archive_data)['result']
+    addon_log('Archive Dict: %s' %archive_dict)
+
     count = int(archive_dict['paging']['count'])
     if count < 1:
         if season == '2013':
