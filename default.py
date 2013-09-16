@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 from BeautifulSoup import BeautifulSoup
-from BeautifulSoup import BeautifulStoneSoup
+import xmltodict
 from operator import itemgetter
 from XmlDict import XmlDictConfig
 
@@ -225,10 +225,9 @@ def get_video_path(game_id, post_data):
     video_path_data = make_request(url, urllib.urlencode(post_data))
 
     try:
-        soup = BeautifulStoneSoup(video_path_data, convertEntities=BeautifulSoup.XML_ENTITIES)
-        video_path = soup.find('path')
+        video_path_dict = xmltodict.parse(video_path_data)['result']
         addon_log('Video Path Acquired Successfully.')
-        return video_path.string
+        return video_path_dict['path']
     except:
         addon_log('Video Path Acquisition Failed.')
         return False
@@ -324,11 +323,11 @@ def make_request(url, data=None, headers=None):
 
 def parse_manifest(manifest):
     try:
-        soup = BeautifulStoneSoup(manifest, convertEntities=BeautifulStoneSoup.XML_ENTITIES)
-        items = [{'servers': [{'name': x['name'], 'port': x['port']} for x in i('httpserver')],
-                  'url': i['url'], 'bitrate': int(i['bitrate']),
-                  'info': '%sx%s Bitrate: %s' %(i.video['height'], i.video['width'], i['bitrate'])}
-                 for i in soup('streamdata')]
+        manifest_dict = xmltodict.parse(manifest)
+        items = [{'servers': [{'name': x['@name'], 'port': x['@port']} for x in i['httpservers']['httpserver']],
+                  'url': i['@url'], 'bitrate': int(i['@bitrate']),
+                  'info': '%sx%s Bitrate: %s' %(i['video']['@height'], i['video']['@width'], i['video']['@bitrate'])}
+                 for i in manifest_dict['channel']['streamDatas']['streamData']]
 
         ret = select_bitrate(items)
 
