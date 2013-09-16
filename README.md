@@ -38,6 +38,7 @@ example) that are simply distracting. We're here to watch a game, nothing else.
 By now, most NFL Game Pass features are supported.
 
  * Archived games from 2009 to 2013
+ * Condensed games
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
  * NFL Total Access
@@ -46,15 +47,14 @@ By now, most NFL Game Pass features are supported.
  * NFL RedZone
  * Playbook
  * A Football Life
+ * NFL Films Presents
 
 Currently unsupported features:
- * Condensed game streams
  * Alternate team audio
  * Coaches film (22 man view)
  * Superbowl Archives
  * Top 100 Players
  * Coaches Show
- * NFL Films Presents
 
 ## Release names ##
 
