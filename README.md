@@ -1,6 +1,5 @@
 # NFL Game Pass Plugin for XBMC #
-by Alex Waite and divingmule
-Version: 0.2.0 -- Donald Driver Edition
+**version 0.2.0 — Donald Driver Edition** by Alex Waite and divingmule
 
 Before reading any further, please understand that while this plugin does
 work, not all features are supported (or fully tested) and it should be
@@ -35,7 +34,7 @@ example) that are simply distracting. We're here to watch a game, nothing else.
 
 ## What features are currently supported? ##
 
-By now, most NFL Game Pass features are supported.
+By now, most core NFL Game Pass features are supported.
 
  * Archived games from 2009 to 2013
  * Condensed games
@@ -59,15 +58,15 @@ Currently unsupported features:
 ## Release names ##
 
 Want a release to be named after your player/coach of choice? Contribute to the
-project in some way (code, art, debugging, beer, brazen -- yet effective
--- flattery), and we'll gladly name a future release after them.
+project in some way (code, art, debugging, beer, brazen — yet effective —
+flattery, etc), and we'll gladly name a future release after them.
 
 ## Roadmap ##
 
 A rough roadmap follows:
 
 * Continue work towards feature completeness
-* Work on a Game Rewind branch -- this work will determine whether Game Rewind
+* Work on a Game Rewind branch. This work will determine whether Game Rewind
   needs to be its own add-on, and (if so) how much code can be shared between
   the two add-ons (and refactor the code to accomodate).
 * Once Game Rewind support is in master and reasonably stable, begin work on a
