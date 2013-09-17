@@ -60,7 +60,6 @@ def cache_seasons_and_weeks(login_data):
         cache.set('seasons', repr(seasons))
         addon_log('Seasons cached')
     except:
-        print format_exc
         addon_log('Season cache failed')
         return False
 
@@ -244,6 +243,8 @@ def get_publishpoint_url(game_id):
 
 def get_stream_url(game_id, post_data=None):
     set_cookies = get_current_week()
+    if cache.get('mode') == '4':
+        set_cookies = get_weeks_games(*eval(cache.get('current_schedule')))
     video_path = get_video_path(game_id, post_data)
     manifest = get_manifest(video_path)
     stream_url = parse_manifest(manifest)
@@ -278,6 +279,7 @@ def get_video_path(game_id, post_data):
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
 def get_weeks_games(season, week):
+    cache.set('current_schedule', repr((season, week)))
     url = 'https://gamepass.nfl.com/nflgp/servlets/games'
     post_data = {
         'isFlex': 'true',
@@ -451,6 +453,7 @@ try:
     mode = int(params['mode'])
 except:
     mode = None
+    
 
 if mode == None:
     auth = check_login()
@@ -526,3 +529,5 @@ elif mode == 7:
 elif mode == 8:
     # for a do nothing list item
     pass
+
+cache.set('mode', str(mode))
