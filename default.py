@@ -212,6 +212,7 @@ def get_manifest(video_path):
     return manifest_data
 
 def get_publishpoint_url(game_id):
+    set_cookies = get_current_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
     if game_id == 'nfl_network':
         post_data = {
