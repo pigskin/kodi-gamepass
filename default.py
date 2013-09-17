@@ -134,22 +134,40 @@ def display_weeks(season, weeks):
         add_dir(week_name, season + ';' + week_code, 3, icon)
 
 def check_login():
-    cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
-    cookies = {}
-    for i in cookie_jar:
-        cookies[i.name] = i.value
-    login_ok = False
-    if cookies.has_key('userId'):
-        data = make_request('https://gamepass.nfl.com/nflgp/secure/myaccount')
-        try:
-            login_ok = re.findall('Update Account Information / Change Password', data)[0]
-        except IndexError:
-            addon_log('Not Logged In')
-    if not login_ok:
-        gamepass_login()
+    if not xbmcvfs.exists(addon_profile):
+        xbmcvfs.mkdir(addon_profile)
+
+    if addon.getSetting('sans_login') == 'true':
+        data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
+        return cache_seasons_and_weeks(data)
+
+    elif username and password:
+        if not xbmcvfs.exists(cookie_file):
+            return gamepass_login()
+        else:
+            cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
+            cookies = {}
+            for i in cookie_jar:
+                cookies[i.name] = i.value
+            login_ok = False
+            if cookies.has_key('userId'):
+                data = make_request('https://gamepass.nfl.com/nflgp/secure/myaccount')
+                try:
+                    login_ok = re.findall('Update Account Information / Change Password', data)[0]
+                except IndexError:
+                    addon_log('Not Logged In')
+                if not login_ok:
+                    return gamepass_login()
+                else:
+                    addon_log('Logged In')
+                    data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
+                    return cache_seasons_and_weeks(data)
+            else:
+                return gamepass_login()
     else:
-        addon_log('Logged In')
-        return True
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
+        addon_log('No account settings detected.')
 
 def gamepass_login():
     url = 'https://id.s.nfl.com/login'
@@ -416,9 +434,6 @@ def get_params():
 
 if debug == 'true':
     cache.dbg = True
-if not xbmcvfs.exists(addon_profile):
-    xbmcvfs.mkdir(addon_profile)
-
 
 params = get_params()
 addon_log("params: %s" %params)
@@ -429,37 +444,16 @@ except:
     mode = None
 
 if mode == None:
-    seasons = None
-    sans_login_region = addon.getSetting('sans_login')
-
-    if sans_login_region == 'true':
-        try:
-            seasons = eval(cache.get('seasons'))
-        except SyntaxError:
-            addon_log('No season cache')
-            data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
-            ok = cache_seasons_and_weeks(data)
-            if ok:
-                seasons = eval(cache.get('seasons'))
-    else:
-        if username and password:
-            login_success = check_login()
-            if login_success:
-                seasons = eval(cache.get('seasons'))
-        else:
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
-            addon_log('No account settings detected.')
-
-    if seasons:
+    auth = check_login()
+    if auth:
+        seasons = eval(cache.get('seasons'))
         display_seasons(seasons)
+        add_dir('NFL Network', 'nfl_network_url', 5, icon)
+        get_nfl_redzone()
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Error", "Could not acquire Game Pass metadata.")
-        addon_log('No seasons data.')
-
-    add_dir('NFL Network', 'nfl_network_url', 5, icon)
-    get_nfl_redzone()
+        addon_log('Auth failed.')
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
