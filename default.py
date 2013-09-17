@@ -216,6 +216,7 @@ def get_publishpoint_url(game_id):
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
 
 def get_stream_url(game_id, post_data=None):
+    set_cookies = get_current_week()
     video_path = get_video_path(game_id, post_data)
     manifest = get_manifest(video_path)
     stream_url = parse_manifest(manifest)
@@ -415,6 +416,8 @@ def get_params():
 
 if debug == 'true':
     cache.dbg = True
+if not xbmcvfs.exists(addon_profile):
+    xbmcvfs.mkdir(addon_profile)
 
 
 params = get_params()
@@ -490,7 +493,6 @@ elif mode == 4:
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 5:
-    get_cookies = cache.cacheFunction(get_current_week)
     get_nfl_network()
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
