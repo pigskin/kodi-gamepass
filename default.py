@@ -30,6 +30,7 @@ addon_version = addon.getAddonInfo('version')
 cache = StorageServer.StorageServer("nfl_game_pass", 2)
 username = addon.getSetting('email')
 password = addon.getSetting('password')
+language = addon.getLocalizedString
 
 show_archives = {
     'NFL Gameday': {'2013': '179', '2012': '146'},
@@ -96,10 +97,18 @@ def display_games(season, week_code):
                 continue
             away_team = game['awayTeam']
             game_name = '%s %s at %s %s' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-            if (game.has_key('condensedId') and preferred_version == 1):
-                game_id = game['condensedId']
-            else:
-                game_id = game['programId']
+
+            game_ids = {}
+            for i in ['condensedId', 'programId', 'id']:
+                if game.has_key(i):
+                    if 'condensed' in i:
+                        label = language(30015)
+                    elif 'program' in i:
+                        label = language(30014)
+                    else:
+                        label = 'Live'
+                    game_ids[label] = game[i]
+                
             if not game.has_key('hasProgram'):
                 # may want to change this to game['gameTimeGMT'] or do a setting maybe
                 game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
@@ -109,7 +118,6 @@ def display_games(season, week_code):
             if game.has_key('isLive'):
                 # sometimes isLive lies
                 if not game.has_key('gameEndTimeGMT'):
-                    game_id = game['id']
                     game_name += ' - Live'
             if game.has_key('gameEndTimeGMT'):
                 try:
@@ -119,7 +127,7 @@ def display_games(season, week_code):
                 except:
                     addon_log(format_exc())
 
-            add_dir(game_name, game_id, mode, icon, '', duration, False)
+            add_dir(game_name, game_ids, mode, icon, '', duration, False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
@@ -474,14 +482,28 @@ elif mode == 3:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 4:
-    game_id = params['url']
+    try:
+        if isinstance(eval(params['url']), dict):
+            game_ids = eval(params['url'])
+    except NameError:
+        game_id = params['url']
     if params['name'] == 'NFL Network - Live':
         resolved_url = get_publishpoint_url('nfl_network')
     elif params['name'] == 'NFL RedZone - Live':
         resolved_url = get_stream_url(game_id, 'NFL RedZone')
     elif params['name'].endswith('- Live'):
-        resolved_url = get_publishpoint_url(game_id)
+        resolved_url = get_publishpoint_url(game_ids['Live'])
     else:
+        preferred_version = int(addon.getSetting('preferred_game_version'))
+        if preferred_version == 0:
+            game_id = game_ids[language(30014)]
+        elif preferred_version == 1:
+            game_id = game_ids[language(30015)]
+        else:
+            dialog = xbmcgui.Dialog()
+            versions = [language(30014), language(30015)]
+            ret = dialog.select(language(30016), versions)
+            game_id = game_ids[versions[ret]]
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)

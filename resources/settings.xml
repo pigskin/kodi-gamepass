@@ -4,5 +4,5 @@
   <setting id="preferred_bitrate" type="select" label="30003" lvalues="30004|30005|30006|30007|30008|30009|30010|30011|30012" default="8"/>
   <setting id="sans_login" type="bool" label="Sans-Login Region" default="false"/>
   <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
-  <setting id="preferred_game_version" type="select" label="30013" lvalues="30014|30015" default="0"/>
+  <setting id="preferred_game_version" type="select" label="30013" lvalues="30014|30015|30012" default="0"/>
 </settings>
