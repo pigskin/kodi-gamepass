@@ -19,13 +19,25 @@ addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
 addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
-cookie_file = os.path.join(addon_profile, 'cookie_file')
-cookie_jar = cookielib.LWPCookieJar(cookie_file)
 debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
-cache = StorageServer.StorageServer("nfl_game_pass", 2)
-username = addon.getSetting('email')
-password = addon.getSetting('password')
+subscription = addon.getSetting('subscription')
+
+if subscription == '0':
+    username = addon.getSetting('email')
+    password = addon.getSetting('password')
+    cache = StorageServer.StorageServer("nfl_game_pass", 2)
+    cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
+    base_url = 'https://gamepass.nfl.com/nflgp'
+    servlets_url = base_url
+else:
+    username = addon.getSetting('gr_email')
+    password = addon.getSetting('gr_password')
+    cache = StorageServer.StorageServer("nfl_game_rewind", 2)
+    cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
+    base_url = 'https://gamerewind.nfl.com/nflgr'
+    servlets_url = base_url.replace('https', 'http')
+cookie_jar = cookielib.LWPCookieJar(cookie_file)
 
 
 def addon_log(string):
@@ -66,9 +78,10 @@ def check_login():
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
 
-    if addon.getSetting('sans_login') == 'true':
-        data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
-        return cache_seasons_and_weeks(data)
+    if subscription == '0':
+        if addon.getSetting('sans_login') == 'true':
+            data = make_request(base_url + '/secure/schedule')
+            return cache_seasons_and_weeks(data)
 
     elif username and password:
         if not xbmcvfs.exists(cookie_file):
@@ -80,7 +93,7 @@ def check_login():
                 cookies[i.name] = i.value
             login_ok = False
             if cookies.has_key('userId'):
-                data = make_request('https://gamepass.nfl.com/nflgp/secure/myaccount')
+                data = make_request(base_url + '/secure/myaccount')
                 try:
                     login_ok = re.findall('Update Account Information / Change Password', data)[0]
                 except IndexError:
@@ -89,7 +102,7 @@ def check_login():
                     return gamepass_login()
                 else:
                     addon_log('Logged In')
-                    data = make_request('https://gamepass.nfl.com/nflgp/secure/schedule')
+                    data = make_request(base_url + '/secure/schedule')
                     return cache_seasons_and_weeks(data)
             else:
                 return gamepass_login()
@@ -104,8 +117,8 @@ def gamepass_login():
         'username': username,
         'password': password,
         'vendor_id': 'nflptnrnln',
-        'error_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
-        'success_url': 'https://gamepass.nfl.com/nflgp/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
+        'error_url': base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
+        'success_url': base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
     }
     login_data = make_request(url, urllib.urlencode(post_data))
 
@@ -217,7 +230,7 @@ def cache_seasons_and_weeks(login_data):
     return True
 
 def get_current_week():
-    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+    url = servlets_url + '/servlets/simpleconsole'
     data = make_request(url, urllib.urlencode({'isFlex':'true'}))
     if data:
         return data
@@ -227,7 +240,7 @@ def get_current_week():
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
 def get_weeks_games(season, week):
     cache.set('current_schedule', repr((season, week)))
-    url = 'https://gamepass.nfl.com/nflgp/servlets/games'
+    url = servlets_url + '/servlets/games'
     post_data = {
         'isFlex': 'true',
         'season': season,
@@ -254,7 +267,7 @@ def get_stream_url(game_id, post_data=None):
 
 # the "video path" provides the info neccesary to request the stream's manifest
 def get_video_path(game_id, post_data):
-    url = 'https://gamepass.nfl.com/nflgp/servlets/encryptvideopath'
+    url = servlets_url + '/servlets/encryptvideopath'
     plid = gen_plid()
     if post_data is None:
         type = 'fgpa'
@@ -268,6 +281,7 @@ def get_video_path(game_id, post_data):
         'type': type,
         'isFlex': 'true'
     }
+
     video_path_data = make_request(url, urllib.urlencode(post_data))
 
     try:
