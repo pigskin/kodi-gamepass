@@ -78,37 +78,38 @@ def check_login():
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
 
-    if subscription == '0':
+    if username and password:
+        if not xbmcvfs.exists(cookie_file):
+            return gamepass_login()
+        else:
+            cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
+            cookies = {}
+            for i in cookie_jar:
+                cookies[i.name] = i.value
+            login_ok = False
+            if cookies.has_key('userId'):
+                data = make_request(base_url + '/secure/myaccount')
+                try:
+                    login_ok = re.findall('Update Account Information / Change Password', data)[0]
+                except IndexError:
+                    addon_log('Not Logged In')
+                if not login_ok:
+                    return gamepass_login()
+                else:
+                    addon_log('Logged In')
+                    data = make_request(base_url + '/secure/schedule')
+                    return cache_seasons_and_weeks(data)
+            else:
+                return gamepass_login()
+    elif subscription == '0':
         if addon.getSetting('sans_login') == 'true':
             data = make_request(base_url + '/secure/schedule')
             return cache_seasons_and_weeks(data)
-        elif username and password:
-            if not xbmcvfs.exists(cookie_file):
-                return gamepass_login()
-            else:
-                cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
-                cookies = {}
-                for i in cookie_jar:
-                    cookies[i.name] = i.value
-                login_ok = False
-                if cookies.has_key('userId'):
-                    data = make_request(base_url + '/secure/myaccount')
-                    try:
-                        login_ok = re.findall('Update Account Information / Change Password', data)[0]
-                    except IndexError:
-                        addon_log('Not Logged In')
-                    if not login_ok:
-                        return gamepass_login()
-                    else:
-                        addon_log('Logged In')
-                        data = make_request(base_url + '/secure/schedule')
-                        return cache_seasons_and_weeks(data)
-                else:
-                    return gamepass_login()
-        else:
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
-            addon_log('No account settings detected.')
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
+        addon_log('No account settings detected.')
+        return False
 
 def gamepass_login():
     url = 'https://id.s.nfl.com/login'
