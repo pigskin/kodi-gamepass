@@ -1,5 +1,5 @@
 <settings>
-  <setting id="subscription" type="enum" label="Choose Subscription" values="Game Pass|Game Rewind" default='0'/>
+  <setting id="subscription" type="enum" label="Choose Subscription" lvalues="30017|30018" default='0'/>
   <setting id="email" type="text" label="30001" default="" visible="eq(-1,0)" enable="eq(-1,0)"/>
   <setting id="password" type="text" label="30002" default="" option="hidden" visible="eq(-2,0)" enable="eq(-2,0)"/>
   <setting id="gr_email" type="text" label="30001" default="" visible="eq(-3,1)" enable="eq(-3,1)"/>
