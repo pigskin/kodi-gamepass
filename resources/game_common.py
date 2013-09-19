@@ -3,17 +3,18 @@ import urllib2
 import re
 import os
 import cookielib
+import md5
+import random
+from operator import itemgetter
+from uuid import getnode as get_mac
+from traceback import format_exc
+
 import xbmc
 import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
-import random
-import md5
 import xmltodict
-from operator import itemgetter
-from uuid import getnode as get_mac
-from traceback import format_exc
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')

@@ -2,15 +2,17 @@
 import os
 import time
 import sys
+from datetime import datetime, timedelta
+from traceback import format_exc
+from urlparse import urlparse, parse_qs
+
 import xbmc
 import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import StorageServer
-from datetime import datetime, timedelta
-from traceback import format_exc
-from urlparse import urlparse, parse_qs
 import xmltodict
+
 from game_common import *
 
 addon = xbmcaddon.Addon(id='plugin.video.nfl.gamepass')
