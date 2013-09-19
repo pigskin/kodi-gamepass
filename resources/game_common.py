@@ -3,7 +3,7 @@ import urllib2
 import re
 import os
 import cookielib
-import md5
+import hashlib
 import random
 from operator import itemgetter
 from uuid import getnode as get_mac
@@ -141,7 +141,7 @@ def gamepass_login():
 def gen_plid():
     rand = random.getrandbits(10)
     mac_address = str(get_mac())
-    m = md5.new(str(rand) + mac_address)
+    m = hashlib.md5(str(rand) + mac_address)
     return m.hexdigest()
 
 # the XML manifest of all available streams for a game
