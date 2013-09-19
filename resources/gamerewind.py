@@ -40,8 +40,7 @@ def no_service_check():
     service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
     if len(re.findall(no_service, service_data)) > 0:
         lines = no_service.replace('.', ',').split(',')
-        for i in lines:
-            dialog_string = '[CR]'.join(lines)
+        dialog_string = '[CR]'.join(lines)
         dialog = xbmcgui.Dialog()
         dialog.ok(dialog_string)
         return True
