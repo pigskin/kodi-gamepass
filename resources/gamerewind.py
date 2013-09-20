@@ -43,19 +43,6 @@ def no_service_check():
         return True
 
 
-# seems a need to request before requesting encryptvideopath
-def set_cookies(week, season):
-    url = 'http://gamerewind.nfl.com/nflgr/servlets/games'
-    post_data = {
-        'isFlex': 'true',
-        'week': week,
-        'season': season
-        }
-    get_cookie = make_request(url, urllib.urlencode(post_data))
-    if get_cookie:
-        return True
-
-
 if debug == 'true':
     cache.dbg = True
 
@@ -74,8 +61,7 @@ if mode == None:
     else:
         auth = check_login()
         if auth:
-            seasons = eval(cache.get('seasons'))
-            display_seasons(seasons)
+            display_seasons()
             add_dir('NFL Network', 'nfl_network_url', 5, icon)
         else:
             dialog = xbmcgui.Dialog()
@@ -91,7 +77,7 @@ elif mode == 1:
 elif mode == 2:
     weeks = eval(cache.get('weeks'))
     season = params['name']
-    display_weeks(season, weeks)
+    display_weeks(season)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 3:
