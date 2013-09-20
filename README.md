@@ -1,5 +1,5 @@
-# NFL Game Pass Plugin for XBMC #
-**version 0.2.0 — Donald Driver Edition** by Alex Waite and divingmule
+# NFL Game Pass/Rewind Plugin for XBMC #
+**version 0.3.0 — Don Shula Edition** by Alex Waite and divingmule
 
 Before reading any further, please understand that while this plugin does
 work, not all features are supported (or fully tested) and it should be
@@ -24,25 +24,24 @@ outside of the US ;-) to watch NFL games. Archives of old games stretch back to
 radio network. Overall, it is a sweet service offered by the NFL for those of
 us who must have our American Football fix.
 
-## Is NFL Game Rewind supported? ##
+## What is NFL Game Rewind? ##
 
-No, but we do have plans to add support soon-ish (possibly as its own add-on).
-NFL Game Rewind is a similar service, but is different enough that it's not
-trivial to add support.
+NFL Game Rewind is very similar to Game Pass, but doesn't have quite as many
+features. For example, it does not support live games.
 
 ## Why write a plugin for XBMC? ##
 
 First off, we love XBMC and like consuming media through its interface.
-Secondly, while NFL Game Pass does have a nice Flash interface, it's... well...
+Secondly, while there is a nice Flash interface, it's... well...
 written in Flash. The client is a resource hog, the interface is frequently
 buggy, and it includes a bunch of bells and whistles (social media, for
 example) that are simply distracting. We're here to watch a game, nothing else.
 
 ## What features are currently supported? ##
 
-By now, most core NFL Game Pass features are supported.
+By now, most core features are supported.
 
- * Archived games from 2009 to 2013
+ * Archived games from 2011 to 2013
  * Condensed games
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
@@ -55,6 +54,7 @@ By now, most core NFL Game Pass features are supported.
  * NFL Films Presents
 
 Currently unsupported features:
+ * Archived games prior to 2011
  * Alternate team audio
  * Coaches film (22 man view)
  * Superbowl Archives
@@ -72,10 +72,8 @@ flattery, etc), and we'll gladly name a future release after them.
 A rough roadmap follows:
 
 * Continue work towards feature completeness
-* Work on a Game Rewind branch. This work will determine whether Game Rewind
-  needs to be its own add-on, and (if so) how much code can be shared between
-  the two add-ons (and refactor the code to accomodate).
-* Once Game Rewind support is in master and reasonably stable, begin work on a
-  "skin" branch to convert the addon(s) to a "skin" plugin. This will allow us
-  much more control over the UI. It should be prettier (more graphics) and more
-  intutive.
+* Stabilize Game Rewind support
+* Refactor code to be more XBMC agnostic
+* Work on a "skin" branch to convert the addon(s) to a "skin" plugin. This will
+ allow us much more control over the UI. It should be prettier (more graphics)
+ and more intutive.

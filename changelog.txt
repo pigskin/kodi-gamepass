@@ -1,9 +1,16 @@
-unreleased v0.2.1 -- unnamed
+unreleased v0.3.0 -- Don Shula Edition
++ New Feature: Initial Game Rewind support
++ New Setting: Choose Subscription (Game Pass vs Game Rewind)
 + New Feature: NFL Films Presents (thanks to msoderberg!)
++ New Feature: NFL RedZone Live (untested) (thanks to msoderberg!)
 + New Feature: Condensed Games (thanks to msoderberg!)
 + New Setting: Preferred Game Version (Full vs Condensed stream)
-+ XML parsing cleanup
-+ New dependency (xmltodict)
++ Updated Dutch locale (thanks to Vulpecula-nl!)
++ Bug fix: starting new streams after lengthy watching of another stream should be more robust
++ More strings localized
++ XML/HTML parsing cleanup
++ Major code refactoring
++ New dependency: xmltodict
 
 13 Sep 2013 v0.2.0 -- Donald Driver Edition
 Credit goes to divingmule for most of the features added below.
