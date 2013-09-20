@@ -112,7 +112,10 @@ elif mode == 5:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 6:
-    display_archive(params['name'].split(' - ')[0], params['url'])
+    show_name = params['name'].split(' - ')[0]
+    season = params['url']
+    cid = show_archives[show_name][season]
+    display_archive(show_name, season, cid)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 7:

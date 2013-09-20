@@ -34,8 +34,7 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, isfolder)
 
 
-def display_archive(show_name, season):
-    cid = show_archives[show_name][season]
+def display_archive(show_name, season, cid):
     items = parse_archive(cid, show_name)
     image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
     if items:
