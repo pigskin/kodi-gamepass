@@ -27,20 +27,24 @@ debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
 subscription = addon.getSetting('subscription')
 
-if subscription == '0':
+if subscription == '0': # game pass
     username = addon.getSetting('email')
     password = addon.getSetting('password')
     cache = StorageServer.StorageServer("nfl_game_pass", 2)
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     base_url = 'https://gamepass.nfl.com/nflgp'
     servlets_url = base_url
-else:
+    icon = os.path.join(addon_path, 'resources', 'gp_icon.png')
+    fanart = os.path.join(addon_path, 'resources', 'gp_fanart.jpg')
+else: # game rewind
     username = addon.getSetting('gr_email')
     password = addon.getSetting('gr_password')
     cache = StorageServer.StorageServer("nfl_game_rewind", 2)
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
     base_url = 'https://gamerewind.nfl.com/nflgr'
     servlets_url = base_url.replace('https', 'http')
+    icon = os.path.join(addon_path, 'resources', 'gr_icon.png')
+    fanart = os.path.join(addon_path, 'resources', 'gr_fanart.jpg')
 cookie_jar = cookielib.LWPCookieJar(cookie_file)
 
 
