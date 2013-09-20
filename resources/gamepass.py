@@ -93,11 +93,13 @@ def display_games(season, week_code):
         dialog.ok("Fetching Games Failed", "Fetching Game Data Failed.")
         addon_log('Fetching games failed.')
 
-def display_seasons(seasons):
+def display_seasons():
+    seasons = get_seasons()
     for season in seasons:
         add_dir(season, season, 2, icon)
 
-def display_weeks(season, weeks):
+def display_weeks(season):
+    weeks = get_seasons_weeks(season)
     for week_code, week_name in sorted(weeks.iteritems()):
         add_dir(week_name, season + ';' + week_code, 3, icon)
 
@@ -205,8 +207,7 @@ except:
 if mode == None:
     auth = check_login()
     if auth:
-        seasons = eval(cache.get('seasons'))
-        display_seasons(seasons)
+        display_seasons()
         add_dir('NFL Network', 'nfl_network_url', 5, icon)
         get_nfl_redzone()
     else:
@@ -221,9 +222,8 @@ elif mode == 1:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 2:
-    weeks = eval(cache.get('weeks'))
     season = params['name']
-    display_weeks(season, weeks)
+    display_weeks(season)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 3:

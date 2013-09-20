@@ -98,19 +98,17 @@ def check_login():
                     return gamepass_login()
                 else:
                     addon_log('Logged In')
-                    data = make_request(base_url + '/secure/schedule')
-                    return cache_seasons_and_weeks(data)
             else:
                 return gamepass_login()
     elif subscription == '0':
         if addon.getSetting('sans_login') == 'true':
-            data = make_request(base_url + '/secure/schedule')
-            return cache_seasons_and_weeks(data)
+            return True
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
         addon_log('No account settings detected.')
         return False
+
 
 def gamepass_login():
     url = 'https://id.s.nfl.com/login'
@@ -123,16 +121,19 @@ def gamepass_login():
     }
     login_data = make_request(url, urllib.urlencode(post_data))
 
-    cache_success = cache_seasons_and_weeks(login_data)
 
-    if cache_success:
-        addon_log('login success')
-        return True
-    else: # if cache failed, then login failed or the login page's HTML changed
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
-        addon_log('login failed')
-        return False
+    # todo:
+    # check http://smb.cdnak.neulion.com/fs/nfl/nfl/stats/scores/
+    # util then, we're naive and assume it worked
+
+    addon_log('login success')
+    return True
+#    else: # if cache failed, then login failed or the login page's HTML changed
+#        dialog = xbmcgui.Dialog()
+#        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
+#        addon_log('login failed')
+#        return False
+
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
 # However, I don't know what it is an "id" of, since the value seems to change constantly.
@@ -151,6 +152,33 @@ def get_manifest(video_path):
     url = url.replace('adaptive://', 'http://') + port + '/play?' + urllib.quote_plus('url=' + path, ':&=')
     manifest_data = make_request(url)
     return manifest_data
+
+
+def get_seasons():
+    try:
+        seasons = eval(cache.get('seasons'))
+    except:
+        try:
+            cache_seasons_and_weeks()
+            seasons = eval(cache.get('seasons'))
+        except:
+            raise
+
+    return seasons
+
+
+def get_seasons_weeks(season):
+    try:
+        weeks = eval(cache.get('weeks'))
+    except:
+        try:
+            cache_seasons_and_weeks()
+            weeks = eval(cache.get('weeks'))
+        except:
+            raise
+
+    return weeks[season]
+
 
 def parse_manifest(manifest):
     try:
@@ -202,33 +230,50 @@ def select_bitrate(streams):
     addon_log('ret: %s' %ret)
     return ret
 
-def cache_seasons_and_weeks(login_data):
-    for i in ['\r', '\t', '\n']:
-        login_data = login_data.replace(i, '')
-    try:
-        season_str = re.findall(
-            '<select id="seasonSelect" class="select" onchange="getGameSchedule\(\)">(.+?)</select>', login_data)[0]
-        seasons = re.findall('value="(.+?)"', season_str)
-        cache.set('seasons', repr(seasons))
-        addon_log('Seasons cached')
-    except:
-        print format_exc()
-        addon_log('Season cache failed')
-        return False
+
+def cache_seasons_and_weeks():
+    seasons = []
+    weeks = {}
 
     try:
-        week_str = re.findall(
-            '<select id="weekSelect" class="select" onchange="getGameSchedule\(\)">(.+?)</select>', login_data)[0]
-        weeks = {}
-        for i in re.findall('<option value="(.+?)">(.+?)</option>', week_str):
-            weeks[i[0]] = i[1]
-        cache.set('weeks', repr(weeks))
-        addon_log('Weeks cached')
+        url = 'http://smb.cdnak.neulion.com/fs/nfl/nfl/mobile/weeks_v2.xml'
+        s_w_data = make_request(url)
+        s_w_data_dict = xmltodict.parse(s_w_data)
     except:
-        addon_log('Week cache failed')
-        return False
+        addon_log('Acquiring season and week data failed.')
+        raise
 
+    try:
+        for season in s_w_data_dict['seasons']['season']:
+            year = season['@season']
+            seasons.append(year)
+            weeks[year] = {}
+
+            for week in season['week']:
+                if week['@section'] == "pre":
+                    week_code = '1' + week['@value'].zfill(2)
+                    weeks[year][week_code] = 'Preseason Week ' + week['@value']
+                elif week['@section'] == "reg":
+                    week_code = '2' + week['@value'].zfill(2)
+                    weeks[year][week_code] = 'Week ' + week['@value']
+                elif week['@section'] == "post":
+                    week_code = '2' + week['@value'].zfill(2)
+                    weeks[year][week_code] = week['@label']
+                else:
+                    addon_log('Unknown week type: %' %week['@section'])
+    except:
+        addon_log('Parsing season and week data failed.')
+        raise
+
+    cache.set('seasons', repr(seasons))
+    addon_log('Seasons cached')
+    cache.set('weeks', repr(weeks))
+    addon_log('Weeks cached')
+
+    addon_log('seasons: %s' %seasons)
+    addon_log('weeks: %s' %weeks)
     return True
+
 
 def get_current_week():
     url = servlets_url + '/servlets/simpleconsole'
