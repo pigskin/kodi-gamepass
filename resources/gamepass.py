@@ -91,7 +91,7 @@ if mode == None:
         get_nfl_redzone()
     else:
         dialog = xbmcgui.Dialog()
-        dialog.ok("Error", "Could not acquire Game Pass metadata.")
+        dialog.ok("Error", "Could not access Game Pass.")
         addon_log('Auth failed.')
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
