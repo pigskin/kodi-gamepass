@@ -157,27 +157,31 @@ def get_manifest(video_path):
 def get_seasons():
     try:
         seasons = eval(cache.get('seasons'))
+        return seasons
     except:
-        try:
-            cache_seasons_and_weeks()
-            seasons = eval(cache.get('seasons'))
-        except:
-            raise
+        pass
 
-    return seasons
+    try:
+        cache_seasons_and_weeks()
+        seasons = eval(cache.get('seasons'))
+        return seasons
+    except:
+        raise
 
 
 def get_seasons_weeks(season):
     try:
         weeks = eval(cache.get('weeks'))
+        return weeks[season]
     except:
-        try:
-            cache_seasons_and_weeks()
-            weeks = eval(cache.get('weeks'))
-        except:
-            raise
+        pass
 
-    return weeks[season]
+    try:
+        cache_seasons_and_weeks()
+        weeks = eval(cache.get('weeks'))
+        return weeks[season]
+    except:
+        raise
 
 
 def parse_manifest(manifest):
