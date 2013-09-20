@@ -1,4 +1,4 @@
-# NFL Game Pass/Rewind Plugin for XBMC #
+# NFL Game Pass/Rewind XBMC Plugin #
 **version 0.3.0 — Don Shula Edition** by Alex Waite and divingmule
 
 Before reading any further, please understand that while this plugin does
