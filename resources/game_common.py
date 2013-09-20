@@ -89,15 +89,14 @@ def check_login():
                 cookies[i.name] = i.value
             login_ok = False
             if cookies.has_key('userId'):
-                data = make_request(base_url + '/secure/myaccount')
-                try:
-                    login_ok = re.findall('Update Account Information / Change Password', data)[0]
-                except IndexError:
-                    addon_log('Not Logged In')
-                if not login_ok:
-                    return gamepass_login()
+                already_logged_in = check_for_subscription()
+
+                if already_logged_in:
+                    addon_log('Already logged in')
+                    return True
                 else:
-                    addon_log('Logged In')
+                    addon_log('Not yet logged in')
+                    return gamepass_login()
             else:
                 return gamepass_login()
     elif subscription == '0':
@@ -107,6 +106,25 @@ def check_login():
         dialog = xbmcgui.Dialog()
         dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
         addon_log('No account settings detected.')
+        return False
+
+def check_for_subscription():
+    sc_url = servlets_url + '/servlets/simpleconsole'
+    sc_post_data = { 'isFlex': 'true' }
+    sc_data = make_request(sc_url, urllib.urlencode(sc_post_data))
+
+    try:
+        sc_dict = xmltodict.parse(sc_data)['result']
+
+        if sc_dict.has_key('subscription'):
+            addon_log('Game Pass subscription detected.')
+            return True
+        else:
+            addon_log('No Game Pass subscription was detected.')
+            return False
+    except:
+        dialog = xbmcgui.Dialog()
+        addon_log('Subscription detection failed gloriously.')
         return False
 
 
@@ -121,18 +139,14 @@ def gamepass_login():
     }
     login_data = make_request(url, urllib.urlencode(post_data))
 
+    login_success = check_for_subscription()
 
-    # todo:
-    # check http://smb.cdnak.neulion.com/fs/nfl/nfl/stats/scores/
-    # util then, we're naive and assume it worked
-
-    addon_log('login success')
-    return True
-#    else: # if cache failed, then login failed or the login page's HTML changed
-#        dialog = xbmcgui.Dialog()
-#        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
-#        addon_log('login failed')
-#        return False
+    if login_success:
+        return True
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
+        addon_log('Game Pass login failure')
 
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
