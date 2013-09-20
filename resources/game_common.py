@@ -337,3 +337,31 @@ def get_video_path(game_id, post_data):
     except:
         addon_log('Video Path Acquisition Failed.')
         return False
+
+# parse archives for NFL Network, RedZone
+def parse_archive(cid, show_name):
+    url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+    if show_name == 'NFL RedZone':
+        ps = 17
+    else:
+        ps = 50
+    post_data = {
+        'isFlex':'true',
+        'cid': cid,
+        'pm': 0,
+        'ps': ps,
+        'pn': 1
+        }
+    archive_data = make_request(url, urllib.urlencode(post_data))
+    archive_dict = xmltodict.parse(archive_data)['result']
+    addon_log('Archive Dict: %s' %archive_dict)
+
+    count = int(archive_dict['paging']['count'])
+    if count < 1:
+        return
+    else:
+        items = archive_dict['programs']['program']
+        if isinstance(items, dict):
+            items_list = [items]
+            items = items_list
+        return items

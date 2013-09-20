@@ -1,5 +1,6 @@
 ﻿import urllib
 import os
+import re
 import time
 import sys
 from datetime import datetime, timedelta
@@ -12,7 +13,6 @@ import xbmcgui
 import xbmcaddon
 import StorageServer
 import xmltodict
-
 from game_common import *
 
 addon = xbmcaddon.Addon()
@@ -24,6 +24,26 @@ debug = addon.getSetting('debug')
 cache = StorageServer.StorageServer("nfl_game_rewind", 2)
 language = addon.getLocalizedString
 
+show_archives = {
+    'NFL Gameday': {'2013': '179', '2012': '146'},
+    'Superbowl Archives': {'2013': '117'},
+    'Top 100 Players': {'2013': '185', '2012': '153'}}
+
+
+def get_nfl_network():
+    for i in show_archives.keys():
+        add_dir(i, '2013', 6, icon)
+
+def no_service_check():
+    no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
+                  '  Please check back later.')
+    service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
+    if len(re.findall(no_service, service_data)) > 0:
+        lines = no_service.replace('.', ',').split(',')
+        dialog_string = '[CR]'.join(lines)
+        dialog = xbmcgui.Dialog()
+        dialog.ok(dialog_string)
+        return True
 
 def display_games(season, week_code):
     games = get_weeks_games(season, week_code)
@@ -90,6 +110,19 @@ def display_weeks(season):
     for week_code, week_name in sorted(weeks.iteritems()):
         add_dir(week_name, season + ';' + week_code, 3, icon)
 
+def display_archive(show_name, season):
+    cid = show_archives[show_name][season]
+    items = parse_archive(cid, show_name)
+    image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
+    if items:
+        for i in items:
+            add_dir(i['name'], i['publishPoint'], 7, image_path + i['image'], '%s\n%s' %(i['description'], i['releaseDate']), i['runtime'], False)
+        if season == '2013':
+            if not (show_name == 'Superbowl Archives' or show_name == 'NFL Films Presents'):
+                add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
+    elif season == '2013':
+        return display_archive(show_name, '2012')
+
 # seems a need to request before requesting encryptvideopath
 def set_cookies(week, season):
     url = 'http://gamerewind.nfl.com/nflgr/servlets/games'
@@ -134,14 +167,18 @@ except:
 
 
 if mode == None:
-    auth = check_login()
-    if auth:
-        seasons = eval(cache.get('seasons'))
-        display_seasons(seasons)
+    if no_service_check():
+        pass
     else:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Error", "Could not acquire Game Rewind metadata.")
-        addon_log('Auth failed.')
+        auth = check_login()
+        if auth:
+            seasons = eval(cache.get('seasons'))
+            display_seasons(seasons)
+            add_dir('NFL Network', 'nfl_network_url', 5, icon)
+        else:
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Error", "Could not acquire Game Rewind metadata.")
+            addon_log('Auth failed.')
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
@@ -161,15 +198,39 @@ elif mode == 3:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 4:
+    preferred_version = int(addon.getSetting('preferred_game_version'))
     try:
         if isinstance(eval(params['url']), dict):
             game_ids = eval(params['url'])
-            game_id = game_ids['Full']
+            game_id = game_ids[language(30014)]
+            if preferred_version > 0:
+                if game_ids.has_key(language(30015)):
+                    if preferred_version == 1:
+                        game_id = game_ids[language(30015)]
+                    else:
+                        dialog = xbmcgui.Dialog()
+                        versions = [language(30014), language(30015)]
+                        ret = dialog.select(language(30016), versions)
+                        game_id = game_ids[versions[ret]]
     except NameError:
         game_id = params['url']
     resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
     item = xbmcgui.ListItem(path=resolved_url)
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
+
+elif mode == 5:
+    get_nfl_network()
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+elif mode == 6:
+    display_archive(params['name'].split(' - ')[0], params['url'])
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+elif mode == 7:
+    manifest = get_manifest(params['url'])
+    stream_url = parse_manifest(manifest)
+    item = xbmcgui.ListItem(path=stream_url)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 8:
