@@ -107,6 +107,7 @@ elif mode == 2:
 
 elif mode == 3:
     season, week_code = params['url'].split(';', 1)
+    week_code = re.sub('".*', '', week_code)
     display_games(season, week_code)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
