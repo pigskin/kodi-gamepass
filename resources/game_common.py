@@ -1,3 +1,6 @@
+"""
+An XBMC agnostic library for NFL Game Pass and Game Rewind support.
+"""
 import urllib
 import urllib2
 import re
@@ -45,6 +48,7 @@ def addon_log(string):
     if debug == 'true':
         xbmc.log("[%s-%s]: %s" %(addon_id, addon_version, string))
 
+
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
     if not xbmcvfs.exists(cookie_file):
@@ -74,6 +78,7 @@ def make_request(url, data=None, headers=None):
             addon_log('Reason: %s' %e.reason)
         if hasattr(e, 'code'):
             addon_log('We failed with error code - %s.' %e.code)
+
 
 def check_login():
     if not xbmcvfs.exists(addon_profile):
@@ -159,6 +164,7 @@ def gen_plid():
     m = hashlib.md5(str(rand) + mac_address)
     return m.hexdigest()
 
+
 # the XML manifest of all available streams for a game
 def get_manifest(video_path):
     url, port, path = video_path.partition(':443')
@@ -223,6 +229,7 @@ def parse_manifest(manifest):
     except:
         addon_log(format_exc())
         return False
+
 
 def select_bitrate(streams):
     preferred_bitrate = addon.getSetting('preferred_bitrate')
@@ -300,6 +307,7 @@ def get_current_week():
         return data
     return 'False'
 
+
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
 def get_weeks_games(season, week):
@@ -320,6 +328,7 @@ def get_weeks_games(season, week):
 
     return games
 
+
 def get_stream_url(game_id, post_data=None):
     set_cookies = get_current_week()
     if cache.get('mode') == '4':
@@ -328,6 +337,7 @@ def get_stream_url(game_id, post_data=None):
     manifest = get_manifest(video_path)
     stream_url = parse_manifest(manifest)
     return stream_url
+
 
 # the "video path" provides the info neccesary to request the stream's manifest
 def get_video_path(game_id, post_data):
@@ -355,6 +365,7 @@ def get_video_path(game_id, post_data):
     except:
         addon_log('Video Path Acquisition Failed.')
         return False
+
 
 # parse archives for NFL Network, RedZone
 def parse_archive(cid, show_name):
