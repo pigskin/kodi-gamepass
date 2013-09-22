@@ -44,7 +44,7 @@ def display_archive(show_name, season, cid):
                 add_dir(name, i['publishPoint'], 7, image_path + i['image'], '%s\n%s' %(i['description'], i['releaseDate']), i['runtime'], False)
             except:
                 addon_log('Exception adding archive directory: %s' %format_exc())
-                addon_log('Directory name: %s' %i['name']
+                addon_log('Directory name: %s' %i['name'])
 
         if season == '2013':
             if not (show_name == 'Superbowl Archives' or show_name == 'NFL Films Presents'):
