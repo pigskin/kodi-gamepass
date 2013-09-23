@@ -351,8 +351,6 @@ def get_video_path(game_id, post_data):
         type = 'fgpa'
     elif post_data == 'NFL Network':
         type = 'channel'
-    elif post_data == 'NFL RedZone':
-        type = 'frz'
     post_data = {
         'path': game_id,
         'plid': plid,
