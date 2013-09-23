@@ -84,23 +84,22 @@ def display_games(season, week_code):
                         label = 'Live'
                     game_ids[label] = game[i]
 
-            if not game.has_key('hasProgram'):
-                # may want to change this to game['gameTimeGMT'] or do a setting maybe
-                game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
-                game_date_string = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                game_name += ' - ' + game_date_string + ' ET'
-                mode = 8
-            if game.has_key('isLive'):
-                # sometimes isLive lies
-                if not game.has_key('gameEndTimeGMT'):
-                    game_name += ' - Live'
-            if game.has_key('gameEndTimeGMT'):
+            if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
+                game_name += ' - Live'
+            elif game.has_key('gameEndTimeGMT'):
                 try:
                     start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
                     end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
                     duration = (end_time - start_time).seconds / 60
                 except:
                     addon_log(format_exc())
+            else:
+                # may want to change this to game['gameTimeGMT'] or do a setting maybe
+                game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                game_date_string = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                game_name += ' - ' + game_date_string + ' ET'
+                if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
+                    mode = 8
 
             add_dir(game_name, game_ids, mode, icon, '', duration, False)
     else:
