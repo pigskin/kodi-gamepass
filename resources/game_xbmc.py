@@ -93,13 +93,19 @@ def display_games(season, week_code):
                     duration = (end_time - start_time).seconds / 60
                 except:
                     addon_log(format_exc())
+                    if game.has_key('result'):
+                        game_name += ' - Final'
             else:
-                # may want to change this to game['gameTimeGMT'] or do a setting maybe
-                game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
-                game_date_string = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                game_name += ' - ' + game_date_string + ' ET'
-                if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
-                    mode = 8
+                try:
+                    # may want to change this to game['gameTimeGMT'] or do a setting maybe
+                    game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                    game_date_string = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                    game_name += ' - ' + game_date_string + ' ET'
+                    if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
+                        mode = 8
+                except:
+                    game_datetime = game['date'].split('T')
+                    game_name += ' - ' + game_datetime[0] + ', ' + game_datetime[1].split('.')[0] + ' ET'
 
             add_dir(game_name, game_ids, mode, icon, '', duration, False)
     else:
