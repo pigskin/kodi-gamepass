@@ -37,9 +37,8 @@ def no_service_check():
     service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
     if len(re.findall(no_service, service_data)) > 0:
         lines = no_service.replace('.', ',').split(',')
-        dialog_string = '[CR]'.join(lines)
         dialog = xbmcgui.Dialog()
-        dialog.ok(dialog_string)
+        dialog.ok(language(30018), lines[0], lines[1], lines[2])
         return True
 
 
@@ -56,17 +55,17 @@ except:
 
 
 if mode == None:
-    if no_service_check():
-        pass
-    else:
-        auth = check_login()
-        if auth:
+    auth = check_login()
+    if auth:
+        if no_service_check():
+            pass
+        else:
             display_seasons()
             add_dir('NFL Network', 'nfl_network_url', 5, icon)
-        else:
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Error", "Could not acquire Game Rewind metadata.")
-            addon_log('Auth failed.')
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Error", "Could not acquire Game Rewind metadata.")
+        addon_log('Auth failed.')
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
