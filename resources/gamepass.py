@@ -36,17 +36,23 @@ show_archives = {
 def get_publishpoint_url(game_id):
     set_cookies = get_current_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
-    if game_id == 'nfl_network':
+    nt = '1'
+    if (game_id == 'nfl_network' or game_id == 'rz'):
+        type = 'channel'
+        if game_id == 'rz':
+            id = '2'
+        else:
+            id = '1'
         post_data = {
-            'id': '1',
-            'type': 'channel',
-            'nt': '1'
+            'id': id,
+            'type': type,
+            'nt': nt 
             }
     else:
         post_data = {
             'id' : game_id,
             'type' : 'game',
-            'nt' : '1',
+            'nt' : nt,
             'gt' : 'live'
             }
     headers = {'User-Agent' : 'Android'}
@@ -68,7 +74,7 @@ def get_nfl_redzone():
     simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
     simple_dict = xmltodict.parse(simple_data)['result']
     if simple_dict['rzPhase'] == 'in':
-        add_dir('NFL RedZone - Live', 'frz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
+        add_dir('NFL RedZone - Live', 'rz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
 
 
 if debug == 'true':
@@ -107,6 +113,7 @@ elif mode == 2:
 
 elif mode == 3:
     season, week_code = params['url'].split(';', 1)
+    week_code = re.sub('".*', '', week_code)
     display_games(season, week_code)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -119,7 +126,7 @@ elif mode == 4:
     if params['name'] == 'NFL Network - Live':
         resolved_url = get_publishpoint_url('nfl_network')
     elif params['name'] == 'NFL RedZone - Live':
-        resolved_url = get_stream_url(game_id, 'NFL RedZone')
+        resolved_url = get_publishpoint_url(game_id)
     elif params['name'].endswith('- Live'):
         resolved_url = get_publishpoint_url(game_ids['Live'])
     else:
