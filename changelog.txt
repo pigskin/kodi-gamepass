@@ -1,4 +1,11 @@
-unreleased v0.3.0 -- Don Shula Edition
+unreleased v0.3.1 -- unnamed Edition
++ New Game Pass/Rewind icon (thanks to dahlSTROM)
++ Bug fix: workaround Android crash
++ Bug fix: RedZone live should work again (thanks to msoderberg)
++ Bug fix: fix service check for Rewind
++ Bug fix: display live games properly
+
+20 Sept 2013 v0.3.0 -- Don Shula Edition
 + New Feature: Initial Game Rewind support
 + New Setting: Choose Subscription (Game Pass vs Game Rewind)
 + New Feature: NFL Films Presents (thanks to msoderberg!)
