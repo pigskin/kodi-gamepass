@@ -33,7 +33,7 @@ if subscription == '0': # game pass
     cache = StorageServer.StorageServer("nfl_game_pass", 2)
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     base_url = 'https://gamepass.nfl.com/nflgp'
-    servlets_url = base_url
+    servlets_url = base_url.replace('https', 'http')
     icon = os.path.join(addon_path, 'resources', 'gp_icon.png')
     fanart = os.path.join(addon_path, 'resources', 'gp_fanart.jpg')
 else: # game rewind
