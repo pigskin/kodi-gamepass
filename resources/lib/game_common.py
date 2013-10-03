@@ -214,7 +214,8 @@ def select_bitrate(streams):
             ret = bitrate_values[int(preferred_bitrate) -1]
         else:
             dialog = xbmcgui.Dialog()
-            ret = bitrate_values[dialog.select('Choose a bitrate', [i for i in bitrate_values])]
+            ret = bitrate_values[dialog.select('Choose a bitrate',
+                                 [language(30005 + i) for i in range(len(bitrate_values))])]
 
     else:
         streams.sort(key=itemgetter('bitrate'), reverse=True)
