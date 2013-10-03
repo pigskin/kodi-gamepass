@@ -1,7 +1,6 @@
 """
 An XBMC specific library for NFL Game Pass and Game Rewind support.
 """
-import os
 import sys
 import urllib
 import time
@@ -13,13 +12,9 @@ from traceback import format_exc
 import xbmc
 import xbmcplugin
 import xbmcgui
-import xbmcvfs
-import xbmcaddon
-import StorageServer
 
 from game_common import *
 
-language = addon.getLocalizedString
 
 def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
