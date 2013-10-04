@@ -6,55 +6,9 @@ import xbmcplugin
 import xbmcgui
 import xmltodict
 
-from resources.lib.game_common import *
 from resources.lib.game_xbmc import *
-
-
-def get_publishpoint_url(game_id):
-    set_cookies = get_current_week()
-    url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
-    nt = '1'
-    if (game_id == 'nfl_network' or game_id == 'rz'):
-        type = 'channel'
-        if game_id == 'rz':
-            id = '2'
-        else:
-            id = '1'
-        post_data = {
-            'id': id,
-            'type': type,
-            'nt': nt
-            }
-    else:
-        post_data = {
-            'id' : game_id,
-            'type' : 'game',
-            'nt' : nt,
-            'gt' : 'live'
-            }
-    headers = {'User-Agent' : 'Android'}
-    m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
-    m3u8_dict = xmltodict.parse(m3u8_data)['result']
-    addon_log('NFL Dict %s.' %m3u8_dict)
-    m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
-
-
-def get_nfl_network():
-    if subscription == '0': # gamepass
-        add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
-    for i in show_archives.keys():
-        add_dir(i, '2013', 6, icon)
-
-
-def get_nfl_redzone():
-    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-    simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
-    simple_dict = xmltodict.parse(simple_data)['result']
-    if simple_dict['rzPhase'] == 'in':
-        add_dir('NFL RedZone - Live', 'rz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
-
-
+    
+    
 if debug == 'true':
     cache.dbg = True
 
@@ -65,19 +19,10 @@ try:
     mode = int(params['mode'])
 except:
     mode = None
-
-
+    
 if mode == None:
-    auth = check_login()
-    if auth:
-        display_seasons()
-        add_dir('NFL Network', 'nfl_network_url', 5, icon)
-        if subscription == '0':
-            get_nfl_redzone()
-    else:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Error", "Could not access Game Pass.")
-        addon_log('Auth failed.')
+    if start_addon():
+        display_plugin_root()
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 1:
@@ -96,32 +41,7 @@ elif mode == 3:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 4:
-    try:
-        if isinstance(eval(params['url']), dict):
-            game_ids = eval(params['url'])
-    except NameError:
-        game_id = params['url']
-    if params['name'] == 'NFL Network - Live':
-        resolved_url = get_publishpoint_url('nfl_network')
-    elif params['name'] == 'NFL RedZone - Live':
-        resolved_url = get_publishpoint_url(game_id)
-    elif params['name'].endswith('- Live'):
-        resolved_url = get_publishpoint_url(game_ids['Live'])
-    else:
-        preferred_version = int(addon.getSetting('preferred_game_version'))
-        game_id = game_ids[language(30014)]
-        if preferred_version > 0:
-            if game_ids.has_key(language(30015)):
-                if preferred_version == 1:
-                    game_id = game_ids[language(30015)]
-                else:
-                    dialog = xbmcgui.Dialog()
-                    versions = [language(30014), language(30015)]
-                    ret = dialog.select(language(30016), versions)
-                    game_id = game_ids[versions[ret]]
-        resolved_url = get_stream_url(game_id)
-    addon_log('Resolved URL: %s.' %resolved_url)
-    item = xbmcgui.ListItem(path=resolved_url)
+    item = set_resolved_url(params['name'], params['url'])
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 5:
@@ -129,16 +49,12 @@ elif mode == 5:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 6:
-    show_name = params['name'].split(' - ')[0]
-    season = params['url']
-    cid = show_archives[show_name][season]
-    display_archive(show_name, season, cid)
+    cid = get_show_archive(params['name'], params['url'])
+    display_archive(params['name'], params['url'], cid)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 elif mode == 7:
-    manifest = get_manifest(params['url'])
-    stream_url = parse_manifest(manifest)
-    item = xbmcgui.ListItem(path=stream_url)
+    item = resolve_show_archive_url(params['url'])
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
 elif mode == 8:

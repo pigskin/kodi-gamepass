@@ -126,3 +126,25 @@ def get_params():
     for i in p.keys():
         p[i] = p[i][0]
     return p
+
+
+def get_nfl_network():
+    if subscription == '0': # gamepass
+        add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
+    for i in show_archives.keys():
+        add_dir(i, '2013', 6, icon)
+
+
+def get_nfl_redzone():
+    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+    simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+    simple_dict = xmltodict.parse(simple_data)['result']
+    if simple_dict['rzPhase'] == 'in':
+        add_dir('NFL RedZone - Live', 'rz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
+
+
+def display_plugin_root():
+    display_seasons()
+    add_dir('NFL Network', 'nfl_network_url', 5, icon)
+    if subscription == '0':
+        get_nfl_redzone()

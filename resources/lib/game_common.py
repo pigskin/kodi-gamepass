@@ -1,6 +1,7 @@
 """
 An XBMC agnostic library for NFL Game Pass and Game Rewind support.
 """
+import re
 import urllib
 import urllib2
 import hashlib
@@ -85,6 +86,7 @@ def check_login():
         dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
         addon_log('No account settings detected.')
         return False
+
 
 def check_for_subscription():
     sc_url = servlets_url + '/servlets/simpleconsole'
@@ -366,3 +368,103 @@ def parse_archive(cid, show_name):
             items_list = [items]
             items = items_list
         return items
+
+
+def get_show_archive(name, url):
+    show_name = name.split(' - ')[0]
+    season = url
+    cid = show_archives[show_name][season]
+    return cid
+
+
+def resolve_show_archive_url(url):
+    manifest = get_manifest(url)
+    stream_url = parse_manifest(manifest)
+    item = xbmcgui.ListItem(path=stream_url)
+    return item
+
+
+def get_publishpoint_url(game_id):
+    set_cookies = get_current_week()
+    url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
+    nt = '1'
+    if (game_id == 'nfl_network' or game_id == 'rz'):
+        type = 'channel'
+        if game_id == 'rz':
+            id = '2'
+        else:
+            id = '1'
+        post_data = {
+            'id': id,
+            'type': type,
+            'nt': nt
+            }
+    else:
+        post_data = {
+            'id' : game_id,
+            'type' : 'game',
+            'nt' : nt,
+            'gt' : 'live'
+            }
+    headers = {'User-Agent' : 'Android'}
+    m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
+    m3u8_dict = xmltodict.parse(m3u8_data)['result']
+    addon_log('NFL Dict %s.' %m3u8_dict)
+    m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
+    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
+
+
+def check_for_service():
+    # game rewind suspends service when there are live games
+    no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
+                  ' Please check back later.')
+    service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
+    if len(re.findall(no_service, service_data)) > 0:
+        lines = no_service.replace('.', ',').split(',')
+        dialog = xbmcgui.Dialog()
+        dialog.ok(language(30018), lines[0], lines[1], lines[2])
+        return False
+    return True
+
+
+def start_addon():
+    service = True
+    auth = check_login()
+    if auth:
+        if subscription == '1':
+            service = check_for_service()
+        return service
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Error", "Could not access Game Pass.")
+        addon_log('Auth failed.')
+
+
+def set_resolved_url(name, url):
+    try:
+        if isinstance(eval(url), dict):
+            game_ids = eval(url)
+    except NameError:
+        game_id = url
+    if name == 'NFL Network - Live':
+        resolved_url = get_publishpoint_url('nfl_network')
+    elif name == 'NFL RedZone - Live':
+        resolved_url = get_publishpoint_url(game_id)
+    elif name.endswith('- Live'):
+        resolved_url = get_publishpoint_url(game_ids['Live'])
+    else:
+        preferred_version = int(addon.getSetting('preferred_game_version'))
+        game_id = game_ids[language(30014)]
+        if preferred_version > 0:
+            if game_ids.has_key(language(30015)):
+                if preferred_version == 1:
+                    game_id = game_ids[language(30015)]
+                else:
+                    dialog = xbmcgui.Dialog()
+                    versions = [language(30014), language(30015)]
+                    ret = dialog.select(language(30016), versions)
+                    game_id = game_ids[versions[ret]]
+        resolved_url = get_stream_url(game_id)
+    addon_log('Resolved URL: %s.' %resolved_url)
+    item = xbmcgui.ListItem(path=resolved_url)
+    return item
