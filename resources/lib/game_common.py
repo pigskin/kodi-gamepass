@@ -1,5 +1,5 @@
 """
-An XBMC agnostic library for NFL Game Pass and Game Rewind support.
+An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 """
 import re
 import urllib
