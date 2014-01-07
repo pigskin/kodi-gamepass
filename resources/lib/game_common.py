@@ -148,8 +148,24 @@ def get_manifest(video_path):
     manifest_data = make_request(url)
     return manifest_data
 
+# Check age of cache, delete and update if it is older than 7200 sec (2hr)
+def check_cache():
+    # This try is just for those who alredy has cached data, but no cachetime set
+    try:
+        eval(cache.get('cachetime'))
+    except:
+        cache.set('cachetime', "0")
+
+    if int(cache.get('cachetime')) > time.time() - 7200:
+        addon_log('Found Cache')
+    else:
+        addon_log('Cache too old, updating')
+        cache.delete('seasons')
+        cache.delete('weeks')
 
 def get_seasons():
+    check_cache()
+
     try:
         seasons = eval(cache.get('seasons'))
         return seasons
@@ -266,6 +282,7 @@ def cache_seasons_and_weeks():
         addon_log('Parsing season and week data failed.')
         raise
 
+    cache.set('cachetime', str(int(time.time())))
     cache.set('seasons', repr(seasons))
     addon_log('Seasons cached')
     cache.set('weeks', repr(weeks))
