@@ -45,7 +45,7 @@ def display_archive(show_name, season, cid):
             if not (show_name == 'Superbowl Archives' or show_name == 'NFL Films Presents'):
                 add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
     elif season == '2013':
-        return display_archive(show_name, '2012')
+        return display_archive(show_name, '2012', cid)
 
 
 def display_games(season, week_code):
