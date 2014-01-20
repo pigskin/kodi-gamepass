@@ -1,0 +1,90 @@
+# XBMC NFL Game Pass language file
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-GamePass\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2013-11-18 16:15+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#30001"
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
+msgctxt "#30002"
+msgid "Password"
+msgstr "Passwort"
+
+msgctxt "#30003"
+msgid "Preferred Stream Quality"
+msgstr "Bevorzugte Stream Qualität"
+
+msgctxt "#30004"
+msgid "Always Use Highest Bitrate"
+msgstr "Immer höchste Bitrate nutzen"
+
+msgctxt "#30005"
+msgid "1280x720 Bitrate 4.5 Mbps"
+msgstr ""
+
+msgctxt "#30006"
+msgid "1280x720 Bitrate 3.0 Mbps"
+msgstr ""
+
+msgctxt "#30007"
+msgid "960x540 Bitrate 2.4 Mbps"
+msgstr ""
+
+msgctxt "#30008"
+msgid "960x540 Bitrate 1.6 Mbps"
+msgstr ""
+
+msgctxt "#30009"
+msgid "640x360 Bitrate 1.2 Mbps"
+msgstr ""
+
+msgctxt "#30010"
+msgid "640x360 Bitrate 800 Kbps"
+msgstr ""
+
+msgctxt "#30011"
+msgid "400x224 Bitrate 400 Kbps"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Ask"
+msgstr "Vorher fragen"
+
+msgctxt "#30013"
+msgid "Preferred Game Version"
+msgstr "Bevorzugte Spiel Version"
+
+msgctxt "#30014"
+msgid "Full"
+msgstr "Vollständig"
+
+msgctxt "#30015"
+msgid "Condensed"
+msgstr "Zusammengefasst"
+
+msgctxt "#30016"
+msgid "Choose a game version"
+msgstr "Wähle eine Spiel Version"
+
+msgctxt "#30017"
+msgid "Game Pass"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Game Rewind"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Choose Subscription"
+msgstr "Abonnement wählen"
