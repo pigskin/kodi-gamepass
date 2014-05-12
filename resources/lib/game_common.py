@@ -411,8 +411,7 @@ def get_publishpoint_url(game_id):
     m3u8_dict = xmltodict.parse(m3u8_data)['result']
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-    temp_path, temp_parm = m3u8_url.split('?', 1)
-    m3u8_header = {'Cookie' : 'nlqptid=' + temp_parm, 'User-Agent' : 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Connection' : 'Keep-Alive'}
+    m3u8_header = {'User-Agent' : 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Connection' : 'Keep-Alive'}
     m3u8_url = m3u8_url + '|' + urllib.urlencode(m3u8_header)
     addon_log('Url with Headers %s.' %m3u8_url)
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
