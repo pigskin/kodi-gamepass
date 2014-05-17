@@ -1,11 +1,12 @@
-unreleased v0.3.1 -- unnamed Edition
+2014.05.16 v0.3.1 -- Vince Lombardi Edition
 + New Game Pass/Rewind icon (thanks to dahlSTROM)
 + Bug fix: workaround Android crash
 + Bug fix: RedZone live should work again (thanks to msoderberg)
 + Bug fix: fix service check for Rewind
 + Bug fix: display live games properly
++ Big fix: Fix live NFL Network streams (thanks to BaumSchorle)
 
-20 Sept 2013 v0.3.0 -- Don Shula Edition
+2013.09.20 v0.3.0 -- Don Shula Edition
 + New Feature: Initial Game Rewind support
 + New Setting: Choose Subscription (Game Pass vs Game Rewind)
 + New Feature: NFL Films Presents (thanks to msoderberg!)
@@ -19,7 +20,7 @@ unreleased v0.3.1 -- unnamed Edition
 + Major code refactoring
 + New dependency: xmltodict
 
-13 Sep 2013 v0.2.0 -- Donald Driver Edition
+2013.09.13 v0.2.0 -- Donald Driver Edition
 Credit goes to divingmule for most of the features added below.
 + New Feature: Live games work (Gotham only)
 + New Feature: NFL Network - Live (Gotham only)
@@ -36,21 +37,21 @@ Credit goes to divingmule for most of the features added below.
 + Future games now have date and time listed
 + Live games are noted as such in the interface
 
-25 Aug 2013 v0.1.3
+2013.08.25 v0.1.3
 + Bug fix: Super Bowl weeks now list properly.
 + Bug fix: Older streams now list (but don't neccesarily play) properly.
 + Bug fix: Duration is now calculated for longer than one dir listing.
 + Bug fix: Fixed misleading popup when login failed
 + New Setting: "Sans Login Region" for those who live in countries where Game Pass is free.
 
-24 Aug 2013 v0.1.2
+2013.08.24 v0.1.2
 + Bug fix. All 16 games (rather than 15) are listed now.
 + New Setting: Always use best bitrate
 
-19 Aug 2013 v0.1.1
+2013.08.19 v0.1.1
 + Critical bug fix. Streams play again.
 
-18 Aug 2013 v0.1.0
+2013.08.18 v0.1.0
 + Initial development release (divingmule, Alexqw)
 + Only supports normal game streams (no coaches film, NFL TV, etc)
 + Can select stream bit rate
