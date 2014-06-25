@@ -30,6 +30,7 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
 
 
 def display_archive(show_name, season, cid):
+    cur_season = get_current_season()
     items = parse_archive(cid, show_name)
     image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
     if items:
@@ -41,11 +42,16 @@ def display_archive(show_name, season, cid):
                 addon_log('Exception adding archive directory: %s' %format_exc())
                 addon_log('Directory name: %s' %i['name'])
 
-        if season == '2013':
-            if not (show_name == 'Superbowl Archives' or show_name == 'NFL Films Presents'):
-                add_dir('%s - Season 2012' %show_name, '2012', 6, icon)
-    elif season == '2013':
-        return display_archive(show_name, '2012')
+        if season == cur_season:
+            if not (show_name == 'Superbowl Archives'):
+                for j in show_archives[show_name].keys():
+                   addon_log('j: %s' %j)
+                   if not (j == cur_season):
+                      add_dir('%s - Season %s' %(show_name, j), j, 6, icon)
+    elif season == cur_season:
+        for j in show_archives[show_name].keys():
+            if not (j == cur_season):
+               add_dir('%s - Season %s' %(show_name, j), j, 6, icon)
 
 
 def display_games(season, week_code):
@@ -129,10 +135,11 @@ def get_params():
 
 
 def get_nfl_network():
+    cur_season = get_current_season()
     if subscription == '0': # gamepass
         add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
     for i in show_archives.keys():
-        add_dir(i, '2013', 6, icon)
+        add_dir(i, cur_season, 6, icon)
 
 
 def get_nfl_redzone():

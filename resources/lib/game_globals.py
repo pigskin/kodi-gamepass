@@ -24,16 +24,16 @@ if subscription == '0': # game pass
     icon = os.path.join(addon_path, 'resources', 'images', 'gp_icon.png')
     fanart = os.path.join(addon_path, 'resources', 'images', 'gp_fanart.jpg')
     show_archives = {
-        'NFL Gameday': {'2013': '179', '2012': '146'},
-        'Playbook': {'2013': '180', '2012': '147'},
-        'NFL Total Access': {'2013': '181', '2012': '148'},
-        'NFL RedZone': {'2013': '182', '2012': '149'},
-        'Sound FX': {'2013': '183', '2012': '150'},
-        'Coaches Show': {'2013': '184', '2012': '151'},
-        'Top 100 Players': {'2013': '185', '2012': '153'},
-        'A Football Life': {'2013': '186', '2012': '154'},
-        'Superbowl Archives': {'2013': '117'},
-        'NFL Films Presents': {'2013': '187'}
+        'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
+        'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
+        'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
+        'NFL RedZone': {'2014': '221', '2013': '182', '2012': '149'},
+        'Sound FX': {'2014': '215', '2013': '183', '2012': '150'},
+        'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
+        'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'},
+        'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
+        'Superbowl Archives': {'2014': '117'},
+        'NFL Films Presents': {'2014': '219', '2013': '187'}
         }
         
 else: # game rewind
@@ -45,9 +45,9 @@ else: # game rewind
     icon = os.path.join(addon_path, 'resources', 'images', 'gr_icon.png')
     fanart = os.path.join(addon_path, 'resources', 'images', 'gr_fanart.jpg')
     show_archives = {
-        'NFL Gameday': {'2013': '179', '2012': '146'},
+        'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
         'Superbowl Archives': {'2013': '117'},
-        'Top 100 Players': {'2013': '185', '2012': '153'}
+        'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
         }
     
 servlets_url = base_url.replace('https', 'http')
