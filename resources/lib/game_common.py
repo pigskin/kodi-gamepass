@@ -163,6 +163,19 @@ def get_seasons():
     except:
         raise
 
+def get_current_season():
+    try:
+        cur_season = eval(cache.get('current_season'))
+        return str(cur_season)
+    except:
+        pass
+
+    try:
+        cache_seasons_and_weeks()
+        cur_season = eval(cache.get('current_season'))
+        return str(cur_season)
+    except:
+        raise
 
 def get_seasons_weeks(season):
     try:
@@ -235,6 +248,7 @@ def select_bitrate(streams):
 def cache_seasons_and_weeks():
     seasons = []
     weeks = {}
+    current_season = ''
 
     try:
         url = 'http://smb.cdnak.neulion.com/fs/nfl/nfl/mobile/weeks_v2.xml'
@@ -247,6 +261,11 @@ def cache_seasons_and_weeks():
     try:
         for season in s_w_data_dict['seasons']['season']:
             year = season['@season']
+            
+            #assume that first year is current season
+            if current_season == '':
+               current_season = str(year)
+            
             seasons.append(year)
             weeks[year] = {}
 
@@ -268,10 +287,13 @@ def cache_seasons_and_weeks():
 
     cache.set('seasons', repr(seasons))
     addon_log('Seasons cached')
+    cache.set('current_season', current_season)
+    addon_log('Current season cached')
     cache.set('weeks', repr(weeks))
     addon_log('Weeks cached')
 
     addon_log('seasons: %s' %seasons)
+    addon_log('current season: %s' %current_season)
     addon_log('weeks: %s' %weeks)
     return True
 
@@ -344,6 +366,8 @@ def get_video_path(game_id, post_data):
 # parse archives for NFL Network, RedZone
 def parse_archive(cid, show_name):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+    show_name = show_name.split('-')[0]
+    
     if show_name == 'NFL RedZone':
         ps = 17
     else:
