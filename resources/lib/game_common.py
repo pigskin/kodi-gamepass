@@ -397,7 +397,13 @@ def parse_archive(cid, show_name):
 def get_show_archive(name, url):
     show_name = name.split(' - ')[0]
     season = url
-    cid = show_archives[show_name][season]
+    
+    try: 
+       cid = show_archives[show_name][season]
+    except:
+       #if no valid cid is found in show_archives
+       cid = 0
+       
     return cid
 
 
