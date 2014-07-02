@@ -34,7 +34,7 @@ if subscription == '0': # game pass
         'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
         'Superbowl Archives': {'2014': '117'},
         'NFL Films Presents': {'2014': '219', '2013': '187'},
-        'Hard Knocks': {'2013': '220'}
+        'Hard Knocks': {'2014': '220'}
         }
         
 else: # game rewind
