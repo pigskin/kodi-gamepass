@@ -31,13 +31,13 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
 
 def display_archive(show_name, season, cid):
     cur_season = get_current_season()
-    
-    #No valid CID passed
+
+    # No valid CID passed
     if cid > 0:
        items = parse_archive(cid, show_name)
     else:
        items = ''
-       
+
     image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
     if items:
         for i in items:

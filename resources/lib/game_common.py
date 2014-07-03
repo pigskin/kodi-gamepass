@@ -230,7 +230,7 @@ def select_bitrate(streams):
         else:
             dialog = xbmcgui.Dialog()
             ret = bitrate_values[dialog.select('Choose a bitrate',
-                                 [language(30005 + i) for i in range(len(bitrate_values))])]
+                                [language(30005 + i) for i in range(len(bitrate_values))])]
 
     else:
         streams.sort(key=itemgetter('bitrate'), reverse=True)
@@ -318,10 +318,10 @@ def get_weeks_games(season, week):
     }
 
     game_data = make_request(url, urllib.urlencode(post_data))
-    #addon_log('game data: %s' %game_data)
+    # addon_log('game data: %s' %game_data)
 
     game_data_dict = xmltodict.parse(game_data)['result']
-    #addon_log('game data dict: %s' %game_data_dict)
+    # addon_log('game data dict: %s' %game_data_dict)
     games = game_data_dict['games']['game']
 
     return games
@@ -337,7 +337,7 @@ def get_stream_url(game_id, post_data=None):
     return stream_url
 
 
-# the "video path" provides the info neccesary to request the stream's manifest
+# the "video path" provides the info necessary to request the stream's manifest
 def get_video_path(game_id, post_data):
     url = servlets_url + '/servlets/encryptvideopath'
     plid = gen_plid()
@@ -401,7 +401,7 @@ def get_show_archive(name, url):
     try: 
        cid = show_archives[show_name][season]
     except:
-       #if no valid cid is found in show_archives
+       # if no valid cid is found in show_archives
        cid = 0
        
     return cid
