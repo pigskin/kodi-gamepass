@@ -1,5 +1,5 @@
 # NFL Game Pass/Rewind XBMC Plugin #
-**version 0.3.1 — Vince Lombardi Edition** by Alex Waite and divingmule
+**version 0.3.1 — Vince Lombardi Edition**
 
 Before reading any further, please understand that while this plugin does
 work, not all features are supported (or fully tested) and it should be
@@ -45,20 +45,20 @@ By now, most core features are supported.
  * Condensed games
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
+ * NFL Films Presents
+ * Top 100 Players
+ * NFL Gameday
+ * A Football Life
  * NFL Total Access
  * Sound FX
- * NFL Gameday
  * NFL RedZone
  * Playbook
- * A Football Life
- * NFL Films Presents
 
 Currently unsupported features:
  * Archived games prior to 2011
  * Alternate team audio
  * Coaches film (22 man view)
  * Superbowl Archives
- * Top 100 Players
  * Coaches Show
 
 ## Release names ##
