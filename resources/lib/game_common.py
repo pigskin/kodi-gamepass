@@ -26,7 +26,7 @@ def addon_log(string):
 def make_request(url, data=None, headers=None):
     addon_log('Request URL: %s' %url)
     if not xbmcvfs.exists(cookie_file):
-        addon_log('Creating cookie_file!')
+        addon_log('Creating cookie_file')
         cookie_jar.save()
     cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
@@ -43,15 +43,15 @@ def make_request(url, data=None, headers=None):
         redirect_url = response.geturl()
         response.close()
         if redirect_url != url:
-                addon_log('Redirect URL: %s' %redirect_url)
+            addon_log('Redirect URL: %s' %redirect_url)
         return data
     except urllib2.URLError, e:
-        addon_log('We failed to open "%s".' %url)
+        addon_log('Failed to open "%s".' %url)
         if hasattr(e, 'reason'):
-            addon_log('We failed to reach a server.')
+            addon_log('Failed to reach a server.')
             addon_log('Reason: %s' %e.reason)
         if hasattr(e, 'code'):
-            addon_log('We failed with error code - %s.' %e.code)
+            addon_log('Failed with error code - %s.' %e.code)
 
 
 def check_login():

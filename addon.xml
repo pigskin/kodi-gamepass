@@ -14,7 +14,7 @@
   <extension point="xbmc.addon.metadata">
     <summary>NFL Game Pass</summary>
     <description>
-    Watch NFL Game Pass streams.
+    Watch NFL Game Pass and NFL Game Rewind streams.
     </description>
     <platform>all</platform>
     <language>en</language>
