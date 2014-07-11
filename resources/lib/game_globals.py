@@ -1,6 +1,8 @@
 
 import os
 import cookielib
+import requests2 as requests
+import urllib
 
 import xbmc
 import xbmcaddon
@@ -53,3 +55,11 @@ else: # game rewind
 
 servlets_url = base_url.replace('https', 'http')
 cookie_jar = cookielib.LWPCookieJar(cookie_file)
+
+try:
+    cookie_jar.load(ignore_discard=True, ignore_expires=True)
+except:
+    pass
+
+s = requests.Session()
+s.cookies = cookie_jar

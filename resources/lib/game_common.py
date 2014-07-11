@@ -2,8 +2,6 @@
 An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 """
 import re
-import urllib
-import urllib2
 import hashlib
 import random
 from operator import itemgetter
@@ -23,35 +21,18 @@ def addon_log(string):
         xbmc.log("[%s-%s]: %s" %(addon_id, addon_version, string))
 
 
-def make_request(url, data=None, headers=None):
+def make_request(url, payload=None, headers=None):
     addon_log('Request URL: %s' %url)
-    if not xbmcvfs.exists(cookie_file):
-        addon_log('Creating cookie_file')
-        cookie_jar.save()
-    cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
-    urllib2.install_opener(opener)
+    addon_log('Headers: %s' %headers)
+
     try:
-        if headers is None:
-            req = urllib2.Request(url, data)
-        else:
-            req = urllib2.Request(url, data, headers)
-        response = urllib2.urlopen(req)
-        cookie_jar.save(cookie_file, ignore_discard=True, ignore_expires=False)
-        data = response.read()
-        addon_log(str(response.info()))
-        redirect_url = response.geturl()
-        response.close()
-        if redirect_url != url:
-            addon_log('Redirect URL: %s' %redirect_url)
-        return data
-    except urllib2.URLError, e:
-        addon_log('Failed to open "%s".' %url)
-        if hasattr(e, 'reason'):
-            addon_log('Failed to reach a server.')
-            addon_log('Reason: %s' %e.reason)
-        if hasattr(e, 'code'):
-            addon_log('Failed with error code - %s.' %e.code)
+        r = s.post(url, data=payload, headers=headers, allow_redirects=False)
+        addon_log('Response code: %s' %r.status_code)
+        addon_log('Response: %s' %r.text)
+        cookie_jar.save(ignore_discard=True, ignore_expires=False)
+        return r.text
+    except requests.exceptions.RequestException as e:
+        addon_log('Error: - %s.' %e)
 
 
 # Check age of cache, delete and update if it is older than 7200 sec (2hr)
@@ -81,7 +62,7 @@ def check_login():
         if not xbmcvfs.exists(cookie_file):
             return gamepass_login()
         else:
-            cookie_jar.load(cookie_file, ignore_discard=True, ignore_expires=True)
+            cookie_jar.load(ignore_discard=True, ignore_expires=True)
             cookies = {}
             for i in cookie_jar:
                 cookies[i.name] = i.value
@@ -110,7 +91,7 @@ def check_login():
 def check_for_subscription():
     sc_url = servlets_url + '/servlets/simpleconsole'
     sc_post_data = { 'isFlex': 'true' }
-    sc_data = make_request(sc_url, urllib.urlencode(sc_post_data))
+    sc_data = make_request(sc_url, sc_post_data)
 
     try:
         sc_dict = xmltodict.parse(sc_data)['result']
@@ -136,7 +117,7 @@ def gamepass_login():
         'error_url': base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
         'success_url': base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
     }
-    login_data = make_request(url, urllib.urlencode(post_data))
+    login_data = make_request(url, post_data)
 
     login_success = check_for_subscription()
 
@@ -163,7 +144,7 @@ def gen_plid():
 def get_manifest(video_path):
     url, port, path = video_path.partition(':443')
     path = path.replace('?', '&')
-    url = url.replace('adaptive://', 'http://') + port + '/play?' + urllib.quote_plus('url=' + path, ':&=')
+    url = url.replace('adaptive://', 'http://') + port + '/play?url=' + path
     manifest_data = make_request(url)
     return manifest_data
 
@@ -322,7 +303,7 @@ def cache_seasons_and_weeks():
 
 def get_current_week():
     url = servlets_url + '/servlets/simpleconsole'
-    data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+    data = make_request(url, {'isFlex':'true'})
     if data:
         return data
     return 'False'
@@ -339,7 +320,7 @@ def get_weeks_games(season, week):
         'week': week
     }
 
-    game_data = make_request(url, urllib.urlencode(post_data))
+    game_data = make_request(url, post_data)
     game_data_dict = xmltodict.parse(game_data)['result']
     games = game_data_dict['games']['game']
 
@@ -371,7 +352,7 @@ def get_video_path(game_id, post_data):
         'isFlex': 'true'
     }
 
-    video_path_data = make_request(url, urllib.urlencode(post_data))
+    video_path_data = make_request(url, post_data)
 
     try:
         video_path_dict = xmltodict.parse(video_path_data)['result']
@@ -397,8 +378,9 @@ def parse_archive(cid, show_name):
         'pm': 0,
         'ps': ps,
         'pn': 1
-        }
-    archive_data = make_request(url, urllib.urlencode(post_data))
+    }
+
+    archive_data = make_request(url, post_data)
     archive_dict = xmltodict.parse(archive_data)['result']
     addon_log('Archive Dict: %s' %archive_dict)
 
@@ -456,7 +438,7 @@ def get_publishpoint_url(game_id):
             'gt' : 'live'
         }
     headers = {'User-Agent' : 'Android'}
-    m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
+    m3u8_data = make_request(url, post_data, headers)
     m3u8_dict = xmltodict.parse(m3u8_data)['result']
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')

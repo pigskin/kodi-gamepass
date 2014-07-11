@@ -2,7 +2,6 @@
 An XBMC plugin specific library for NFL Game Pass and Game Rewind support.
 """
 import sys
-import urllib
 import time
 from datetime import datetime
 import time
@@ -150,7 +149,7 @@ def get_nfl_network():
 
 def get_nfl_redzone():
     url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-    simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+    simple_data = make_request(url, {'isFlex':'true'})
     simple_dict = xmltodict.parse(simple_data)['result']
     if simple_dict['rzPhase'] == 'in':
         add_dir('NFL RedZone - Live', 'rz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
