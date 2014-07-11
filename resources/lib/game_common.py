@@ -126,6 +126,7 @@ def gamepass_login():
         dialog = xbmcgui.Dialog()
         dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
         addon_log('Game Pass login failure')
+        return False
 
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
@@ -460,16 +461,18 @@ def check_for_service():
 
 
 def start_addon():
-    service = True
     auth = check_login()
     if auth:
-        if subscription == '1':
+        if subscription == '1': # Game Rewind
             service = check_for_service()
-        return service
+            return service
+        else:
+            return True
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok("Error", "Could not access Game Pass.")
         addon_log('Auth failed.')
+        return False
 
 
 def set_resolved_url(name, url):
