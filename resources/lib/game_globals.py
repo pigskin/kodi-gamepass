@@ -2,12 +2,13 @@
 import os
 import cookielib
 import requests2 as requests
+import time
+from traceback import format_exc
 import urllib
 
 import xbmc
 import xbmcaddon
 import StorageServer
-import time
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')

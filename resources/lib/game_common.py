@@ -6,12 +6,11 @@ import hashlib
 import random
 from operator import itemgetter
 from uuid import getnode as get_mac
-from traceback import format_exc
+import xmltodict
 
 import xbmc
 import xbmcgui
 import xbmcvfs
-import xmltodict
 
 from game_globals import *
 

@@ -2,11 +2,8 @@
 An XBMC plugin specific library for NFL Game Pass and Game Rewind support.
 """
 import sys
-import time
 from datetime import datetime
-import time
 from urlparse import parse_qs
-from traceback import format_exc
 
 import xbmc
 import xbmcplugin
