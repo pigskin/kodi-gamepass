@@ -11,10 +11,11 @@ If you're interested in helping out, just drop us an email or send a pull
 request. Patches and (constructive) input are always welcome.
 
 ## Any Dependencies? ##
-Until this addon is part of an official XBMC repository, dependencies will not
-be installed automatically.
- * xmltodict (mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
+Until this addon is part of an official XBMC repository (hopefully sometime
+soon), dependencies will not be installed automatically.
+ * xmltodict (http://mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
  * plugin.cache (just install the YouTube addon, which uses it)
+ * Requests (http://mirrors.xbmc.org/addons/frodo/script.module.requests2/)
 
 ## What is NFL Game Pass? ##
 
@@ -27,7 +28,7 @@ us who must have our American Football fix.
 ## What is NFL Game Rewind? ##
 
 NFL Game Rewind is very similar to Game Pass, but doesn't have quite as many
-features. For example, it does not support live games.
+features. For example, it does not support live games, NFL Network - Live, etc.
 
 ## Why write a plugin for XBMC? ##
 
@@ -76,4 +77,4 @@ A rough roadmap follows:
 * Refactor code to be more XBMC agnostic
 * Work on a "skin" branch to convert the addon(s) to a "skin" plugin. This will
  allow us much more control over the UI. It should be prettier (more graphics)
- and more intutive.
+ and more intuitive.
