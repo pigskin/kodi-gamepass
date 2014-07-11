@@ -12,7 +12,7 @@ import xbmcgui
 from game_common import *
 
 
-def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=True):
+def add_dir(name, url, mode, iconimage, description="", duration=None, isfolder=True):
     params = {'name': name, 'url': url, 'mode': mode}
     url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
     listitem = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
@@ -21,7 +21,7 @@ def add_dir(name, url, mode, iconimage, discription="", duration=None, isfolder=
         if not mode == 8:
             # IsPlayable tells xbmc that there is more work to be done to resolve a playable url
             listitem.setProperty('IsPlayable', 'true')
-        listitem.setInfo(type="Video", infoLabels={"Title": name, "Plot": discription, "Duration": duration})
+        listitem.setInfo(type="Video", infoLabels={"Title": name, "Plot": description, "Duration": duration})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, listitem, isfolder)
 
 
@@ -139,7 +139,7 @@ def get_params():
 def get_nfl_network():
     cur_season = get_current_season()
     if subscription == '0': # gamepass
-        add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, discription="NFL Network", duration=None, isfolder=False)
+        add_dir('NFL Network - Live', 'nfl_network_url', 4, icon, description="NFL Network", duration=None, isfolder=False)
     for i in show_archives.keys():
         add_dir(i, cur_season, 6, icon)
 
@@ -149,7 +149,7 @@ def get_nfl_redzone():
     simple_data = make_request(url, {'isFlex':'true'})
     simple_dict = xmltodict.parse(simple_data)['result']
     if simple_dict['rzPhase'] == 'in':
-        add_dir('NFL RedZone - Live', 'rz', 4, icon, discription="NFL RedZone - Live", duration=None, isfolder=False)
+        add_dir('NFL RedZone - Live', 'rz', 4, icon, description="NFL RedZone - Live", duration=None, isfolder=False)
 
 
 def display_plugin_root():
