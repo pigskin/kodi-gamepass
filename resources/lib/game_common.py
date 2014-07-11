@@ -55,8 +55,10 @@ def make_request(url, data=None, headers=None):
 
 
 # Check age of cache, delete and update if it is older than 7200 sec (2hr)
+# TODO: This shouldn't be neccesary, as we set the cache TTL with StorageServer,
+# but that cache was not expiring correctly.
 def check_cache():
-    # This try is just for those who already has cached data, but no cachetime set
+    # for those who already have cached data, but no cachetime set
     try:
         eval(cache.get('cachetime'))
     except:
@@ -70,6 +72,7 @@ def check_cache():
         cache.delete('weeks')
 
 
+# check for subscription, if not, login
 def check_login():
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
@@ -146,9 +149,9 @@ def gamepass_login():
 
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
-# However, I don't know what it is an "id" of, since the value seems to change constantly.
-# Reusing a plid doesn't work, so I assume it's a unique id for the instance of the player.
-# This, pseudorandom approach seems to work for now.
+# I don't know what it is an "id" of, since the value seems to change constantly.
+# Reusing a plid doesn't work, so I'm guessing it's a unique id for the /instance/ of the player.
+# This pseudorandom approach seems to work.
 def gen_plid():
     rand = random.getrandbits(10)
     mac_address = str(get_mac())
@@ -279,11 +282,11 @@ def cache_seasons_and_weeks():
     try:
         for season in s_w_data_dict['seasons']['season']:
             year = season['@season']
-            
-            #assume that first year is current season
+
+            # assume that first year is current season
             if current_season == '':
                current_season = str(year)
-            
+
             seasons.append(year)
             weeks[year] = {}
 
@@ -337,10 +340,7 @@ def get_weeks_games(season, week):
     }
 
     game_data = make_request(url, urllib.urlencode(post_data))
-    # addon_log('game data: %s' %game_data)
-
     game_data_dict = xmltodict.parse(game_data)['result']
-    # addon_log('game data dict: %s' %game_data_dict)
     games = game_data_dict['games']['game']
 
     return games
@@ -386,7 +386,7 @@ def get_video_path(game_id, post_data):
 def parse_archive(cid, show_name):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
     show_name = show_name.split('-')[0]
-    
+
     if show_name == 'NFL RedZone':
         ps = 17
     else:
@@ -416,13 +416,13 @@ def parse_archive(cid, show_name):
 def get_show_archive(name, url):
     show_name = name.split(' - ')[0]
     season = url
-    
-    try: 
+
+    try:
        cid = show_archives[show_name][season]
     except:
        # if no valid cid is found in show_archives
        cid = 0
-       
+
     return cid
 
 
@@ -447,14 +447,14 @@ def get_publishpoint_url(game_id):
             'id': id,
             'type': type,
             'nt': nt
-            }
+        }
     else:
         post_data = {
             'id' : game_id,
             'type' : 'game',
             'nt' : nt,
             'gt' : 'live'
-            }
+        }
     headers = {'User-Agent' : 'Android'}
     m3u8_data = make_request(url, urllib.urlencode(post_data), headers)
     m3u8_dict = xmltodict.parse(m3u8_data)['result']
@@ -465,9 +465,8 @@ def get_publishpoint_url(game_id):
     addon_log('Url with Headers %s.' %m3u8_url)
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
 
-
+# Check if Game Rewind service is blacked-out due to live games in progress
 def check_for_service():
-    # game rewind suspends service when there are live games
     no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
                   ' Please check back later.')
     service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')

@@ -15,6 +15,7 @@ debug = addon.getSetting('debug')
 addon_version = addon.getAddonInfo('version')
 subscription = addon.getSetting('subscription')
 language = addon.getLocalizedString
+
 if subscription == '0': # game pass
     username = addon.getSetting('email')
     password = addon.getSetting('password')
@@ -35,8 +36,7 @@ if subscription == '0': # game pass
         'Superbowl Archives': {'2014': '117'},
         'NFL Films Presents': {'2014': '219', '2013': '187'},
         'Hard Knocks': {'2014': '220'}
-        }
-        
+    }
 else: # game rewind
     username = addon.getSetting('gr_email')
     password = addon.getSetting('gr_password')
@@ -49,7 +49,7 @@ else: # game rewind
         'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
         'Superbowl Archives': {'2013': '117'},
         'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
-        }
-    
+    }
+
 servlets_url = base_url.replace('https', 'http')
 cookie_jar = cookielib.LWPCookieJar(cookie_file)
