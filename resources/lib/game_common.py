@@ -62,8 +62,8 @@ def check_cache():
     except:
         cache.set('cachetime', "0")
 
-    if int(cache.get('cachetime')) > time.time() - 7200:
-        addon_log('Found Cache')
+    if int(cache.get('cachetime')) > (time.time() - 7200):
+        addon_log('Found "young" cache')
     else:
         addon_log('Cache too old, updating')
         cache.delete('seasons')
