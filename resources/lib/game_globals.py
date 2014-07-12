@@ -8,16 +8,19 @@ import urllib
 
 import xbmc
 import xbmcaddon
+import xbmcvfs
 import StorageServer
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
 addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
-debug = addon.getSetting('debug')
+if not xbmcvfs.exists(addon_profile):
+    xbmcvfs.mkdir(addon_profile)
 addon_version = addon.getAddonInfo('version')
-subscription = addon.getSetting('subscription')
+debug = addon.getSetting('debug')
 language = addon.getLocalizedString
+subscription = addon.getSetting('subscription')
 
 if subscription == '0': # game pass
     username = addon.getSetting('email')
