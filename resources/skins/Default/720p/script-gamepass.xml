@@ -14,7 +14,7 @@
         <control type="group" id="100">
               <description>Top row button group</description>
               <posx>0</posx>
-              <posy>28</posy>
+              <posy>0</posy>
               <width>1280</width>
               <height>30</height>
               <defaultcontrol>110</defaultcontrol>
@@ -65,30 +65,31 @@
         </control>
         <control type="panel" id="210">
             <description>Season list container</description>
-            <posx>20</posx>
-            <posy>150</posy>
-            <width>150</width>
-            <height>500</height>
+            <posx>50</posx>
+            <posy>62</posy>
+            <width>800</width>
+            <height>30</height>
             <visible>true</visible>
             <onup>100</onup>
-            <onright>220</onright>
+            <ondown>220</ondown>
             <viewtype label="3D list">list</viewtype>
-            <orientation>vertical</orientation>
+            <orientation>horizontal</orientation>
             <autoscroll>false</autoscroll>
-            <itemlayout width="145" height="40">
+            <itemlayout width="135" height="40">
                 <control type="image">
                         <posx>15</posx>
                         <posy>0</posy>
                         <width>130</width>
-                        <height>40</height>
-                        <texture>GamePass/season_bg.png</texture>
+                        <height>30</height>
+                        <texture></texture>
                 </control>
                 <control type="label">
                     <description>Season text</description>
-                    <posx>15</posx>
-                    <posy>5</posy>
+                    <posx>10</posx>
+                    <posy>0</posy>
                     <width>130</width>
-                    <left>72</left>
+                    <height>30</height>
+                    <left>80</left>
                     <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -110,15 +111,16 @@
                         <posx>15</posx>
                         <posy>0</posy>
                         <width>130</width>
-                        <height>40</height>
-                        <texture>GamePass/season_focus.png</texture>
+                        <height>30</height>
+                        <texture></texture>
                 </control>
                 <control type="label">
                     <description>Season text</description>
-                    <posx>15</posx>
-                    <posy>5</posy>
+                    <posx>10</posx>
+                    <posy>0</posy>
                     <width>130</width>
-                    <left>72</left>
+                    <height>30</height>
+                    <left>80</left>
                     <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -139,16 +141,17 @@
 
         <control type="panel" id="220">
             <description>Week/Show list container</description>
-            <posx>195</posx>
-            <posy>150</posy>
+            <posx>20</posx>
+            <posy>110</posy>
             <width>255</width>
-            <height>500</height>
+            <height>530</height>
             <visible>true</visible>
             <onleft>210</onleft>
             <onright>230</onright>
             <viewtype label="3D list">list</viewtype>
             <orientation>vertical</orientation>
             <autoscroll>false</autoscroll>
+            <pagecontrol>225</pagecontrol>
             <itemlayout width="225" height="40">
                 <control type="image">
                         <posx>15</posx>
@@ -209,28 +212,43 @@
                 </control>
             </focusedlayout>
         </control>
+        <control type="scrollbar" id="225">
+           <description>My first scroll bar control</description>
+           <posx>275</posx>
+           <posy>110</posy>
+           <width>10</width>
+           <height>530</height>
+           <visible allowhiddenfocus="true">true</visible>
+           <texturesliderbackground></texturesliderbackground>
+           <texturesliderbar border="2"></texturesliderbar>
+           <textureslidernib>GamePass/bar.png</textureslidernib>
+           <pulseonselect></pulseonselect>
+           <orientation>vertical</orientation>
+           <showonepage>false</showonepage>
+        </control>
         <control type="panel" id="230">
             <description>Game/Episode panel container</description>
-            <posx>485</posx>
-            <posy>150</posy>
-            <width>780</width>
-            <height>500</height>
+            <posx>300</posx>
+            <posy>110</posy>
+            <width>900</width>
+            <height>530</height>
             <visible>true</visible>
             <onleft>220</onleft>
+            <pagecontrol>235</pagecontrol>
             <viewtype label="3D list">wide</viewtype>
             <orientation>vertical</orientation>
             <autoscroll>false</autoscroll>
-            <itemlayout width="375" height="80">
+            <itemlayout width="450" height="80">
                 <control type="image">
-                        <posx>15</posx>
+                        <posx>0</posx>
                         <posy>0</posy>
-                        <width>345</width>
+                        <width>450</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
                         <visible>true</visible>
                 </control>
                 <control type="image">
-                        <posx>22</posx>
+                        <posx>7</posx>
                         <posy>12</posy>
                         <width>80</width>
                         <height>53</height>
@@ -241,8 +259,8 @@
                     <description>Game competitors text</description>
                     <posx>15</posx>
                     <posy>12</posy>
-                    <width>140</width>
-                    <left>188</left>
+                    <width>275</width>
+                    <left>225</left>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <scroll>false</scroll>
@@ -260,8 +278,8 @@
                     <description>Game description text</description>
                     <posx>15</posx>
                     <posy>35</posy>
-                    <width>140</width>
-                    <left>188</left>
+                    <width>275</width>
+                    <left>225</left>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <scroll>true</scroll>
@@ -312,7 +330,7 @@
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="image">
-                        <posx>275</posx>
+                        <posx>363</posx>
                         <posy>12</posy>
                         <width>80</width>
                         <height>53</height>
@@ -320,17 +338,17 @@
                         <visible>ListItem.Property(is_game)</visible>
                 </control>
             </itemlayout>
-            <focusedlayout width="375" height="80">
+            <focusedlayout width="450" height="80">
                 <control type="image">
-                        <posx>15</posx>
+                        <posx>0</posx>
                         <posy>0</posy>
-                        <width>345</width>
+                        <width>450</width>
                         <height>80</height>
                         <texture>GamePass/game_focus.png</texture>
                         <visible>true</visible>
                 </control>
                 <control type="image">
-                        <posx>22</posx>
+                        <posx>7</posx>
                         <posy>12</posy>
                         <width>80</width>
                         <height>53</height>
@@ -341,27 +359,27 @@
                     <description>Game competitors text</description>
                     <posx>15</posx>
                     <posy>12</posy>
-                    <width>140</width>
-                    <left>188</left>
+                    <width>275</width>
+                    <left>225</left>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
-                    <scroll>true</scroll>
-                    <info>ListItem.Label2</info>
+                    <scroll>false</scroll>
+                    <info>ListItem.Label</info>
                     <number></number>
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font13</font>
-                    <textcolor>black</textcolor>
+                    <textcolor>white</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
-                    <scrollsuffix> - </scrollsuffix>
+                    <scrollsuffix></scrollsuffix>
                 </control>
                 <control type="label">
                     <description>Game description text</description>
                     <posx>15</posx>
                     <posy>35</posy>
-                    <width>140</width>
-                    <left>188</left>
+                    <width>275</width>
+                    <left>225</left>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <scroll>true</scroll>
@@ -370,7 +388,7 @@
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font10</font>
-                    <textcolor>black</textcolor>
+                    <textcolor>white</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
@@ -382,16 +400,16 @@
                     <width>235</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
-                    <scroll>true</scroll>
+                    <scroll>false</scroll>
                     <info>ListItem.Label</info>
                     <number></number>
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font12</font>
-                    <textcolor>black</textcolor>
+                    <textcolor>white</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
-                    <scrollsuffix> - </scrollsuffix>
+                    <scrollsuffix></scrollsuffix>
                 </control>
                 <control type="label">
                     <description>Show description text</description>
@@ -400,19 +418,19 @@
                     <width>235</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
-                    <scroll>true</scroll>
+                    <scroll>false</scroll>
                     <info>ListItem.Property(game_info)</info>
                     <number></number>
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font10</font>
-                    <textcolor>black</textcolor>
+                    <textcolor>white</textcolor>
                     <wrapmultiline>false</wrapmultiline>
-                    <scrollspeed>25</scrollspeed>
+                    <scrollspeed>0</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="image">
-                        <posx>275</posx>
+                        <posx>363</posx>
                         <posy>12</posy>
                         <width>80</width>
                         <height>53</height>
@@ -421,5 +439,21 @@
                 </control>
             </focusedlayout>
         </control>
+         
+        <control type="scrollbar" id="235">
+           <description>Games/Show Scrollbar</description>
+           <posx>1230</posx>
+           <posy>110</posy>
+           <width>10</width>
+           <height>530</height>
+           <visible allowhiddenfocus="true">true</visible>
+           <texturesliderbackground></texturesliderbackground>
+           <texturesliderbar border="2"></texturesliderbar>
+           <textureslidernib>GamePass/bar.png</textureslidernib>
+           <pulseonselect></pulseonselect>
+           <orientation>vertical</orientation>
+           <showonepage>false</showonepage>
+        </control>
+
 	</controls>
 </window>
