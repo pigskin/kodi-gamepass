@@ -457,21 +457,6 @@ def check_for_service():
     return True
 
 
-def start_addon():
-    auth = check_login()
-    if auth:
-        if subscription == '1': # Game Rewind
-            service = check_for_service()
-            return service
-        else:
-            return True
-    else:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Error", "Could not access Game Pass.")
-        addon_log('Auth failed.')
-        return False
-
-
 def set_resolved_url(name, url):
     try:
         if isinstance(eval(url), dict):

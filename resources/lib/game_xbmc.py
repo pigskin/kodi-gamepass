@@ -157,3 +157,17 @@ def display_plugin_root():
     add_dir('NFL Network', 'nfl_network_url', 5, icon)
     if subscription == '0':
         get_nfl_redzone()
+
+def start_addon():
+    auth = check_login()
+    if auth:
+        if subscription == '1': # Game Rewind
+            service = check_for_service()
+            return service
+        else:
+            return True
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Error", "Could not access Game Pass.")
+        addon_log('Auth failed.')
+        return False
