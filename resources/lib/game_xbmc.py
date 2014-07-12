@@ -158,16 +158,17 @@ def display_plugin_root():
     if subscription == '0':
         get_nfl_redzone()
 
+
 def start_addon():
-    auth = check_login()
+    if subscription == '0': # Game Pass
+        auth = login_gamepass(username, password)
+    else: # Game Rewind
+        auth = login_rewind(username, password)
+
     if auth:
-        if subscription == '1': # Game Rewind
-            service = check_for_service()
-            return service
-        else:
-            return True
+        return True
     else:
         dialog = xbmcgui.Dialog()
-        dialog.ok("Error", "Could not access Game Pass.")
-        addon_log('Auth failed.')
+        dialog.ok("Login Failed", "Logging into NFL Game Pass/Rewind failed.", "Make sure your account information is correct.")
+        addon_log('auth failure')
         return False

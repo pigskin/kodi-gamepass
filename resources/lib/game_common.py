@@ -10,7 +10,6 @@ import xmltodict
 
 import xbmc
 import xbmcgui
-import xbmcvfs
 
 from game_globals import *
 
@@ -52,39 +51,38 @@ def check_cache():
         cache.delete('weeks')
 
 
-# check for subscription, if not, login
-def check_login():
-    if not xbmcvfs.exists(addon_profile):
-        xbmcvfs.mkdir(addon_profile)
-
-    if username and password:
-        if not xbmcvfs.exists(cookie_file):
-            return gamepass_login()
-        else:
-            cookie_jar.load(ignore_discard=True, ignore_expires=True)
-            cookies = {}
-            for i in cookie_jar:
-                cookies[i.name] = i.value
-            login_ok = False
-            if cookies.has_key('userId'):
-                already_logged_in = check_for_subscription()
-
-                if already_logged_in:
-                    addon_log('Already logged in')
-                    return True
-                else:
-                    addon_log('Not yet logged in')
-                    return gamepass_login()
-            else:
-                return gamepass_login()
-    elif subscription == '0':
-        if addon.getSetting('sans_login') == 'true':
-            return True
+# Handles to neccesary steps and checks to login to NFL Game Pass.
+def login_gamepass(username=None, password=None):
+    if check_for_subscription():
+        addon_log('Already logged into Game Pass.')
+        return True
     else:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Account Info Not Set", "Please set your Game Pass username and password", "in Add-on Settings.")
-        addon_log('No account settings detected.')
-        return False
+        if username and password:
+            addon_log('Not (yet) logged into Game Pass.')
+            login_to_account()
+            return check_for_subscription()
+        else:
+            # might need sans-login check here, though hoping above subscription check is enough
+            addon_log('No username and password supplied.')
+            return False
+
+
+# Handles to neccesary steps and checks to login to NFL Rewind.
+def login_rewind(username, password):
+    if check_for_subscription():
+        addon_log('Already logged in Game Rewind.')
+        return True
+    else:
+        if username and password:
+            addon_log('Not (yet) logged into Game Rewind.')
+            login_to_account()
+            if check_for_subscription() and check_for_service():
+                return True
+            else:
+                return False
+        else:
+            addon_log('No username and password supplied.')
+            return False
 
 
 def check_for_subscription():
@@ -96,18 +94,20 @@ def check_for_subscription():
         sc_dict = xmltodict.parse(sc_data)['result']
 
         if sc_dict.has_key('subscription'):
-            addon_log('Game Pass subscription detected.')
+            addon_log('Subscription detected.')
             return True
         else:
-            addon_log('No Game Pass subscription was detected.')
+            addon_log('No subscription was detected.')
             return False
     except:
-        dialog = xbmcgui.Dialog()
         addon_log('Subscription detection failed gloriously.')
-        return False
+        raise
 
 
-def gamepass_login():
+# NFL Game Pass/Rewind "helpfully" does not give any indication whether the
+# login was successful or not. Thus, check_for_subscription() should be used
+# afterwards to determine success or failure.
+def login_to_account():
     url = 'https://id.s.nfl.com/login'
     post_data = {
         'username': username,
@@ -117,16 +117,6 @@ def gamepass_login():
         'success_url': base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
     }
     login_data = make_request(url, post_data)
-
-    login_success = check_for_subscription()
-
-    if login_success:
-        return True
-    else:
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL Game Pass failed.", "Make sure your account information is correct.")
-        addon_log('Game Pass login failure')
-        return False
 
 
 # The plid parameter used when requesting the video path appears to be an MD5 of... something.
