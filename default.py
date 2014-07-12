@@ -13,12 +13,14 @@ import StorageServer
 import xml.etree.ElementTree as ET
 import random
 import md5
+import xmltodict
 from uuid import getnode as get_mac
 from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 
-from resources.lib.game_xbmc import *
+from resources.lib.game_common import *
+from resources.lib.game_globals import *
     
 class myPlayer(xbmc.Player):
 
@@ -66,8 +68,19 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
            listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
            self.weeks_list.addItem(listitem)
         for i in show_archives.keys():
-           listitem = xbmcgui.ListItem(i)
+           if not(i == 'NFL RedZone'):
+              listitem = xbmcgui.ListItem(i)
+              self.weeks_list.addItem(listitem)
+
+    def display_redzone(self):
+        url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+        simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+        simple_dict = xmltodict.parse(simple_data)['result']
+        if simple_dict['rzPhase'] == 'in':
+           listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
            self.weeks_list.addItem(listitem)
+        listitem = xbmcgui.ListItem('NFL RedZone - Archive', 'NFL RedZone - Archive')
+        self.weeks_list.addItem(listitem)
 
     def display_weeks_games(self):
         self.games_list.reset()
@@ -81,6 +94,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 	if games:
 	   date_time_format = '%Y-%m-%dT%H:%M:%S.000'
 	   for game in games:
+              isLive     = 'false'
+              isPlayable = 'true'
 	      home_team = game['homeTeam']
 	      # sometimes the first item is empty
 	      if home_team['name'] is None:
@@ -95,19 +110,43 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 		       label = language(30014)
 	            else:
 	               label = 'Live'
-	         game_ids[label] = game[i]
+	            game_ids[label] = game[i]
 
 	      away_team = game['awayTeam']
-	      game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['id'], home_team['id'])
+	      game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
               game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-	      game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
-              game_date_string = game_datetime.strftime('%A, %b %d [CR] %I:%M %p')
+
+              if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
+                 game_name_full += ' - Live'
+                 isLive = 'true'
+              elif game.has_key('gameEndTimeGMT'):
+                 try:
+                    start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+                    end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
+                    game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
+                 except:
+                    addon_log(format_exc())
+                    if game.has_key('result'):
+                        game_info = ' - Final'
+              else:
+                 try:
+                    # may want to change this to game['gameTimeGMT'] or do a setting maybe
+                    game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                    game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                    if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
+                       isPlayable = 'false'
+                 except:
+                    game_datetime = game['date'].split('T')
+                    game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
+              
               listitem = xbmcgui.ListItem(game_name_shrt,game_name_full)
               listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
 	      listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
-              listitem.setProperty('game_info', game_date_string)
+              listitem.setProperty('game_info', game_info)
               listitem.setProperty('is_game', 'true')
               listitem.setProperty('is_show', 'false')
+              listitem.setProperty('isPlayable', isPlayable)
+              listitem.setProperty('isLive', isLive)
 	      params = {'name': game_name_full, 'url': game_ids}
 	      url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
 	      listitem.setProperty('url', url)
@@ -137,18 +176,23 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 addon_log('Exception adding archive directory: %s' %format_exc())
                 addon_log('Directory name: %s' %i['name'])
 
+    def playUrl(self, url):
+        player = myPlayer(parent=window)
+        player.play(url)
+
+        while player.isPlaying():
+           xbmc.sleep(2000) 
+
     def onClick(self, controlId):
-        #if Gamepass is selected
-        if controlId == 110:
-           self.main_selection = 'GP'
-           self.games_list.reset()
-           self.weeks_list.reset()
-           self.season_list.reset()
-           self.display_seasons()
         
-        #if Nfl Network is selected
-        if controlId == 130:
-           self.main_selection = 'NW'
+        if controlId in[110, 120, 130]:
+           if controlId == 110:
+              self.main_selection = 'GP'
+           elif controlId == 120:
+              self.main_selection = 'RZ'
+           elif controlId == 130:
+              self.main_selection = 'NW'
+
            self.games_list.reset()
            self.weeks_list.reset()
            self.season_list.reset()
@@ -159,6 +203,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
            self.weeks_list.reset()
            self.games_list.reset()              
            self.selected_season = self.season_list.getSelectedItem().getLabel()
+
            if self.main_selection == 'GP':
               weeks = get_seasons_weeks(self.selected_season)
               for week_code, week_name in sorted(weeks.iteritems()):
@@ -166,7 +211,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                  listitem.setProperty('week_code', week_code)
                  self.weeks_list.addItem(listitem)
            elif self.main_selection == 'NW':
-               self.display_nfl_network_archive()
+              self.display_nfl_network_archive()
+           elif self.main_selection == 'RZ':
+              self.display_redzone()
 
         #if a week/show is selected
         if controlId == 220:
@@ -176,18 +223,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                self.display_weeks_games()
             elif self.main_selection == 'NW' and self.weeks_list.getSelectedItem().getLabel() == 'NFL Network - Live':
                resolvedItem = set_resolved_url(self.weeks_list.getSelectedItem().getLabel(), 'nfl_network_url') 
-               player = myPlayer(parent=window)
-               player.play(resolvedItem.getLabel())
-
-               while player.isPlaying():
-                  xbmc.sleep(1000)  
+               self.playUrl(resolvedItem.getLabel())
             elif self.main_selection == 'NW':
                show_name = self.weeks_list.getSelectedItem().getLabel()
                self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
+            elif self.main_selection == 'RZ':
+               if self.weeks_list.getSelectedItem().getLabel() == 'NFL RedZone - Archive':
+                  self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
 
         #if a game/show is selected
         if controlId == 230:
-            if self.main_selection == 'GP':
+            if self.main_selection == 'GP' and self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
                selectedGame = self.games_list.getSelectedItem() 
                url = selectedGame.getProperty('url')
                params = parse_qs(urlparse(url).query)
@@ -196,20 +242,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                url = params['url']
                resolvedItem = set_resolved_url(selectedGame.getLabel2(), url)
                
-               player = myPlayer(parent=window)
-               player.play(resolvedItem.getLabel())
-
-               while player.isPlaying():
-                  xbmc.sleep(1000)
+               self.playUrl(resolvedItem.getLabel())
             
-            if self.main_selection == 'NW':
+            if self.main_selection in ['NW', 'RZ']:
                url = self.games_list.getSelectedItem().getProperty('url')
                resolvedItem = resolve_show_archive_url(url)
-               player = myPlayer(parent=window)
-               player.play(resolvedItem.getLabel())
-
-               while player.isPlaying():
-                  xbmc.sleep(1000)
+               self.playUrl(resolvedItem.getLabel())
             
 
 if not xbmcvfs.exists(addon_profile):
