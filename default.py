@@ -1,20 +1,12 @@
 ﻿import urllib
-import urllib2
-import re
 import os
-import json
-import cookielib
 import time
 import xbmcplugin
 import xbmcgui
 import xbmcvfs
 import xbmcaddon
 import StorageServer
-import xml.etree.ElementTree as ET
-import random
-import md5
 import xmltodict
-from uuid import getnode as get_mac
 from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
