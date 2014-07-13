@@ -13,6 +13,7 @@ from urlparse import urlparse, parse_qs
 
 from resources.lib.game_common import *
 from resources.lib.game_globals import *
+from resources.lib.game_xbmc import *
 
 class myPlayer(xbmc.Player):
     def __init__(self, parent, *args, **kwargs):
