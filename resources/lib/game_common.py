@@ -401,7 +401,7 @@ def get_show_archive(name, url):
 def resolve_show_archive_url(url):
     manifest = get_manifest(url)
     stream_url = parse_manifest(manifest)
-    item = xbmcgui.ListItem(path=stream_url)
+    item = xbmcgui.ListItem(label=stream_url,path=stream_url)
     return item
 
 
@@ -473,5 +473,5 @@ def set_resolved_url(name, url):
                     game_id = game_ids[versions[ret]]
         resolved_url = get_stream_url(game_id)
     addon_log('Resolved URL: %s.' %resolved_url)
-    item = xbmcgui.ListItem(path=resolved_url)
+    item = xbmcgui.ListItem(label=resolved_url,path=resolved_url)
     return item
