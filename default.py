@@ -73,7 +73,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_redzone(self):
         url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-        simple_data = make_request(url, urllib.urlencode({'isFlex':'true'}))
+        simple_data = make_request(url, {'isFlex':'true'})
         simple_dict = xmltodict.parse(simple_data)['result']
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
