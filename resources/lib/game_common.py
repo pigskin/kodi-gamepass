@@ -5,6 +5,7 @@ import re
 import hashlib
 import random
 from operator import itemgetter
+from urlparse import urlsplit
 from uuid import getnode as get_mac
 import xmltodict
 
@@ -132,9 +133,8 @@ def gen_plid():
 
 # the XML manifest of all available streams for a game
 def get_manifest(video_path):
-    url, port, path = video_path.partition(':443')
-    path = path.replace('?', '&')
-    url = url.replace('adaptive://', 'http://') + port + '/play?url=' + path
+    parsed_url = urlsplit(video_path)
+    url = 'http://' + parsed_url.netloc + '/play?url=' + parsed_url.path + '&' + parsed_url.query
     manifest_data = make_request(url)
     return manifest_data
 
