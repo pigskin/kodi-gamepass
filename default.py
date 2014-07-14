@@ -1,18 +1,14 @@
 ﻿import urllib
-import os
 import time
 import xbmcplugin
 import xbmcgui
 import xbmcvfs
-import xbmcaddon
-import StorageServer
 import xmltodict
 from datetime import datetime, timedelta
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 
 from resources.lib.game_common import *
-from resources.lib.game_globals import *
 
 class myPlayer(xbmc.Player):
     def __init__(self, parent, *args, **kwargs):
