@@ -118,7 +118,7 @@ def login_gamepass(username=None, password=None):
     else:
         if username and password:
             addon_log('Not (yet) logged into Game Pass.')
-            login_to_account()
+            login_to_account(username, password)
             return check_for_subscription()
         else:
             # might need sans-login check here, though hoping above subscription check is enough
@@ -134,7 +134,7 @@ def login_rewind(username, password):
     else:
         if username and password:
             addon_log('Not (yet) logged into Game Rewind.')
-            login_to_account()
+            login_to_account(username, password)
             if check_for_subscription() and check_for_service():
                 return True
             else:
@@ -166,7 +166,7 @@ def check_for_subscription():
 # NFL Game Pass/Rewind "helpfully" does not give any indication whether the
 # login was successful or not. Thus, check_for_subscription() should be used
 # afterwards to determine success or failure.
-def login_to_account():
+def login_to_account(username, password):
     url = 'https://id.s.nfl.com/login'
     post_data = {
         'username': username,
