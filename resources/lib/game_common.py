@@ -22,7 +22,6 @@ import xbmcgui
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')
-addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
 addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 addon_version = addon.getAddonInfo('version')
 debug = addon.getSetting('debug')
@@ -30,8 +29,6 @@ language = addon.getLocalizedString
 subscription = addon.getSetting('subscription')
 
 if subscription == '0': # game pass
-    username = addon.getSetting('email')
-    password = addon.getSetting('password')
     cache = StorageServer.StorageServer("nfl_game_pass", 2)
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     base_url = 'https://gamepass.nfl.com/nflgp'
@@ -49,8 +46,6 @@ if subscription == '0': # game pass
         'Hard Knocks': {'2014': '220'}
     }
 else: # game rewind
-    username = addon.getSetting('gr_email')
-    password = addon.getSetting('gr_password')
     cache = StorageServer.StorageServer("nfl_game_rewind", 2)
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
     base_url = 'https://gamerewind.nfl.com/nflgr'

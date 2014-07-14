@@ -241,13 +241,15 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 if (__name__ == "__main__"):
     addon_log('script starting')
 
+    addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
+
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
 
     if subscription == '0': # Game Pass
-        auth = login_gamepass(username, password)
+        auth = login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
     else: # Game Rewind
-        auth = login_rewind(username, password)
+        auth = login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
 
     if auth:
         window = GamepassGUI('script-gamepass.xml', addon_path)
