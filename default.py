@@ -13,7 +13,6 @@ from urlparse import urlparse, parse_qs
 
 from resources.lib.game_common import *
 from resources.lib.game_globals import *
-from resources.lib.game_xbmc import *
 
 class myPlayer(xbmc.Player):
     def __init__(self, parent, *args, **kwargs):
@@ -241,13 +240,23 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.playUrl(resolvedItem.getLabel())
 
 
-if not xbmcvfs.exists(addon_profile):
-    xbmcvfs.mkdir(addon_profile)
-
 if (__name__ == "__main__"):
     addon_log('script starting')
-    start_addon()
-    window = GamepassGUI('script-gamepass.xml', addon_path)
-    window.doModal()
+
+    if not xbmcvfs.exists(addon_profile):
+        xbmcvfs.mkdir(addon_profile)
+
+    if subscription == '0': # Game Pass
+        auth = login_gamepass(username, password)
+    else: # Game Rewind
+        auth = login_rewind(username, password)
+
+    if auth:
+        window = GamepassGUI('script-gamepass.xml', addon_path)
+        window.doModal()
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Login Failed", "Logging into NFL Game Pass/Rewind failed.", "Make sure your account information is correct.")
+        addon_log('auth failure')
 
 addon_log('script finished')
