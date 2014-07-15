@@ -457,25 +457,14 @@ def resolve_show_archive_url(url):
 def get_publishpoint_url(game_id):
     set_cookies = get_current_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
-    nt = '1'
-    if (game_id == 'nfl_network' or game_id == 'rz'):
-        type = 'channel'
-        if game_id == 'rz':
-            id = '2'
-        else:
-            id = '1'
-        post_data = {
-            'id': id,
-            'type': type,
-            'nt': nt
-        }
+
+    if game_id == 'nfl_network':
+        post_data = {'id': '1', 'type': 'channel', 'nt': '1'}
+    elif game_id == 'rz':
+        post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
     else:
-        post_data = {
-            'id' : game_id,
-            'type' : 'game',
-            'nt' : nt,
-            'gt' : 'live'
-        }
+        post_data = {'id': game_id, 'type': 'game', 'nt': '1', 'gt': 'live'}
+
     headers = {'User-Agent' : 'Android'}
     m3u8_data = make_request(url, post_data, headers)
     m3u8_dict = xmltodict.parse(m3u8_data)['result']
