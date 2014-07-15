@@ -6,7 +6,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 import xmltodict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 
@@ -207,10 +207,46 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if self.main_selection == 'GP':
                 weeks = get_seasons_weeks(self.selected_season)
-                for week_code, week_name in sorted(weeks.iteritems()):
-                    listitem = xbmcgui.ListItem(week_name)
-                    listitem.setProperty('week_code', week_code)
-                    self.weeks_list.addItem(listitem)
+                
+                # set current week
+                week_current = datetime.now().isocalendar()[1]
+
+                # check which season we're in, if current there might be upcoming games
+                if int(self.selected_season) == datetime.now().isocalendar()[0]:
+                    current_season = 'true'
+                elif week_current < 8 and int(self.selected_season) == datetime.now().isocalendar()[0]-1:
+                    current_season = 'true'
+                else:
+                    current_season = 'false'
+
+                # we need to calculate real week and compare to current week for the
+                # active season, also need to figure out how to remove hardcoded
+                # preseason start date.
+                if current_season == 'true':
+                    pre = date(2014,8,3).isocalendar()[1]
+                    reg = pre + 4
+
+                    for week_code, week_name in sorted(weeks.iteritems()):
+                        # calculate real week, remove leading digit and add current week.
+                        if int(week_code[:1]) == 1:
+                            week_real = int(week_code[-2:]) + pre
+                        elif int(week_code[:1]) == 2:
+                            week_real = int(week_code[-2:]) + reg
+
+                        # "disable" if game is in the future
+                        if week_real > week_current and week_current <= 53:
+                            week_name = self.coloring(week_name,"disabled",week_name)
+                        elif week_real > week_current and week_real < 8:
+                            week_name = self.coloring(week_name,"disabled",week_name)
+
+                        listitem = xbmcgui.ListItem(week_name)
+                        listitem.setProperty('week_code', week_code)
+                        self.weeks_list.addItem(listitem)
+                else:
+                    for week_code, week_name in sorted(weeks.iteritems()):
+                        listitem = xbmcgui.ListItem(week_name)
+                        listitem.setProperty('week_code', week_code)
+                        self.weeks_list.addItem(listitem)
             elif self.main_selection == 'NW':
                 self.display_nfl_network_archive()
             elif self.main_selection == 'RZ':
