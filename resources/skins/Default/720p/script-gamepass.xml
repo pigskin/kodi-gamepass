@@ -383,6 +383,24 @@
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="label">
+                    <description>Upcoming game</description>
+                    <left>230</left>
+                    <top>50</top>
+                    <width>240</width>
+                    <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                    <align>center</align>
+                    <scroll>true</scroll>
+                    <label>Upcoming game!</label>
+                    <number></number>
+                    <angle></angle>
+                    <haspath>false</haspath>
+                    <font>font12</font>
+                    <textcolor>FF9C1518</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>25</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                </control>
+                <control type="label">
                     <description>Show Name</description>
                     <left>110</left>
                     <top>10</top>
@@ -476,6 +494,24 @@
                     <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>25</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                </control>
+                <control type="label">
+                    <description>Upcoming game</description>
+                    <left>230</left>
+                    <top>50</top>
+                    <width>240</width>
+                    <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                    <align>center</align>
+                    <scroll>true</scroll>
+                    <label>Upcoming game!</label>
+                    <number></number>
+                    <angle></angle>
+                    <haspath>false</haspath>
+                    <font>font12</font>
+                    <textcolor>FF9C1518</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
