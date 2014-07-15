@@ -46,6 +46,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list = self.window.getControl(230)
         self.setFocus(self.window.getControl(100))
 
+    def coloring(self, text, color, colorword):
+        if color == "enabled":
+            color="FF333333"
+        if color == "disabled":
+            color="FF9C1518"
+        if color == "disabled-info":
+            color="FF904D4F"
+        colored_text = text.replace( colorword , "[COLOR=%s]%s[/COLOR]" % ( color , colorword ) )
+        return colored_text
+
     def display_seasons(self):
         seasons = get_seasons()
         for season in seasons:
@@ -124,6 +134,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
                         if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
                             isPlayable = 'false'
+                            game_name_full = self.coloring(game_name_full,"disabled",game_name_full)
+                            game_name_shrt = self.coloring(game_name_shrt,"disabled",game_name_shrt)
+                            game_info = self.coloring(game_info,"disabled-info",game_info)
                     except:
                         game_datetime = game['date'].split('T')
                         game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
