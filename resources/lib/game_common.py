@@ -370,31 +370,26 @@ def get_weeks_games(season, week):
     return games
 
 
-def get_stream_url(game_id, post_data=None):
+def get_stream_url(game_id):
     set_cookies = get_current_week()
     if cache.get('mode') == '4':
         set_cookies = get_weeks_games(*eval(cache.get('current_schedule')))
-    video_path = get_video_path(game_id, post_data)
+    video_path = get_video_path(game_id)
     manifest = get_manifest(video_path)
     stream_url = parse_manifest(manifest)
     return stream_url
 
 
 # the "video path" provides the info necessary to request the stream's manifest
-def get_video_path(game_id, post_data):
+def get_video_path(game_id):
     url = servlets_url + '/servlets/encryptvideopath'
     plid = gen_plid()
-    if post_data is None:
-        type = 'fgpa'
-    elif post_data == 'NFL Network':
-        type = 'channel'
     post_data = {
         'path': game_id,
         'plid': plid,
-        'type': type,
+        'type': 'fgpa',
         'isFlex': 'true'
     }
-
     video_path_data = make_request(url, post_data)
 
     try:
