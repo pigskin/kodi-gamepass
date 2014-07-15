@@ -106,6 +106,7 @@ def check_cache():
 
 
 # Handles to neccesary steps and checks to login to NFL Game Pass.
+# Some regions are free, hence why username and password are optional
 def login_gamepass(username=None, password=None):
     if check_for_subscription():
         addon_log('Already logged into Game Pass.')
@@ -124,7 +125,7 @@ def login_gamepass(username=None, password=None):
 # Handles to neccesary steps and checks to login to NFL Rewind.
 def login_rewind(username, password):
     if check_for_subscription():
-        addon_log('Already logged in Game Rewind.')
+        addon_log('Already logged into Game Rewind.')
         return True
     else:
         if username and password:
