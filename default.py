@@ -212,7 +212,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 week_current = datetime.now().isocalendar()[1]
 
                 # check which season we're in, if current there might be upcoming games
-                if int(self.selected_season) == datetime.now().isocalendar()[0]:
+                if week_current > 10 and int(self.selected_season) == datetime.now().isocalendar()[0]:
                     current_season = 'true'
                 elif week_current < 8 and int(self.selected_season) == datetime.now().isocalendar()[0]-1:
                     current_season = 'true'
