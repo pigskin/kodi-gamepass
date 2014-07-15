@@ -450,8 +450,7 @@ def get_show_archive(name, url):
 def resolve_show_archive_url(url):
     manifest = get_manifest(url)
     stream_url = parse_manifest(manifest)
-    item = xbmcgui.ListItem(label=stream_url,path=stream_url)
-    return item
+    return stream_url
 
 
 def get_publishpoint_url(game_id):

@@ -234,8 +234,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if self.main_selection in ['NW', 'RZ']:
                 url = self.games_list.getSelectedItem().getProperty('url')
-                resolvedItem = resolve_show_archive_url(url)
-                self.playUrl(resolvedItem.getLabel())
+                stream_url = resolve_show_archive_url(url)
+                self.playUrl(stream_url)
 
 
 if (__name__ == "__main__"):
