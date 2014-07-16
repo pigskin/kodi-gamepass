@@ -6,7 +6,6 @@ import hashlib
 from operator import itemgetter
 import os
 import random
-import re
 import requests2 as requests
 import StorageServer
 import time
@@ -497,12 +496,14 @@ def get_publishpoint_url(game_id):
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
     return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
 
+
 # Check if Game Rewind service is blacked-out due to live games in progress
 def check_for_service():
     no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
                   ' Please check back later.')
     service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
-    if len(re.findall(no_service, service_data)) > 0:
+
+    if no_service in service_data:
         lines = no_service.replace('.', ',').split(',')
         dialog = xbmcgui.Dialog()
         dialog.ok(language(30018), lines[0], lines[1], lines[2])
