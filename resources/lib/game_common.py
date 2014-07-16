@@ -237,6 +237,7 @@ def get_seasons_weeks(season):
 
     try:
         cache_seasons_and_weeks()
+        weeks = eval(cache.get('weeks'))
         weeks_dates = eval(cache.get('weeks_dates'))
         output = {
             "weeks": weeks[season],
