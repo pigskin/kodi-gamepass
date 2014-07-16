@@ -345,12 +345,15 @@ def cache_seasons_and_weeks():
     return True
 
 
-def get_current_week():
-    url = servlets_url + '/servlets/simpleconsole'
-    data = make_request(url, {'isFlex':'true'})
-    if data:
-        return data
-    return 'False'
+# Returns the current season and week_code in a dict
+# e.g. {'2014': '210'}
+def get_current_season_and_week():
+    sc_url = servlets_url + '/servlets/simpleconsole'
+    sc_data = make_request(sc_url, {'isFlex':'true'})
+
+    sc_dict = xmltodict.parse(sc_data)['result']
+    current_s_w = {sc_dict['currentSeason']: sc_dict['currentWeek']}
+    return current_s_w
 
 
 # season is in format: YYYY
@@ -372,7 +375,7 @@ def get_weeks_games(season, week):
 
 
 def get_stream_url(game_id):
-    set_cookies = get_current_week()
+    set_cookies = get_current_season_and_week()
     if cache.get('mode') == '4':
         set_cookies = get_weeks_games(*eval(cache.get('current_schedule')))
     video_path = get_video_path(game_id)
@@ -454,7 +457,7 @@ def resolve_show_archive_url(url):
 
 
 def get_publishpoint_url(game_id):
-    set_cookies = get_current_week()
+    set_cookies = get_current_season_and_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
 
     if game_id == 'nfl_network':
