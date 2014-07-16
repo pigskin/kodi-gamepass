@@ -285,6 +285,13 @@ if (__name__ == "__main__"):
             dialog.ok('Login Failed',
                       'Logging into NFL Game Pass/Rewind failed.',
                       'Make sure your account information is correct.')
+    except:
+        addon_log(format_exc())
+        dialog = xbmcgui.Dialog()
+        dialog.ok('Epic Failure',
+                  'Some bad jujumagumbo just went down.',
+                  'Please enable debuging, and submit a bug report.')
+        sys.exit(0)
 
     window = GamepassGUI('script-gamepass.xml', addon_path)
     window.doModal()
