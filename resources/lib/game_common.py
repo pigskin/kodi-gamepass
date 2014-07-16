@@ -143,8 +143,7 @@ def login_rewind(username, password):
 
 def check_for_subscription():
     sc_url = servlets_url + '/servlets/simpleconsole'
-    sc_post_data = { 'isFlex': 'true' }
-    sc_data = make_request(sc_url, sc_post_data)
+    sc_data = make_request(sc_url, {'isFlex': 'true'})
 
     try:
         sc_dict = xmltodict.parse(sc_data)['result']
