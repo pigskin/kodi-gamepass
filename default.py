@@ -267,17 +267,26 @@ if (__name__ == "__main__"):
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
 
-    if subscription == '0': # Game Pass
-        auth = login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
-    else: # Game Rewind
-        auth = login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
-
-    if auth:
-        window = GamepassGUI('script-gamepass.xml', addon_path)
-        window.doModal()
-    else:
+    try:
+        if subscription == '0': # Game Pass
+            login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
+        else: # Game Rewind
+            login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
+    except LoginFailure as e:
         dialog = xbmcgui.Dialog()
-        dialog.ok("Login Failed", "Logging into NFL Game Pass/Rewind failed.", "Make sure your account information is correct.")
-        addon_log('auth failure')
+        if e.value == 'Game Rewind Blackout':
+            addon_log('Rewind is in blackout.')
+            dialog.ok(language(30018),
+                      'Due to broadcast restrictions',
+                      'NFL Game Rewind is currently unavailable.',
+                      'Please try again later.')
+        else:
+            addon_log('auth failure')
+            dialog.ok('Login Failed',
+                      'Logging into NFL Game Pass/Rewind failed.',
+                      'Make sure your account information is correct.')
+
+    window = GamepassGUI('script-gamepass.xml', addon_path)
+    window.doModal()
 
 addon_log('script finished')

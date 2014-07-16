@@ -67,6 +67,13 @@ s = requests.Session()
 s.cookies = cookie_jar
 
 
+class LoginFailure(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+
 def addon_log(string):
     if debug == 'true':
         xbmc.log("[%s-%s]: %s" %(addon_id, addon_version, string))
@@ -109,34 +116,29 @@ def check_cache():
 def login_gamepass(username=None, password=None):
     if check_for_subscription():
         addon_log('Already logged into Game Pass.')
-        return True
     else:
         if username and password:
             addon_log('Not (yet) logged into Game Pass.')
             login_to_account(username, password)
-            return check_for_subscription()
+            if not check_for_subscription:
+                raise LoginFailure('Game Pass login failed.')
         else:
             # might need sans-login check here, though hoping above subscription check is enough
             addon_log('No username and password supplied.')
-            return False
+            raise LoginFailure('No username and password supplied.')
 
 
 # Handles to neccesary steps and checks to login to NFL Rewind.
 def login_rewind(username, password):
     if check_for_subscription():
         addon_log('Already logged into Game Rewind.')
-        return True
     else:
-        if username and password:
-            addon_log('Not (yet) logged into Game Rewind.')
-            login_to_account(username, password)
-            if check_for_subscription() and check_for_service():
-                return True
-            else:
-                return False
-        else:
-            addon_log('No username and password supplied.')
-            return False
+        addon_log('Not (yet) logged into Game Rewind.')
+        login_to_account(username, password)
+        if not check_for_subscription():
+            raise LoginFailure('Game Rewind login failed.')
+        elif service_blackout():
+            raise LoginFailure('Game Rewind Blackout')
 
 
 def check_for_subscription():
@@ -498,17 +500,15 @@ def get_publishpoint_url(game_id):
 
 
 # Check if Game Rewind service is blacked-out due to live games in progress
-def check_for_service():
+def service_blackout():
     no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
                   ' Please check back later.')
     service_data = make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
 
     if no_service in service_data:
-        lines = no_service.replace('.', ',').split(',')
-        dialog = xbmcgui.Dialog()
-        dialog.ok(language(30018), lines[0], lines[1], lines[2])
+        return True
+    else:
         return False
-    return True
 
 
 def set_resolved_url(name, url):
