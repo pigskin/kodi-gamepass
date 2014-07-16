@@ -211,9 +211,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     week_code = week_code[:3]
 
                     week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
-                    now_time = int(time.time())
+                    time_utc = str(datetime.utcnow())[:-7]
+                    time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
 
-                    if week_time > now_time:
+                    if week_time > time_now:
                         week_name = self.coloring(week_name,"disabled",week_name)
 
                     listitem = xbmcgui.ListItem(week_name)
