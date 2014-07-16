@@ -316,14 +316,21 @@ def cache_seasons_and_weeks():
             weeks[year] = {}
 
             for week in season['week']:
+                # games prior to 2013 don't have dates in the xml-file, so I just
+                # put a static prior date
+                if int(year) >= 2013:
+                    week_start = '_'+week['@start']
+                else:
+                    week_start = '_20010203'
+
                 if week['@section'] == "pre":
-                    week_code = '1' + week['@value'].zfill(2)
+                    week_code = '1' + week['@value'].zfill(2) + week_start
                     weeks[year][week_code] = 'Preseason Week ' + week['@value']
                 elif week['@section'] == "reg":
-                    week_code = '2' + week['@value'].zfill(2)
+                    week_code = '2' + week['@value'].zfill(2) + week_start
                     weeks[year][week_code] = 'Week ' + week['@value']
                 elif week['@section'] == "post":
-                    week_code = '2' + week['@value'].zfill(2)
+                    week_code = '2' + week['@value'].zfill(2) + week_start
                     weeks[year][week_code] = week['@label']
                 else:
                     addon_log('Unknown week type: %' %week['@section'])
@@ -361,7 +368,7 @@ def get_weeks_games(season, week):
     post_data = {
         'isFlex': 'true',
         'season': season,
-        'week': week
+        'week': week[:3]
     }
 
     game_data = make_request(url, post_data)
