@@ -226,14 +226,24 @@ def get_current_season():
 def get_seasons_weeks(season):
     try:
         weeks = eval(cache.get('weeks'))
-        return weeks[season]
+        weeks_dates = eval(cache.get('weeks_dates'))
+        output = {
+            "weeks": weeks[season],
+            "dates": weeks_dates[season]
+        }
+        return output
     except:
         pass
 
     try:
         cache_seasons_and_weeks()
         weeks = eval(cache.get('weeks'))
-        return weeks[season]
+        weeks_dates = eval(cache.get('weeks_dates'))
+        output = {
+            "weeks": weeks[season],
+            "dates": weeks_dates[season]
+        }
+        return output
     except:
         raise
 
@@ -294,6 +304,7 @@ def select_bitrate(streams):
 def cache_seasons_and_weeks():
     seasons = []
     weeks = {}
+    weeks_dates = {}
     current_season = ''
 
     try:
@@ -314,24 +325,28 @@ def cache_seasons_and_weeks():
 
             seasons.append(year)
             weeks[year] = {}
+            weeks_dates[year] = {}
 
             for week in season['week']:
                 # games prior to 2013 don't have dates in the xml-file, so I just
                 # put a static prior date
                 if int(year) >= 2013:
-                    week_start = '_'+week['@start']
+                    week_start = week['@start']
                 else:
-                    week_start = '_20010203'
+                    week_start = '20010203'
 
                 if week['@section'] == "pre":
-                    week_code = '1' + week['@value'].zfill(2) + week_start
+                    week_code = '1' + week['@value'].zfill(2)
                     weeks[year][week_code] = 'Preseason Week ' + week['@value']
+                    weeks_dates[year][week_code] = week_start
                 elif week['@section'] == "reg":
-                    week_code = '2' + week['@value'].zfill(2) + week_start
+                    week_code = '2' + week['@value'].zfill(2)
                     weeks[year][week_code] = 'Week ' + week['@value']
+                    weeks_dates[year][week_code] = week_start
                 elif week['@section'] == "post":
-                    week_code = '2' + week['@value'].zfill(2) + week_start
+                    week_code = '2' + week['@value'].zfill(2)
                     weeks[year][week_code] = week['@label']
+                    weeks_dates[year][week_code] = week_start
                 else:
                     addon_log('Unknown week type: %' %week['@section'])
     except:
@@ -344,6 +359,7 @@ def cache_seasons_and_weeks():
     cache.set('current_season', current_season)
     addon_log('Current season cached')
     cache.set('weeks', repr(weeks))
+    cache.set('weeks_dates', repr(weeks_dates))
     addon_log('Weeks cached')
 
     addon_log('seasons: %s' %seasons)
@@ -371,7 +387,7 @@ def get_weeks_games(season, week):
     post_data = {
         'isFlex': 'true',
         'season': season,
-        'week': week[:3]
+        'week': week
     }
 
     game_data = make_request(url, post_data)

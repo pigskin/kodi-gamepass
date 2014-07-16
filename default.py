@@ -206,9 +206,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if self.main_selection == 'GP':
                 weeks = get_seasons_weeks(self.selected_season)
 
-                for week_code, week_name in sorted(weeks.iteritems()):
-                    week_date = week_code[4:]+' 06:00' 
-                    week_code = week_code[:3]
+                for week_code, week_name in sorted(weeks['weeks'].iteritems()):
+                    week_date = weeks['dates'][week_code]+' 06:00'
 
                     week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
                     time_utc = str(datetime.utcnow())[:-7]
