@@ -6,7 +6,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 import xmltodict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from traceback import format_exc
 from urlparse import urlparse, parse_qs
 
@@ -45,6 +45,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.weeks_list = self.window.getControl(220)
         self.games_list = self.window.getControl(230)
         self.setFocus(self.window.getControl(100))
+
+    def coloring(self, text, color, colorword):
+        if color == "disabled":
+            color="FF9C1518"
+        if color == "disabled-info":
+            color="FF904D4F"
+        colored_text = text.replace( colorword , "[COLOR=%s]%s[/COLOR]" % ( color , colorword ) )
+        return colored_text
 
     def display_seasons(self):
         seasons = get_seasons()
@@ -124,6 +132,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
                         if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
                             isPlayable = 'false'
+                            game_name_full = self.coloring(game_name_full,"disabled",game_name_full)
+                            game_name_shrt = self.coloring(game_name_shrt,"disabled",game_name_shrt)
+                            game_info = self.coloring(game_info,"disabled-info",game_info)
                     except:
                         game_datetime = game['date'].split('T')
                         game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
@@ -194,7 +205,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if self.main_selection == 'GP':
                 weeks = get_seasons_weeks(self.selected_season)
-                for week_code, week_name in sorted(weeks.iteritems()):
+
+                for week_code, week_name in sorted(weeks['weeks'].iteritems()):
+                    week_date = weeks['dates'][week_code]+' 06:00' 
+
+                    week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
+                    time_utc = str(datetime.utcnow())[:-7]
+                    time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
+
+                    if week_time > time_now:
+                        week_name = self.coloring(week_name,"disabled",week_name)
+
                     listitem = xbmcgui.ListItem(week_name)
                     listitem.setProperty('week_code', week_code)
                     self.weeks_list.addItem(listitem)
