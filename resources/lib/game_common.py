@@ -479,7 +479,7 @@ def resolve_show_archive_url(url):
     return stream_url
 
 
-def get_publishpoint_url(game_id):
+def get_live_url(game_id):
     set_cookies = get_current_season_and_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
 
@@ -517,7 +517,7 @@ def set_resolved_url(name, url):
     except NameError:
         game_id = url
     if name.endswith('- Live'):
-        resolved_url = get_publishpoint_url(game_ids['Live'])
+        resolved_url = get_live_url(game_ids['Live'])
     else:
         preferred_version = int(addon.getSetting('preferred_game_version'))
         game_id = game_ids[language(30014)]
