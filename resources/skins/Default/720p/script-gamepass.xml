@@ -355,7 +355,16 @@
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
-                        <visible>true</visible>
+                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                </control>
+                <control type="image">
+                        <left>10</left>
+                        <top>0</top>
+                        <width>440</width>
+                        <height>80</height>
+                        <texture>GamePass/game_bg.png</texture>
+                        <colordiffuse>AAFFFFFF</colordiffuse>
+                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
@@ -409,12 +418,12 @@
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <scroll>true</scroll>
-                    <label>Upcoming game</label>
+                    <label>[B]Upcoming game[/B]</label>
                     <number></number>
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font10</font>
-                    <textcolor>FF9C1518</textcolor>
+                    <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
@@ -525,12 +534,12 @@
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <scroll>true</scroll>
-                    <label>Upcoming game</label>
+                    <label>[B]Upcoming game[/B]</label>
                     <number></number>
                     <angle></angle>
                     <haspath>false</haspath>
                     <font>font10</font>
-                    <textcolor>FF9C1518</textcolor>
+                    <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
