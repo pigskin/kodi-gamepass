@@ -77,8 +77,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         simple_dict = xmltodict.parse(simple_data)['result']
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+            listitem.setProperty('week_enabled', 'true')
             self.weeks_list.addItem(listitem)
         listitem = xbmcgui.ListItem('NFL RedZone - Archive', 'NFL RedZone - Archive')
+        listitem.setProperty('week_enabled', 'true')
         self.weeks_list.addItem(listitem)
 
     def display_weeks_games(self):
