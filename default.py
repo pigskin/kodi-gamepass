@@ -230,15 +230,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if self.main_selection == 'GP':
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
                 self.display_weeks_games()
-            elif self.main_selection == 'NW' and self.weeks_list.getSelectedItem().getLabel() == 'NFL Network - Live':
-                resolvedItem = set_resolved_url(self.weeks_list.getSelectedItem().getLabel(), 'nfl_network_url')
-                self.playUrl(resolvedItem.getLabel())
-            elif self.main_selection == 'NW':
+            else:
                 show_name = self.weeks_list.getSelectedItem().getLabel()
-                self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
-            elif self.main_selection == 'RZ':
-                if self.weeks_list.getSelectedItem().getLabel() == 'NFL RedZone - Archive':
-                    self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
+                if self.main_selection == 'NW' and show_name == 'NFL Network - Live':
+                    resolvedItem = set_resolved_url(show_name, 'nfl_network_url')
+                    self.playUrl(resolvedItem.getLabel())
+                elif self.main_selection == 'NW':
+                    self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
+                elif self.main_selection == 'RZ':
+                    if show_name == 'NFL RedZone - Archive':
+                        self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
 
         # if a game/show is selected
         if controlId == 230:
