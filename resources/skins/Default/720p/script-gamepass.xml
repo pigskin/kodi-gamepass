@@ -398,7 +398,16 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
-                        <visible>true</visible>
+                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                </control>
+                <control type="image">
+                        <left>22</left>
+                        <top>12</top>
+                        <width>80</width>
+                        <height>53</height>
+                        <info>ListItem.Property(away_thumb)</info>
+                        <colordiffuse>66FFFFFF</colordiffuse>
+                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
                 <control type="label">
                     <description>Game competitors text</description>
@@ -496,7 +505,16 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
-                        <visible>ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                </control>
+                <control type="image">
+                        <left>360</left>
+                        <top>13</top>
+                        <width>80</width>
+                        <height>53</height>
+                        <info>ListItem.Property(home_thumb)</info>
+                        <colordiffuse>66FFFFFF</colordiffuse>
+                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
             </itemlayout>
             <focusedlayout width="450" height="80">
@@ -523,7 +541,16 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
-                        <visible>true</visible>
+                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                </control>
+                <control type="image">
+                        <left>22</left>
+                        <top>12</top>
+                        <width>80</width>
+                        <height>53</height>
+                        <info>ListItem.Property(away_thumb)</info>
+                        <colordiffuse>99FFFFFF</colordiffuse>
+                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
                 <control type="label">
                     <description>Game competitors text</description>
@@ -621,7 +648,16 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
-                        <visible>ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                </control>
+                <control type="image">
+                        <left>360</left>
+                        <top>13</top>
+                        <width>80</width>
+                        <height>53</height>
+                        <info>ListItem.Property(home_thumb)</info>
+                        <colordiffuse>99FFFFFF</colordiffuse>
+                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
             </focusedlayout>
         </control>
