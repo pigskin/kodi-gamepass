@@ -381,7 +381,7 @@
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
-                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>10</left>
@@ -390,7 +390,7 @@
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
                         <colordiffuse>AAFFFFFF</colordiffuse>
-                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
@@ -398,7 +398,7 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
-                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
@@ -407,7 +407,7 @@
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <colordiffuse>66FFFFFF</colordiffuse>
-                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="label">
                     <description>Game competitors text</description>
@@ -524,7 +524,7 @@
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_focus2.png</texture>
-                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>10</left>
@@ -533,7 +533,7 @@
                         <height>80</height>
                         <texture>GamePass/game_focus2.png</texture>
                         <colordiffuse>CCFFFFFF</colordiffuse>
-                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
@@ -541,7 +541,7 @@
                         <width>80</width>
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
-                        <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
@@ -550,7 +550,7 @@
                         <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <colordiffuse>99FFFFFF</colordiffuse>
-                        <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
+                        <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="label">
                     <description>Game competitors text</description>
