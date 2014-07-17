@@ -48,9 +48,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def coloring(self, text, meaning):
         if meaning == "disabled":
-            color = "FF9C1518"
+            color = "FF000000"
         elif meaning == "disabled-info":
-            color = "FF904D4F"
+            color = "FF111111"
         colored_text = "[COLOR=%s]%s[/COLOR]" %(color, text)
         return colored_text
 
@@ -208,16 +208,19 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                 for week_code, week_name in sorted(weeks['weeks'].iteritems()):
                     week_date = weeks['dates'][week_code]+' 06:00'
+                    week_enabled = 'true'
 
                     week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
                     time_utc = str(datetime.utcnow())[:-7]
                     time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
 
                     if week_time > time_now:
-                        week_name = self.coloring(week_name, "disabled")
+                        week_name = self.coloring(week_name, "disabled-info")
+                        week_enabled = 'false'
 
                     listitem = xbmcgui.ListItem(week_name)
                     listitem.setProperty('week_code', week_code)
+                    listitem.setProperty('week_enabled', week_enabled)
                     self.weeks_list.addItem(listitem)
             elif self.main_selection == 'NW':
                 self.display_nfl_network_archive()
