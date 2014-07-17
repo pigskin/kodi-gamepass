@@ -46,12 +46,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list = self.window.getControl(230)
         self.setFocus(self.window.getControl(100))
 
-    def coloring(self, text, color, colorword):
-        if color == "disabled":
-            color="FF9C1518"
-        if color == "disabled-info":
-            color="FF904D4F"
-        colored_text = text.replace( colorword , "[COLOR=%s]%s[/COLOR]" % ( color , colorword ) )
+    def coloring(self, text, meaning):
+        if meaning == "disabled":
+            color = "FF9C1518"
+        elif meaning == "disabled-info":
+            color = "FF904D4F"
+        colored_text = "[COLOR=%s]%s[/COLOR]" %(color, text)
         return colored_text
 
     def display_seasons(self):
@@ -132,14 +132,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
                         if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
                             isPlayable = 'false'
-                            game_name_full = self.coloring(game_name_full,"disabled",game_name_full)
-                            game_name_shrt = self.coloring(game_name_shrt,"disabled",game_name_shrt)
-                            game_info = self.coloring(game_info,"disabled-info",game_info)
+                            game_name_full = self.coloring(game_name_full, "disabled")
+                            game_name_shrt = self.coloring(game_name_shrt, "disabled")
+                            game_info = self.coloring(game_info, "disabled-info")
                     except:
                         game_datetime = game['date'].split('T')
                         game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
 
-                listitem = xbmcgui.ListItem(game_name_shrt,game_name_full)
+                listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
                 listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
                 listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
                 listitem.setProperty('game_info', game_info)
@@ -214,7 +214,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
 
                     if week_time > time_now:
-                        week_name = self.coloring(week_name,"disabled",week_name)
+                        week_name = self.coloring(week_name, "disabled")
 
                     listitem = xbmcgui.ListItem(week_name)
                     listitem.setProperty('week_code', week_code)
