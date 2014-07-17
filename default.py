@@ -102,9 +102,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 for i in ['condensedId', 'programId', 'id']:
                     if game.has_key(i):
                         if 'condensed' in i:
-                            label = language(30015)
+                            label = 'Condensed'
                         elif 'program' in i:
-                            label = language(30014)
+                            label = 'Full'
                         else:
                             label = 'Live'
                         game_ids[label] = game[i]
@@ -253,12 +253,35 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 params = parse_qs(urlparse(url).query)
                 for i in params.keys():
                     params[i] = params[i][0]
-                url = params['url']
-                resolvedItem = set_resolved_url(selectedGame.getLabel2(), url)
+                game_ids = eval(params['url'])
 
-                self.playUrl(resolvedItem.getLabel())
+                addon_log('ids betch: %s' %game_ids)
 
-            if self.main_selection in ['NW', 'RZ']:
+                if selectedGame.getLabel2().endswith('- Live'):
+                    game_live_url = get_live_url(game_ids['Live'])
+                    self.playUrl(resolvedItem.getLabel())
+                else:
+                    preferred_version = int(addon.getSetting('preferred_game_version'))
+
+                    # the full version is always available, but not always the condensed
+                    game_id = game_ids['Full']
+                    versions = [language(30014)]
+
+                    if game_ids.has_key('Condensed'):
+                        versions.append(language(30015))
+                        if preferred_version == 1:
+                            game_id = game_ids['Condensed']
+
+                    # user wants to be asked to select version
+                    if preferred_version == 2:
+                        dialog = xbmcgui.Dialog()
+                        ret = dialog.select(language(30016), versions)
+                        if ret == 1:
+                            game_id = game_ids['Condensed']
+
+                    game_url = get_stream_url(game_id)
+                    self.playUrl(game_url)
+            elif self.main_selection in ['NW', 'RZ']:
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
                 self.playUrl(stream_url)

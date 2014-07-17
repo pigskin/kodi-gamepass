@@ -508,29 +508,3 @@ def service_blackout():
         return True
     else:
         return False
-
-
-def set_resolved_url(name, url):
-    try:
-        if isinstance(eval(url), dict):
-            game_ids = eval(url)
-    except NameError:
-        game_id = url
-    if name.endswith('- Live'):
-        resolved_url = get_live_url(game_ids['Live'])
-    else:
-        preferred_version = int(addon.getSetting('preferred_game_version'))
-        game_id = game_ids[language(30014)]
-        if preferred_version > 0:
-            if game_ids.has_key(language(30015)):
-                if preferred_version == 1:
-                    game_id = game_ids[language(30015)]
-                else:
-                    dialog = xbmcgui.Dialog()
-                    versions = [language(30014), language(30015)]
-                    ret = dialog.select(language(30016), versions)
-                    game_id = game_ids[versions[ret]]
-        resolved_url = get_stream_url(game_id)
-    addon_log('Resolved URL: %s.' %resolved_url)
-    item = xbmcgui.ListItem(label=resolved_url,path=resolved_url)
-    return item
