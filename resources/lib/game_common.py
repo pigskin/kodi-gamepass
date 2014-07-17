@@ -516,9 +516,7 @@ def set_resolved_url(name, url):
             game_ids = eval(url)
     except NameError:
         game_id = url
-    if name == 'NFL RedZone - Live':
-        resolved_url = get_publishpoint_url(game_id)
-    elif name.endswith('- Live'):
+    if name.endswith('- Live'):
         resolved_url = get_publishpoint_url(game_ids['Live'])
     else:
         preferred_version = int(addon.getSetting('preferred_game_version'))
