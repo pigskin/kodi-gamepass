@@ -262,8 +262,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     params[i] = params[i][0]
                 game_ids = eval(params['url'])
 
-                addon_log('ids betch: %s' %game_ids)
-
                 if selectedGame.getLabel2().endswith('- Live'):
                     game_live_url = get_live_url(game_ids['Live'])
                     self.playUrl(resolvedItem.getLabel())
