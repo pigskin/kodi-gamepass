@@ -63,10 +63,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     def display_nfl_network_archive(self):
         if subscription == '0': # gamepass
             listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
+            listitem.setProperty('week_enabled', 'true')
             self.weeks_list.addItem(listitem)
         for i in show_archives.keys():
             if not(i == 'NFL RedZone'):
                 listitem = xbmcgui.ListItem(i)
+                listitem.setProperty('week_enabled', 'true')
                 self.weeks_list.addItem(listitem)
 
     def display_redzone(self):
@@ -75,8 +77,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         simple_dict = xmltodict.parse(simple_data)['result']
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+            listitem.setProperty('week_enabled', 'true')
             self.weeks_list.addItem(listitem)
         listitem = xbmcgui.ListItem('NFL RedZone - Archive', 'NFL RedZone - Archive')
+        listitem.setProperty('week_enabled', 'true')
         self.weeks_list.addItem(listitem)
 
     def display_weeks_games(self):
@@ -171,6 +175,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     listitem.setProperty('url', i['publishPoint'])
                     listitem.setProperty('is_game', 'false')
                     listitem.setProperty('is_show', 'true')
+                    listitem.setProperty('isPlayable', 'true')
                     self.games_list.addItem(listitem)
                 except:
                     addon_log('Exception adding archive directory: %s' %format_exc())
