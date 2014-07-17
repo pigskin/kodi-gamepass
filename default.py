@@ -233,8 +233,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             else:
                 show_name = self.weeks_list.getSelectedItem().getLabel()
                 if self.main_selection == 'NW' and show_name == 'NFL Network - Live':
-                    resolvedItem = set_resolved_url(show_name, 'nfl_network_url')
-                    self.playUrl(resolvedItem.getLabel())
+                    nfl_network_url = get_publishpoint_url('nfl_network')
+                    self.playUrl(nfl_network_url)
                 elif self.main_selection == 'NW':
                     self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
                 elif self.main_selection == 'RZ':
