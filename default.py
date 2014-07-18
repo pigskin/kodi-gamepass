@@ -180,6 +180,28 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         while player.isPlaying():
             xbmc.sleep(2000)
 
+    # returns a gameid, while honoring user preference when applicable
+    def select_version(self, game_version_ids):
+        preferred_version = int(addon.getSetting('preferred_game_version'))
+
+        # the full version is always available, but not always the condensed
+        game_id = game_version_ids['Full']
+        versions = [language(30014)]
+
+        if game_version_ids.has_key('Condensed'):
+            versions.append(language(30015))
+            if preferred_version == 1:
+                game_id = game_version_ids['Condensed']
+
+        # user wants to be asked to select version
+        if preferred_version == 2:
+            dialog = xbmcgui.Dialog()
+            ret = dialog.select(language(30016), versions)
+            if ret == 1:
+                game_id = game_version_ids['Condensed']
+
+        return game_id
+
     def onClick(self, controlId):
         if controlId in[110, 120, 130]:
             self.games_list.reset()
@@ -235,24 +257,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_live_url = get_live_url(game_version_ids['Live'])
                         self.playUrl(game_live_url)
                     else:
-                        preferred_version = int(addon.getSetting('preferred_game_version'))
-
-                        # the full version is always available, but not always the condensed
-                        game_id = game_version_ids['Full']
-                        versions = [language(30014)]
-
-                        if game_version_ids.has_key('Condensed'):
-                            versions.append(language(30015))
-                            if preferred_version == 1:
-                                game_id = game_version_ids['Condensed']
-
-                        # user wants to be asked to select version
-                        if preferred_version == 2:
-                            dialog = xbmcgui.Dialog()
-                            ret = dialog.select(language(30016), versions)
-                            if ret == 1:
-                                game_id = game_version_ids['Condensed']
-
+                        game_id = self.select_version(game_version_ids)
                         game_url = get_stream_url(game_id)
                         self.playUrl(game_url)
         elif self.main_selection == 'RedZone':
