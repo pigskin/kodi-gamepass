@@ -145,18 +145,12 @@ def check_for_subscription():
     sc_url = servlets_url + '/servlets/simpleconsole'
     sc_data = make_request(sc_url, {'isFlex': 'true'})
 
-    try:
-        sc_dict = xmltodict.parse(sc_data)['result']
-
-        if sc_dict.has_key('subscription'):
-            addon_log('Subscription detected.')
-            return True
-        else:
-            addon_log('No subscription was detected.')
-            return False
-    except:
-        addon_log('Subscription detection failed gloriously.')
-        raise
+    if '</subscription>' in sc_data:
+        addon_log('Subscription detected.')
+        return True
+    else:
+        addon_log('No subscription was detected.')
+        return False
 
 
 # NFL Game Pass/Rewind "helpfully" does not give any indication whether the
