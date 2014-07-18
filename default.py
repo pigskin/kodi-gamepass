@@ -83,10 +83,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list.reset()
         games = get_weeks_games(self.selected_season, self.selected_week)
         addon_log('Game: %s' %games)
-        # super bowl week has only one game, which thus isn't put into a list
+        # if only one game is returned, we explicitly put it into a list
         if isinstance(games, dict):
-            games_tmp = [games]
-            games = games_tmp
+            games = [games]
 
         if games:
             date_time_format = '%Y-%m-%dT%H:%M:%S.000'
@@ -263,8 +262,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
                 self.display_weeks_games()
             elif controlId == 230: # game is clicked
-                if self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
-                    selectedGame = self.games_list.getSelectedItem()
+                selectedGame = self.games_list.getSelectedItem()
+                if selectedGame.getProperty('isPlayable') == 'true':
                     url = selectedGame.getProperty('url')
                     params = parse_qs(urlparse(url).query)
                     for i in params.keys():
