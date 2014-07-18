@@ -190,25 +190,25 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def onClick(self, controlId):
         if controlId in[110, 120, 130]:
-            if controlId == 110:
-                self.main_selection = 'GP'
-            elif controlId == 120:
-                self.main_selection = 'RZ'
-            elif controlId == 130:
-                self.main_selection = 'NW'
-
             self.games_list.reset()
             self.weeks_list.reset()
             self.season_list.reset()
+
+            if controlId == 110:
+                self.main_selection = 'GamePass'
+            elif controlId == 120:
+                self.main_selection = 'RedZone'
+            elif controlId == 130:
+                self.main_selection = 'NFL Network'
+
             self.display_seasons()
+            return
 
-        # if a season is selected
-        if controlId == 210:
-            self.weeks_list.reset()
-            self.games_list.reset()
-            self.selected_season = self.season_list.getSelectedItem().getLabel()
-
-            if self.main_selection == 'GP':
+        if self.main_selection == 'GamePass':
+            if controlId == 210: # season is selected
+                self.weeks_list.reset()
+                self.games_list.reset()
+                self.selected_season = self.season_list.getSelectedItem().getLabel()
                 weeks = get_seasons_weeks(self.selected_season)
 
                 for week_code, week_name in sorted(weeks['weeks'].iteritems()):
@@ -226,67 +226,76 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     listitem.setProperty('week_code', week_code)
                     listitem.setProperty('week_enabled', week_enabled)
                     self.weeks_list.addItem(listitem)
-            elif self.main_selection == 'NW':
-                self.display_nfl_network_archive()
-            elif self.main_selection == 'RZ':
-                self.display_redzone()
-
-        # if a week/show is selected
-        if controlId == 220:
-            self.games_list.reset()
-            if self.main_selection == 'GP':
+            elif controlId == 220: # week is selected
+                self.games_list.reset()
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
                 self.display_weeks_games()
-            else:
-                show_name = self.weeks_list.getSelectedItem().getLabel()
-                if self.main_selection == 'NW':
-                    if show_name == 'NFL Network - Live':
-                        nfl_network_url = get_live_url('nfl_network')
-                        self.playUrl(nfl_network_url)
+            elif controlId == 230: # game is selected
+                if self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
+                    selectedGame = self.games_list.getSelectedItem()
+                    url = selectedGame.getProperty('url')
+                    params = parse_qs(urlparse(url).query)
+                    for i in params.keys():
+                        params[i] = params[i][0]
+                    game_ids = eval(params['url'])
+
+                    if selectedGame.getLabel2().endswith('- Live'):
+                        game_live_url = get_live_url(game_ids['Live'])
+                        self.playUrl(resolvedItem.getLabel())
                     else:
-                        self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
-                elif self.main_selection == 'RZ':
-                    if show_name == 'RedZone - Live':
-                        redzone_live_url = get_live_url('rz')
-                        self.playUrl(redzone_live_url)
-                    elif show_name == 'NFL RedZone - Archive':
-                        self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
+                        preferred_version = int(addon.getSetting('preferred_game_version'))
 
-        # if a game/show is selected
-        if controlId == 230:
-            if self.main_selection == 'GP' and self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
-                selectedGame = self.games_list.getSelectedItem()
-                url = selectedGame.getProperty('url')
-                params = parse_qs(urlparse(url).query)
-                for i in params.keys():
-                    params[i] = params[i][0]
-                game_ids = eval(params['url'])
+                        # the full version is always available, but not always the condensed
+                        game_id = game_ids['Full']
+                        versions = [language(30014)]
 
-                if selectedGame.getLabel2().endswith('- Live'):
-                    game_live_url = get_live_url(game_ids['Live'])
-                    self.playUrl(resolvedItem.getLabel())
+                        if game_ids.has_key('Condensed'):
+                            versions.append(language(30015))
+                            if preferred_version == 1:
+                                game_id = game_ids['Condensed']
+
+                        # user wants to be asked to select version
+                        if preferred_version == 2:
+                            dialog = xbmcgui.Dialog()
+                            ret = dialog.select(language(30016), versions)
+                            if ret == 1:
+                                game_id = game_ids['Condensed']
+
+                        game_url = get_stream_url(game_id)
+                        self.playUrl(game_url)
+        elif self.main_selection == 'RedZone':
+            if controlId == 210: # season is selected
+                self.weeks_list.reset()
+                self.games_list.reset()
+                self.selected_season = self.season_list.getSelectedItem().getLabel()
+                self.display_redzone()
+            elif controlId == 220: # week/show is selected
+                self.games_list.reset()
+                show_name = self.weeks_list.getSelectedItem().getLabel()
+                if show_name == 'RedZone - Live':
+                    redzone_live_url = get_live_url('rz')
+                    self.playUrl(redzone_live_url)
+                elif show_name == 'NFL RedZone - Archive':
+                    self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
+            elif controlId == 230: # episode is selected
+                url = self.games_list.getSelectedItem().getProperty('url')
+                stream_url = resolve_show_archive_url(url)
+                self.playUrl(stream_url)
+        elif self.main_selection == 'NFL Network':
+            if controlId == 210: # season is selected
+                self.weeks_list.reset()
+                self.games_list.reset()
+                self.selected_season = self.season_list.getSelectedItem().getLabel()
+                self.display_nfl_network_archive()
+            elif controlId == 220: # show is selected
+                self.games_list.reset()
+                show_name = self.weeks_list.getSelectedItem().getLabel()
+                if show_name == 'NFL Network - Live':
+                    nfl_network_url = get_live_url('nfl_network')
+                    self.playUrl(nfl_network_url)
                 else:
-                    preferred_version = int(addon.getSetting('preferred_game_version'))
-
-                    # the full version is always available, but not always the condensed
-                    game_id = game_ids['Full']
-                    versions = [language(30014)]
-
-                    if game_ids.has_key('Condensed'):
-                        versions.append(language(30015))
-                        if preferred_version == 1:
-                            game_id = game_ids['Condensed']
-
-                    # user wants to be asked to select version
-                    if preferred_version == 2:
-                        dialog = xbmcgui.Dialog()
-                        ret = dialog.select(language(30016), versions)
-                        if ret == 1:
-                            game_id = game_ids['Condensed']
-
-                    game_url = get_stream_url(game_id)
-                    self.playUrl(game_url)
-            elif self.main_selection in ['NW', 'RZ']:
+                    self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
+            elif controlId == 230: # episode is selected
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
                 self.playUrl(stream_url)
