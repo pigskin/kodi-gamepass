@@ -98,16 +98,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if home_team['name'] is None:
                     continue
 
-                game_ids = {}
-                for i in ['condensedId', 'programId', 'id']:
-                    if game.has_key(i):
-                        if 'condensed' in i:
-                            label = 'Condensed'
-                        elif 'program' in i:
-                            label = 'Full'
-                        else:
-                            label = 'Live'
-                        game_ids[label] = game[i]
+                game_version_ids = {}
+                for key, value in {'Condensed': 'condensedId', 'Full': 'programId', 'Live': 'id'}.items():
+                    try:
+                        game_version_ids[key] = game[value]
+                    except KeyError:
+                        pass
 
                 away_team = game['awayTeam']
                 game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
@@ -147,7 +143,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 listitem.setProperty('is_show', 'false')
                 listitem.setProperty('isPlayable', isPlayable)
                 listitem.setProperty('isLive', isLive)
-                params = {'name': game_name_full, 'url': game_ids}
+                params = {'name': game_name_full, 'url': game_version_ids}
                 url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
                 listitem.setProperty('url', url)
                 self.games_list.addItem(listitem)
@@ -233,29 +229,29 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     params = parse_qs(urlparse(url).query)
                     for i in params.keys():
                         params[i] = params[i][0]
-                    game_ids = eval(params['url'])
+                    game_version_ids = eval(params['url'])
 
                     if selectedGame.getLabel2().endswith('- Live'):
-                        game_live_url = get_live_url(game_ids['Live'])
+                        game_live_url = get_live_url(game_version_ids['Live'])
                         self.playUrl(game_live_url)
                     else:
                         preferred_version = int(addon.getSetting('preferred_game_version'))
 
                         # the full version is always available, but not always the condensed
-                        game_id = game_ids['Full']
+                        game_id = game_version_ids['Full']
                         versions = [language(30014)]
 
-                        if game_ids.has_key('Condensed'):
+                        if game_version_ids.has_key('Condensed'):
                             versions.append(language(30015))
                             if preferred_version == 1:
-                                game_id = game_ids['Condensed']
+                                game_id = game_version_ids['Condensed']
 
                         # user wants to be asked to select version
                         if preferred_version == 2:
                             dialog = xbmcgui.Dialog()
                             ret = dialog.select(language(30016), versions)
                             if ret == 1:
-                                game_id = game_ids['Condensed']
+                                game_id = game_version_ids['Condensed']
 
                         game_url = get_stream_url(game_id)
                         self.playUrl(game_url)
