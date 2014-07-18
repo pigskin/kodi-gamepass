@@ -263,8 +263,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
                 self.display_weeks_games()
             elif controlId == 230: # game is clicked
-                if self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
-                    selectedGame = self.games_list.getSelectedItem()
+                selectedGame = self.games_list.getSelectedItem()
+                if selectedGame.getProperty('isPlayable') == 'true':
                     url = selectedGame.getProperty('url')
                     params = parse_qs(urlparse(url).query)
                     for i in params.keys():

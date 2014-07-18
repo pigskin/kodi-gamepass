@@ -263,7 +263,8 @@ def parse_manifest(manifest):
             stream_url = 'http://%s%s.m3u8' %(items[ret]['servers'][0]['name'], items[ret]['url'])
             addon_log('Stream URL: %s' %stream_url)
             return stream_url
-        else: raise
+        else:
+            raise
     except:
         addon_log(format_exc())
         return False
