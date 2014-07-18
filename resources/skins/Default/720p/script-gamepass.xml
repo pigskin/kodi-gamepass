@@ -233,7 +233,7 @@
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
-                        <visible>ListItem.Property(week_enabled)</visible>
+                        <visible>!ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <left>0</left>
@@ -242,7 +242,7 @@
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
                         <colordiffuse>AAFFFFFF</colordiffuse>
-                        <visible>!ListItem.Property(week_enabled)</visible>
+                        <visible>ListItem.Property(future)</visible>
                 </control>
                 <control type="label">
                     <description>Week/Show Text</description>
@@ -271,7 +271,7 @@
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
-                        <visible>Control.HasFocus(220) + ListItem.Property(week_enabled)</visible>
+                        <visible>Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <left></left>
@@ -280,7 +280,7 @@
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
                         <colordiffuse>BBFFFFFF</colordiffuse>
-                        <visible>Control.HasFocus(220) + !ListItem.Property(week_enabled)</visible>
+                        <visible>Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <left></left>
@@ -288,7 +288,7 @@
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
-                        <visible>!Control.HasFocus(220) + ListItem.Property(week_enabled)</visible>
+                        <visible>!Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <left>0</left>
@@ -297,7 +297,7 @@
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
                         <colordiffuse>AACCCCCC</colordiffuse>
-                        <visible>!Control.HasFocus(220) + !ListItem.Property(week_enabled)</visible>
+                        <visible>!Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
                 <control type="label">
                     <description>Week/Show text</description>
@@ -356,7 +356,7 @@
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
-                    <visible>!Control.HasFocus(220) + !ListItem.Property(week_enabled)</visible>
+                    <visible>!Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
             </focusedlayout>
         </control>

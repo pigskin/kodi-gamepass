@@ -63,12 +63,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     def display_nfl_network_archive(self):
         if subscription == '0': # gamepass
             listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
-            listitem.setProperty('week_enabled', 'true')
             self.weeks_list.addItem(listitem)
         for i in show_archives.keys():
             if not(i == 'NFL RedZone'):
                 listitem = xbmcgui.ListItem(i)
-                listitem.setProperty('week_enabled', 'true')
                 self.weeks_list.addItem(listitem)
 
     def display_redzone(self):
@@ -77,10 +75,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         simple_dict = xmltodict.parse(simple_data)['result']
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
-            listitem.setProperty('week_enabled', 'true')
             self.weeks_list.addItem(listitem)
         listitem = xbmcgui.ListItem('NFL RedZone - Archive', 'NFL RedZone - Archive')
-        listitem.setProperty('week_enabled', 'true')
         self.weeks_list.addItem(listitem)
 
     def display_weeks_games(self):
@@ -213,18 +209,18 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                 for week_code, week_name in sorted(weeks['weeks'].iteritems()):
                     week_date = weeks['dates'][week_code]+' 06:00'
-                    week_enabled = 'true'
+                    future = 'false'
 
                     week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
                     time_utc = str(datetime.utcnow())[:-7]
                     time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
 
                     if week_time > time_now:
-                        week_enabled = 'false'
+                        future = 'true'
 
                     listitem = xbmcgui.ListItem(week_name)
                     listitem.setProperty('week_code', week_code)
-                    listitem.setProperty('week_enabled', week_enabled)
+                    listitem.setProperty('future', future)
                     self.weeks_list.addItem(listitem)
             elif controlId == 220: # week is selected
                 self.games_list.reset()
