@@ -237,7 +237,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                     if selectedGame.getLabel2().endswith('- Live'):
                         game_live_url = get_live_url(game_ids['Live'])
-                        self.playUrl(resolvedItem.getLabel())
+                        self.playUrl(game_live_url)
                     else:
                         preferred_version = int(addon.getSetting('preferred_game_version'))
 
