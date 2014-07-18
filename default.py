@@ -61,7 +61,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.season_list.addItem(listitem)
 
     def display_nfl_network_archive(self):
-        if subscription == '0': # gamepass
+        if subscription == '0': # GamePass
             listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
             self.weeks_list.addItem(listitem)
         for i in show_archives.keys():
@@ -91,7 +91,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         if games:
             date_time_format = '%Y-%m-%dT%H:%M:%S.000'
             for game in games:
-                isLive     = 'false'
+                isLive = 'false'
                 isPlayable = 'true'
                 home_team = game['homeTeam']
                 # sometimes the first item is empty
@@ -197,7 +197,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             return
 
         if self.main_selection == 'GamePass':
-            if controlId == 210: # season is selected
+            if controlId == 210: # season is clicked
                 self.weeks_list.reset()
                 self.games_list.reset()
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
@@ -218,11 +218,11 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     listitem.setProperty('week_code', week_code)
                     listitem.setProperty('future', future)
                     self.weeks_list.addItem(listitem)
-            elif controlId == 220: # week is selected
+            elif controlId == 220: # week is clicked
                 self.games_list.reset()
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
                 self.display_weeks_games()
-            elif controlId == 230: # game is selected
+            elif controlId == 230: # game is clicked
                 if self.games_list.getSelectedItem().getProperty('isPlayable') == 'true':
                     selectedGame = self.games_list.getSelectedItem()
                     url = selectedGame.getProperty('url')
@@ -256,12 +256,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_url = get_stream_url(game_id)
                         self.playUrl(game_url)
         elif self.main_selection == 'RedZone':
-            if controlId == 210: # season is selected
+            if controlId == 210: # season is clicked
                 self.weeks_list.reset()
                 self.games_list.reset()
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
                 self.display_redzone()
-            elif controlId == 220: # week/show is selected
+            elif controlId == 220: # show is clicked
                 self.games_list.reset()
                 show_name = self.weeks_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
@@ -269,17 +269,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.playUrl(redzone_live_url)
                 elif show_name == 'NFL RedZone - Archive':
                     self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
-            elif controlId == 230: # episode is selected
+            elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
                 self.playUrl(stream_url)
         elif self.main_selection == 'NFL Network':
-            if controlId == 210: # season is selected
+            if controlId == 210: # season is clicked
                 self.weeks_list.reset()
                 self.games_list.reset()
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
                 self.display_nfl_network_archive()
-            elif controlId == 220: # show is selected
+            elif controlId == 220: # show is clicked
                 self.games_list.reset()
                 show_name = self.weeks_list.getSelectedItem().getLabel()
                 if show_name == 'NFL Network - Live':
@@ -287,7 +287,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.playUrl(nfl_network_url)
                 else:
                     self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
-            elif controlId == 230: # episode is selected
+            elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
                 self.playUrl(stream_url)
