@@ -271,26 +271,14 @@ def parse_manifest(manifest):
 
 def select_bitrate(streams):
     preferred_bitrate = addon.getSetting('preferred_bitrate')
-    bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
-    if streams == 'live_stream':
-        if preferred_bitrate == '0' or preferred_bitrate == '1':
-            ret = bitrate_values[0]
-        elif preferred_bitrate != '8':
-            ret = bitrate_values[int(preferred_bitrate) -1]
-        else:
-            dialog = xbmcgui.Dialog()
-            ret = bitrate_values[dialog.select('Choose a bitrate',
-                                [language(30005 + i) for i in range(len(bitrate_values))])]
-
+    streams.sort(key=itemgetter('bitrate'), reverse=True)
+    if preferred_bitrate == '0':
+        ret = 0
+    elif len(streams) == 7 and preferred_bitrate != '8':
+        ret = int(preferred_bitrate) - 1
     else:
-        streams.sort(key=itemgetter('bitrate'), reverse=True)
-        if preferred_bitrate == '0':
-            ret = 0
-        elif len(streams) == 7 and preferred_bitrate != '8':
-            ret = int(preferred_bitrate) - 1
-        else:
-            dialog = xbmcgui.Dialog()
-            ret = dialog.select('Choose a stream', [i['info'] for i in streams])
+        dialog = xbmcgui.Dialog()
+        ret = dialog.select('Choose a stream', [i['info'] for i in streams])
     addon_log('ret: %s' %ret)
     return ret
 
@@ -473,7 +461,7 @@ def resolve_show_archive_url(url):
     return stream_url
 
 
-def get_live_url(game_id):
+def get_live_url(game_id, bitrate):
     set_cookies = get_current_season_and_week()
     url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
 
@@ -489,7 +477,7 @@ def get_live_url(game_id):
     m3u8_dict = xmltodict.parse(m3u8_data)['result']
     addon_log('NFL Dict %s.' %m3u8_dict)
     m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-    return m3u8_url.replace('androidtab', select_bitrate('live_stream'))
+    return m3u8_url.replace('androidtab', bitrate)
 
 
 # Check if Game Rewind service is blacked-out due to live games in progress

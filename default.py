@@ -180,6 +180,24 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         while player.isPlaying():
             xbmc.sleep(2000)
 
+    def select_bitrate(self):
+        preferred_bitrate = int(addon.getSetting('preferred_bitrate'))
+        bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
+
+        if preferred_bitrate == 0: # "highest"
+            bitrate = bitrate_values[0]
+        elif preferred_bitrate < 7: # specific bitrate
+            bitrate = bitrate_values[preferred_bitrate -1]
+        else: # ask
+            options = []
+            for i in range(len(bitrate_values)):
+                options.append(language(30005 + i))
+            dialog = xbmcgui.Dialog()
+            ret = dialog.select(language(30003), options)
+            bitrate = bitrate_values[ret]
+
+        return ret
+
     # returns a gameid, while honoring user preference when applicable
     def select_version(self, game_version_ids):
         preferred_version = int(addon.getSetting('preferred_game_version'))
@@ -254,7 +272,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     game_version_ids = eval(params['url'])
 
                     if selectedGame.getLabel2().endswith('- Live'):
-                        game_live_url = get_live_url(game_version_ids['Live'])
+                        game_live_url = get_live_url(game_version_ids['Live'], self.select_bitrate())
                         self.playUrl(game_live_url)
                     else:
                         game_id = self.select_version(game_version_ids)
@@ -270,7 +288,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.games_list.reset()
                 show_name = self.weeks_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
-                    redzone_live_url = get_live_url('rz')
+                    redzone_live_url = get_live_url('rz', self.select_bitrate())
                     self.playUrl(redzone_live_url)
                 elif show_name == 'NFL RedZone - Archive':
                     self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
@@ -288,7 +306,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.games_list.reset()
                 show_name = self.weeks_list.getSelectedItem().getLabel()
                 if show_name == 'NFL Network - Live':
-                    nfl_network_url = get_live_url('nfl_network')
+                    nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
                     self.playUrl(nfl_network_url)
                 else:
                     self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
