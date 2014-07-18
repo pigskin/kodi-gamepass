@@ -1,7 +1,7 @@
 <window type="window" id="9506">
-	<allowoverlay>yes</allowoverlay>
-	<defaultcontrol always="true">1260</defaultcontrol>
-	<controls>
+    <allowoverlay>yes</allowoverlay>
+    <defaultcontrol always="true">1260</defaultcontrol>
+    <controls>
         <control type="image">
             <description>Normal Default Background Image</description>
             <left>0</left>
@@ -691,5 +691,5 @@
             <showonepage>false</showonepage>
             <orientation>vertical</orientation>
         </control>
-	</controls>
+    </controls>
 </window>
