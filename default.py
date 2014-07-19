@@ -65,7 +65,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
             self.weeks_list.addItem(listitem)
         for i in show_archives.keys():
-            if not(i == 'NFL RedZone'):
+            if not(i == 'NFL RedZone Archives'):
                 listitem = xbmcgui.ListItem(i)
                 self.weeks_list.addItem(listitem)
 
@@ -76,7 +76,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
             self.weeks_list.addItem(listitem)
-        listitem = xbmcgui.ListItem('NFL RedZone - Archive', 'NFL RedZone - Archive')
+        listitem = xbmcgui.ListItem('NFL RedZone Archives', 'NFL RedZone Archives')
         self.weeks_list.addItem(listitem)
 
     def display_weeks_games(self):
@@ -284,8 +284,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if show_name == 'RedZone - Live':
                     redzone_live_url = get_live_url('rz', self.select_bitrate())
                     self.playUrl(redzone_live_url)
-                elif show_name == 'NFL RedZone - Archive':
-                    self.display_archive('NFL Redzone', self.selected_season)
+                elif show_name == 'NFL RedZone Archives':
+                    self.display_archive(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)

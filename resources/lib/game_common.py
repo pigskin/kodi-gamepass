@@ -35,7 +35,7 @@ if subscription == '0': # game pass
         'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
         'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
         'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
-        'NFL RedZone': {'2014': '221', '2013': '182', '2012': '149'},
+        'NFL RedZone Archives': {'2014': '221', '2013': '182', '2012': '149'},
         'Sound FX': {'2014': '215', '2013': '183', '2012': '150'},
         'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
         'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'},
@@ -414,9 +414,8 @@ def get_video_path(game_id):
 # parse archives for NFL Network, RedZone
 def parse_archive(show_name, cid):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
-    show_name = show_name.split('-')[0]
 
-    if show_name == 'NFL RedZone':
+    if show_name == 'NFL RedZone Archives':
         ps = 17
     else:
         ps = 50
@@ -443,7 +442,6 @@ def parse_archive(show_name, cid):
 
 
 def get_show_cid(show_name, season):
-    show_name = show_name.split(' - ')[0]
     try:
         return show_archives[show_name][season]
     except KeyError:
