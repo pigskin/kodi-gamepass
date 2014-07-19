@@ -195,7 +195,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             ret = dialog.select(language(30003), options)
             bitrate = bitrate_values[ret]
 
-        return ret
+        return bitrate
 
     # returns a gameid, while honoring user preference when applicable
     def select_version(self, game_version_ids):
