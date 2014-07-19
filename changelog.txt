@@ -1,7 +1,13 @@
-2014.0?.?? v0.?.? -- ? Edition
+2014.0?.?? v0.?.? -- Jerry Rice Edition
 + New Feature: Skin Interface! (BaumSchorle and eriksoderblom)
++   Tons of new features
++   Games now include team logos
++   Future/unplayable games are greyed out
++   New artwork
++   New background (original image by charamelody)
 + Bug fix: Some archived games wouldn't play. (Alexqw)
-+ Code refactoring
++ Many small performance improvements (Alexqw)
++ Significant code refactoring (Alexqw)
 
 2014.07.11 v0.4.0 -- "Doomsday Defense" Edition
 + New Feature: Support for Hard Knocks (thanks to BaumSchorle)
