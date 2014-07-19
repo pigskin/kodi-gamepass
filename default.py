@@ -149,28 +149,22 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_archive(self, show_name, season, cid):
         cur_season = get_current_season()
-
-        # No valid CID passed
-        if cid > 0:
-            items = parse_archive(cid, show_name)
-        else:
-            items = ''
+        items = parse_archive(cid, show_name)
 
         image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
-        if items:
-            for i in items:
-                try:
-                    listitem = xbmcgui.ListItem('[B]%s[/B]' %show_name)
-                    listitem.setProperty('game_info', i['name'])
-                    listitem.setProperty('away_thumb', image_path + i['image'])
-                    listitem.setProperty('url', i['publishPoint'])
-                    listitem.setProperty('is_game', 'false')
-                    listitem.setProperty('is_show', 'true')
-                    listitem.setProperty('isPlayable', 'true')
-                    self.games_list.addItem(listitem)
-                except:
-                    addon_log('Exception adding archive directory: %s' %format_exc())
-                    addon_log('Directory name: %s' %i['name'])
+        for i in items:
+            try:
+                listitem = xbmcgui.ListItem('[B]%s[/B]' %show_name)
+                listitem.setProperty('game_info', i['name'])
+                listitem.setProperty('away_thumb', image_path + i['image'])
+                listitem.setProperty('url', i['publishPoint'])
+                listitem.setProperty('is_game', 'false')
+                listitem.setProperty('is_show', 'true')
+                listitem.setProperty('isPlayable', 'true')
+                self.games_list.addItem(listitem)
+            except:
+                addon_log('Exception adding archive directory: %s' %format_exc())
+                addon_log('Directory name: %s' %i['name'])
 
     def playUrl(self, url):
         player = myPlayer(parent=window)

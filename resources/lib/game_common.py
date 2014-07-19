@@ -421,7 +421,7 @@ def parse_archive(cid, show_name):
     else:
         ps = 50
     post_data = {
-        'isFlex':'true',
+        'isFlex': 'true',
         'cid': cid,
         'pm': 0,
         'ps': ps,
@@ -430,17 +430,16 @@ def parse_archive(cid, show_name):
 
     archive_data = make_request(url, post_data)
     archive_dict = xmltodict.parse(archive_data)['result']
-    addon_log('Archive Dict: %s' %archive_dict)
 
     count = int(archive_dict['paging']['count'])
-    if count < 1:
-        return
-    else:
+    if count >= 1:
         items = archive_dict['programs']['program']
+        # if only one episode is returned, we explicitly put it into a list
         if isinstance(items, dict):
-            items_list = [items]
-            items = items_list
+            items = [items]
         return items
+    else:
+        return []
 
 
 def get_show_archive(name, url):
