@@ -150,7 +150,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     def display_archive(self, show_name, season):
         cur_season = get_current_season()
         cid = get_show_cid(show_name, season)
-        items = parse_archive(show_name, cid)
+        items = get_shows_episodes(show_name, cid)
 
         image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
         for i in items:

@@ -411,8 +411,8 @@ def get_video_path(game_id):
         return False
 
 
-# parse archives for NFL Network, RedZone
-def parse_archive(show_name, cid):
+# get episodes of archived NFL Network and RedZone shows
+def get_shows_episodes(show_name, cid):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
 
     if show_name == 'NFL RedZone Archives':
