@@ -412,7 +412,7 @@ def get_video_path(game_id):
 
 
 # parse archives for NFL Network, RedZone
-def parse_archive(cid, show_name):
+def parse_archive(show_name, cid):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
     show_name = show_name.split('-')[0]
 
@@ -442,17 +442,12 @@ def parse_archive(cid, show_name):
         return []
 
 
-def get_show_archive(name, url):
-    show_name = name.split(' - ')[0]
-    season = url
-
+def get_show_cid(show_name, season):
+    show_name = show_name.split(' - ')[0]
     try:
-       cid = show_archives[show_name][season]
-    except:
-       # if no valid cid is found in show_archives
-       cid = 0
-
-    return cid
+        return show_archives[show_name][season]
+    except KeyError:
+        return None
 
 
 def resolve_show_archive_url(url):

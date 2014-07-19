@@ -147,9 +147,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 listitem.setProperty('url', url)
                 self.games_list.addItem(listitem)
 
-    def display_archive(self, show_name, season, cid):
+    def display_archive(self, show_name, season):
         cur_season = get_current_season()
-        items = parse_archive(cid, show_name)
+        cid = get_show_cid(show_name, season)
+        items = parse_archive(show_name, cid)
 
         image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
         for i in items:
@@ -284,7 +285,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     redzone_live_url = get_live_url('rz', self.select_bitrate())
                     self.playUrl(redzone_live_url)
                 elif show_name == 'NFL RedZone - Archive':
-                    self.display_archive('NFL RedZone', self.selected_season, show_archives['NFL RedZone'][self.selected_season])
+                    self.display_archive('NFL Redzone', self.selected_season)
             elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
@@ -302,7 +303,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
                     self.playUrl(nfl_network_url)
                 else:
-                    self.display_archive(show_name, self.selected_season, show_archives[show_name][self.selected_season])
+                    self.display_archive(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = resolve_show_archive_url(url)
