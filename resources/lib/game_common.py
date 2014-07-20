@@ -412,13 +412,19 @@ def get_video_path(game_id):
 
 
 # get episodes of archived NFL Network and RedZone shows
-def get_shows_episodes(show_name, cid):
+# returns an empty list if no episodes are found or the showname/season are invalid
+def get_shows_episodes(show_name, season):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+    try:
+        cid = show_archives[show_name][season]
+    except KeyError:
+        return []
 
     if show_name == 'NFL RedZone Archives':
         ps = 17
     else:
         ps = 50
+
     post_data = {
         'isFlex': 'true',
         'cid': cid,
@@ -439,13 +445,6 @@ def get_shows_episodes(show_name, cid):
         return items
     else:
         return []
-
-
-def get_show_cid(show_name, season):
-    try:
-        return show_archives[show_name][season]
-    except KeyError:
-        return None
 
 
 def get_episode_url(url):

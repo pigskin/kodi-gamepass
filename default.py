@@ -174,9 +174,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_shows_episodes(self, show_name, season):
         self.games_items = []
-        cur_season = get_current_season()
-        cid = get_show_cid(show_name, season)
-        items = get_shows_episodes(show_name, cid)
+        items = get_shows_episodes(show_name, season)
 
         image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
         for i in items:
