@@ -245,6 +245,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.games_list.reset()
             self.weeks_list.reset()
             self.season_list.reset()
+            self.live_list.reset()
 
             if controlId == 110:
                 self.main_selection = 'GamePass'
