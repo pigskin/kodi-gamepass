@@ -1,6 +1,6 @@
 <window type="window" id="9506">
     <allowoverlay>yes</allowoverlay>
-    <defaultcontrol always="true">1260</defaultcontrol>
+    <defaultcontrol always="true">100</defaultcontrol>
     <controls>
         <control type="image">
             <description>Normal Default Background Image</description>
@@ -35,6 +35,7 @@
               <top></top>
               <width>1000</width>
               <height>30</height>
+              <defaultcontrol condition="IsEmpty(Window.Property(gamepass))">120</defaultcontrol>
               <defaultcontrol>110</defaultcontrol>
               <visible>true</visible>
               <control type="button" id="110">
@@ -50,7 +51,7 @@
                   <onclick></onclick>
                   <onfocus></onfocus>
                   <onunfocus></onunfocus>
-                  <visible>!Skin.HasSetting(subscription)</visible>
+                  <visible>!IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="120">
                   <description>Redzone button</description>
@@ -66,7 +67,7 @@
                   <onclick></onclick>
                   <onfocus></onfocus>
                   <onunfocus></onunfocus>
-                  <visible>Skin.HasSetting(subscription)</visible>
+                  <visible>IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="130">
                   <description>Network button</description>

@@ -62,6 +62,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         else:
             self.setFocus(self.window.getControl(100))
 
+        if subscription == '0': # GamePass
+            self.window.setProperty('gamepass', 'true')
+
     def coloring(self, text, meaning):
         if meaning == "disabled":
             color = "FF000000"
