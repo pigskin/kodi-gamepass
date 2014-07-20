@@ -448,7 +448,7 @@ def get_show_cid(show_name, season):
         return None
 
 
-def resolve_show_archive_url(url):
+def get_episode_url(url):
     manifest = get_manifest(url)
     stream_url = parse_manifest(manifest)
     return stream_url

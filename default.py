@@ -288,7 +288,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.display_archive(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
-                stream_url = resolve_show_archive_url(url)
+                stream_url = get_episode_url(url)
                 self.playUrl(stream_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
@@ -306,7 +306,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.display_archive(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 url = self.games_list.getSelectedItem().getProperty('url')
-                stream_url = resolve_show_archive_url(url)
+                stream_url = get_episode_url(url)
                 self.playUrl(stream_url)
 
 
