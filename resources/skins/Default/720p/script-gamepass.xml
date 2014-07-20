@@ -60,8 +60,8 @@
                   <ondown>210</ondown>
                   <onleft>110</onleft>
                   <onright>130</onright>
-                  <texturefocus>GamePass/Redzone_focus.png</texturefocus>
-                  <texturenofocus>GamePass/Redzone_bg.png</texturenofocus>
+                  <texturefocus>GamePass/rewind_focus.png</texturefocus>
+                  <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
                   <onclick></onclick>
                   <onfocus></onfocus>
                   <onunfocus></onunfocus>
@@ -99,7 +99,7 @@
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/Redzone_focus.png</texture>
+            <texture>GamePass/rewind_focus.png</texture>
             <visible>ControlGroup(100).HasFocus(120)</visible>
         </control>
         <control type="image">
