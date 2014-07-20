@@ -42,6 +42,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     main_selection = ''
     player = ''
     list_refill = 'false'
+    focusId = 100
 
 
     def __init__(self, *args, **kwargs):
@@ -67,23 +68,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.games_list.addItems(self.games_items)
             self.live_list.reset()
             self.live_list.addItems(self.live_items)
-            self.setFocus(self.window.getControl(230))
-        else:
-            if subscription == '0': # GamePass
-                listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
-                self.live_items.append(listitem)
 
-            #Check whether RedZone is on Air
-            self.weeks_items = []
-            url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-            simple_data = make_request(url, {'isFlex':'true'})
-            simple_dict = xmltodict.parse(simple_data)['result']
-            if simple_dict['rzPhase'] == 'in':
-                listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
-                self.live_items.append(listitem)
-
-            self.live_list.addItems(self.live_items)
-            self.setFocus(self.window.getControl(100))
+        self.setFocus(self.window.getControl(self.focusId))
 
     def coloring(self, text, meaning):
         if meaning == "disabled":
@@ -249,6 +235,11 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         return game_id
 
+    def onFocus(self, controlId):
+        #save currently focused list
+        if controlId in[210, 220, 230, 240]:
+            self.focusId = controlId
+
     def onClick(self, controlId):
         if controlId in[110, 120, 130]:
             self.games_list.reset()
@@ -257,23 +248,25 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if controlId == 110:
                 self.main_selection = 'GamePass'
-            elif controlId == 120:
-                self.main_selection = 'RedZone'
             elif controlId == 130:
                 self.main_selection = 'NFL Network'
+                if subscription == '0': # GamePass
+                    listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
+                    self.live_items.append(listitem)
+
+                #Check whether RedZone is on Air
+                self.weeks_items = []
+                url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+                simple_data = make_request(url, {'isFlex':'true'})
+                simple_dict = xmltodict.parse(simple_data)['result']
+                if simple_dict['rzPhase'] == 'in':
+                    listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+                    self.live_items.append(listitem)
+
+                self.live_list.addItems(self.live_items)
 
             self.display_seasons()
             return
-
-        #NFL-Network or RedZone - Live is selected
-        if controlId == 240:
-            show_name = self.live_list.getSelectedItem().getLabel()
-            if show_name == 'RedZone - Live':
-                redzone_live_url = get_live_url('rz', self.select_bitrate())
-                self.playUrl(redzone_live_url)
-            elif show_name == 'NFL Network - Live':
-                nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
-                self.playUrl(nfl_network_url)
 
         if self.main_selection == 'GamePass':
             if controlId == 210: # season is clicked
@@ -333,6 +326,15 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = get_episode_url(url)
                 self.playUrl(stream_url)
+                    #NFL-Network or RedZone - Live is selected
+            elif controlId == 240: #Live Content is selected
+                show_name = self.live_list.getSelectedItem().getLabel()
+                if show_name == 'RedZone - Live':
+                    redzone_live_url = get_live_url('rz', self.select_bitrate())
+                    self.playUrl(redzone_live_url)
+                elif show_name == 'NFL Network - Live':
+                    nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
+                    self.playUrl(nfl_network_url)
 
 
 if (__name__ == "__main__"):
