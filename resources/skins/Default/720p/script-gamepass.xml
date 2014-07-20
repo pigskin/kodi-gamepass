@@ -31,9 +31,9 @@
         </control>
         <control type="group" id="100">
               <description>Top row button group</description>
-              <left>40</left>
+              <left>140</left>
               <top></top>
-              <width>1200</width>
+              <width>1000</width>
               <height>30</height>
               <defaultcontrol>110</defaultcontrol>
               <visible>true</visible>
@@ -50,10 +50,11 @@
                   <onclick></onclick>
                   <onfocus></onfocus>
                   <onunfocus></onunfocus>
+                  <visible>!Skin.HasSetting(subscription)</visible>
             </control>
             <control type="button" id="120">
                   <description>Redzone button</description>
-                  <left>400</left>
+                  <left>0</left>
                   <width>375</width>
                   <height>56</height>
                   <visible>true</visible>
@@ -65,10 +66,11 @@
                   <onclick></onclick>
                   <onfocus></onfocus>
                   <onunfocus></onunfocus>
+                  <visible>Skin.HasSetting(subscription)</visible>
             </control>
             <control type="button" id="130">
                   <description>Network button</description>
-                  <left>800</left>
+                  <left>600</left>
                   <width>375</width>
                   <height>56</height>
                   <visible>true</visible>
@@ -84,7 +86,7 @@
 
         <control type="image">
             <description>Gamepass active overlay</description>
-            <left>40</left>
+            <left>140</left>
             <top>0</top>
             <width>375</width>
             <height>56</height>
@@ -93,8 +95,8 @@
             <visible>ControlGroup(100).HasFocus(110)</visible>
         </control>
         <control type="image">
-            <description>SubMenubar background</description>
-            <left>440</left>
+            <description>GameRewind active overlay</description>
+            <left>140</left>
             <top>0</top>
             <width>375</width>
             <height>56</height>
@@ -103,8 +105,8 @@
             <visible>ControlGroup(100).HasFocus(120)</visible>
         </control>
         <control type="image">
-            <description>SubMenubar background</description>
-            <left>840</left>
+            <description>NFL Network active overlay</description>
+            <left>740</left>
             <top>0</top>
             <width>375</width>
             <height>56</height>
