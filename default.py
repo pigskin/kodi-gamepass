@@ -24,15 +24,21 @@ class myPlayer(xbmc.Player):
         self.onPlayBackEnded()
 
     def onPlayBackEnded(self):
+        self.dawindow.list_refill = 'true'
         self.dawindow.doModal()
 
 class GamepassGUI(xbmcgui.WindowXMLDialog):
     season_list = ''
+    season_items = []
     weeks_list = ''
+    weeks_items = []
     games_list = ''
+    games_items = []
     selectedSeason = ''
     selectedWeek = ''
     main_selection = ''
+    player = ''
+    list_refill = 'false'
 
 
     def __init__(self, *args, **kwargs):
@@ -44,7 +50,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.season_list = self.window.getControl(210)
         self.weeks_list = self.window.getControl(220)
         self.games_list = self.window.getControl(230)
-        self.setFocus(self.window.getControl(100))
+
+        if self.list_refill == 'true':
+            self.season_list.reset()
+            self.season_list.addItems(self.season_items)
+            self.weeks_list.reset()
+            self.weeks_list.addItems(self.weeks_items)
+            self.games_list.reset()
+            self.games_list.addItems(self.games_items)
+            self.setFocus(self.window.getControl(230))
+        else:
+            self.setFocus(self.window.getControl(100))
 
     def coloring(self, text, meaning):
         if meaning == "disabled":
@@ -55,31 +71,38 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         return colored_text
 
     def display_seasons(self):
+        self.season_items = []
         seasons = get_seasons()
         for season in seasons:
             listitem = xbmcgui.ListItem(season)
-            self.season_list.addItem(listitem)
+            self.season_items.append(listitem)
+        self.season_list.addItems(self.season_items)
 
     def display_nfl_network_archive(self):
+        self.weeks_items = []
         if subscription == '0': # GamePass
             listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
-            self.weeks_list.addItem(listitem)
+            self.weeks_items.append(listitem)
         for i in show_archives.keys():
             if not(i == 'NFL RedZone Archives'):
                 listitem = xbmcgui.ListItem(i)
-                self.weeks_list.addItem(listitem)
+                self.weeks_items.append(listitem)
+        self.weeks_list.addItems(self.weeks_items)
 
     def display_redzone(self):
+        self.weeks_items = []
         url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
         simple_data = make_request(url, {'isFlex':'true'})
         simple_dict = xmltodict.parse(simple_data)['result']
         if simple_dict['rzPhase'] == 'in':
             listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
-            self.weeks_list.addItem(listitem)
+            self.weeks_items.append(listitem)
         listitem = xbmcgui.ListItem('NFL RedZone Archives', 'NFL RedZone Archives')
-        self.weeks_list.addItem(listitem)
+        self.weeks_items.append(listitem)
+        self.weeks_list.addItems(self.weeks_items)
 
     def display_weeks_games(self):
+        self.games_items = []
         self.games_list.reset()
         games = get_weeks_games(self.selected_season, self.selected_week)
         addon_log('Game: %s' %games)
@@ -145,9 +168,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 params = {'name': game_name_full, 'url': game_version_ids}
                 url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
                 listitem.setProperty('url', url)
-                self.games_list.addItem(listitem)
+                self.games_items.append(listitem)
+
+            self.games_list.addItems(self.games_items)
 
     def display_archive(self, show_name, season):
+        self.games_items = []
         cur_season = get_current_season()
         cid = get_show_cid(show_name, season)
         items = get_shows_episodes(show_name, cid)
@@ -162,17 +188,21 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
-                self.games_list.addItem(listitem)
+                self.games_items.append(listitem)
             except:
                 addon_log('Exception adding archive directory: %s' %format_exc())
                 addon_log('Directory name: %s' %i['name'])
+        self.games_list.addItems(self.games_items)
 
     def playUrl(self, url):
-        player = myPlayer(parent=window)
+        player = myPlayer(parent=self)
         player.play(url)
 
         while player.isPlaying():
             xbmc.sleep(2000)
+
+        del player
+
 
     def select_bitrate(self):
         preferred_bitrate = int(addon.getSetting('preferred_bitrate'))
@@ -232,6 +262,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         if self.main_selection == 'GamePass':
             if controlId == 210: # season is clicked
+                self.weeks_items = []
                 self.weeks_list.reset()
                 self.games_list.reset()
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
@@ -251,7 +282,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     listitem = xbmcgui.ListItem(week_name)
                     listitem.setProperty('week_code', week_code)
                     listitem.setProperty('future', future)
-                    self.weeks_list.addItem(listitem)
+                    self.weeks_items.append(listitem)
+                self.weeks_list.addItems(self.weeks_items)
             elif controlId == 220: # week is clicked
                 self.games_list.reset()
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
@@ -344,7 +376,8 @@ if (__name__ == "__main__"):
                   'Please enable debuging, and submit a bug report.')
         sys.exit(0)
 
-    window = GamepassGUI('script-gamepass.xml', addon_path)
-    window.doModal()
+    gui = GamepassGUI('script-gamepass.xml', addon_path)
+    gui.doModal()
+    del gui
 
 addon_log('script finished')
