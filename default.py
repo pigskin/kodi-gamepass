@@ -249,13 +249,13 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if controlId == 110:
                 self.main_selection = 'GamePass'
             elif controlId == 130:
+                self.live_items = []
                 self.main_selection = 'NFL Network'
                 if subscription == '0': # GamePass
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
 
                 #Check whether RedZone is on Air
-                self.weeks_items = []
                 url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
                 simple_data = make_request(url, {'isFlex':'true'})
                 simple_dict = xmltodict.parse(simple_data)['result']
