@@ -74,7 +74,7 @@
                   <width>375</width>
                   <height>56</height>
                   <visible>true</visible>
-                  <ondown>210</ondown>
+                  <ondown>240</ondown>
                   <onleft>120</onleft>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
@@ -124,6 +124,7 @@
             <visible>true</visible>
             <onup>100</onup>
             <ondown>220</ondown>
+            <onright>240</onright>
             <viewtype label="list">list</viewtype>
             <orientation>horizontal</orientation>
             <autoscroll>false</autoscroll>
@@ -210,6 +211,97 @@
                     <scrollspeed>50</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
                     <visible>Control.HasFocus(210)</visible>
+                </control>
+            </focusedlayout>
+        </control>
+
+        <control type="list" id="240">
+            <description>Live list container</description>
+            <left>870</left>
+            <top>56</top>
+            <width>450</width>
+            <height>50</height>
+            <visible>true</visible>
+            <onup>100</onup>
+            <ondown>220</ondown>
+            <onleft>210</onleft>
+            <viewtype label="list">list</viewtype>
+            <orientation>horizontal</orientation>
+            <autoscroll>false</autoscroll>
+            <itemlayout width="200" height="36">
+                <control type="label">
+                    <description>Live item text</description>
+                    <left>100</left>
+                    <top>3</top>
+                    <width>190</width>
+                    <height>30</height>
+                    <visible>true</visible>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <scroll>false</scroll>
+                    <label>6</label>
+                    <info>ListItem.Label</info>
+                    <font>font13</font>
+                    <textcolor>FF333333</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>50</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                </control>
+            </itemlayout>
+            <focusedlayout width="200" height="36">
+                <control type="image">
+                        <left>0</left>
+                        <top>0</top>
+                        <width>200</width>
+                        <height>36</height>
+                        <aspectratio>stretch</aspectratio>
+                        <texture>GamePass/submenuwide_focus2.png</texture>
+                        <visible>!Control.HasFocus(240)</visible>
+                </control>
+                <control type="image">
+                        <left>0</left>
+                        <top>0</top>
+                        <width>200</width>
+                        <height>36</height>
+                        <aspectratio>stretch</aspectratio>
+                        <texture>GamePass/submenuwide_focus.png</texture>
+                        <visible>Control.HasFocus(240)</visible>
+                </control>
+                <control type="label">
+                    <description>Live item text</description>
+                    <left>100</left>
+                    <top>3</top>
+                    <width>190</width>
+                    <height>30</height>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <scroll>false</scroll>
+                    <label>6</label>
+                    <info>ListItem.Label</info>
+                    <font>font13</font>
+                    <textcolor>FF222222</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>50</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                    <visible>!Control.HasFocus(240)</visible>
+                </control>
+                <control type="label">
+                    <description>Live item text</description>
+                    <left>100</left>
+                    <top>3</top>
+                    <width>190</width>
+                    <height>30</height>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <scroll>false</scroll>
+                    <label>6</label>
+                    <info>ListItem.Label</info>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>50</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                    <visible>Control.HasFocus(240)</visible>
                 </control>
             </focusedlayout>
         </control>
