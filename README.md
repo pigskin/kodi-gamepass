@@ -27,40 +27,41 @@ us who must have our American Football fix.
 
 ## What is NFL Game Rewind? ##
 
-NFL Game Rewind is very similar to Game Pass, but doesn't have quite as many
-features. For example, it does not support live games, NFL Network - Live, etc.
+NFL Game Rewind is the USA version of Game Pass, but the service is blacked out
+during live games, and doesn't have access to NFL Network - Live, many of the
+archived shows, etc.
 
 ## Why write a plugin for XBMC? ##
 
 First off, we love XBMC and like consuming media through its interface.
-Secondly, while there is a nice Flash interface, it's... well...
-written in Flash. The client is a resource hog, the interface is frequently
-buggy, and it includes a bunch of bells and whistles (social media, for
-example) that are simply distracting. We're here to watch a game, nothing else.
+Secondly, while there is a nice Flash interface, it's... well... written in
+Flash. The client is a resource hog, the interface is frequently buggy, and it
+includes a bunch of bells and whistles (social media, for example) that are
+simply distracting. We're here to watch a game, nothing else.
 
 ## What features are currently supported? ##
 
 By now, most core features are supported.
 
- * Archived games from 2011 to 2013
- * Condensed games
+ * Archived games from 2011 to 2013 (both full and condensed)
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
- * NFL Films Presents
- * Top 100 Players
- * NFL Gameday
  * A Football Life
- * NFL Total Access
- * Sound FX
- * NFL RedZone
+ * NFL Films Presents
+ * NFL Gameday
  * Playbook
+ * NFL RedZone Archives
+ * NFL RedZone - Live (requires Gotham)
+ * Sound FX
+ * NFL Total Access
 
 Currently unsupported features:
  * Archived games prior to 2011
  * Alternate team audio
  * Coaches film (22 man view)
- * Superbowl Archives
  * Coaches Show
+ * Superbowl Archives
+ * Top 100 Players
 
 ## Release names ##
 
