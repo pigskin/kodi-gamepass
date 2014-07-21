@@ -32,25 +32,20 @@
         <control type="group" id="100">
               <description>Top row button group</description>
               <left>140</left>
-              <top></top>
+              <top>0</top>
               <width>1000</width>
               <height>30</height>
               <defaultcontrol condition="IsEmpty(Window.Property(gamepass))">120</defaultcontrol>
               <defaultcontrol>110</defaultcontrol>
-              <visible>true</visible>
               <control type="button" id="110">
                   <description>Gamepass button</description>
                   <left>0</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>210</ondown>
                   <onright>120</onright>
                   <texturefocus>GamePass/gamepass_focus.png</texturefocus>
                   <texturenofocus>GamePass/gamepass_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
                   <visible>!IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="120">
@@ -58,15 +53,11 @@
                   <left>0</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>210</ondown>
                   <onleft>110</onleft>
                   <onright>130</onright>
                   <texturefocus>GamePass/rewind_focus.png</texturefocus>
                   <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
                   <visible>IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="130">
@@ -74,21 +65,16 @@
                   <left>600</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>240</ondown>
                   <onleft>120</onleft>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
             </control>
         </control>
 
         <control type="image">
             <description>Gamepass active overlay</description>
             <left>140</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -98,7 +84,6 @@
         <control type="image">
             <description>GameRewind active overlay</description>
             <left>140</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -122,13 +107,11 @@
             <top>56</top>
             <width>500</width>
             <height>50</height>
-            <visible>true</visible>
             <onup>100</onup>
             <ondown>220</ondown>
             <onright>240</onright>
             <viewtype label="list">list</viewtype>
             <orientation>horizontal</orientation>
-            <autoscroll>false</autoscroll>
             <itemlayout width="110" height="36">
                 <control type="label">
                     <description>Season text</description>
@@ -136,15 +119,10 @@
                     <top>3</top>
                     <width>90</width>
                     <height>30</height>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -180,11 +158,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -201,11 +175,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -222,7 +192,6 @@
             <top>56</top>
             <width>450</width>
             <height>50</height>
-            <visible>true</visible>
             <onup>100</onup>
             <ondown>220</ondown>
             <onleft>210</onleft>
@@ -236,11 +205,9 @@
                     <top>3</top>
                     <width>190</width>
                     <height>30</height>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
@@ -277,7 +244,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
@@ -295,7 +261,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
@@ -313,7 +278,6 @@
             <top>110</top>
             <width>290</width>
             <height>520</height>
-            <visible>true</visible>
             <onup>210</onup>
             <onleft>60</onleft>
             <onright>230</onright>
@@ -344,14 +308,10 @@
                     <left>140</left>
                     <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -361,7 +321,7 @@
             </itemlayout>
             <focusedlayout width="280" height="40">
                 <control type="image">
-                        <left></left>
+                        <left>0</left>
                         <top>0</top>
                         <width>280</width>
                         <height>40</height>
@@ -369,7 +329,7 @@
                         <visible>Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left></left>
+                        <left>0</left>
                         <top>0</top>
                         <width>280</width>
                         <height>40</height>
@@ -378,7 +338,7 @@
                         <visible>Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left></left>
+                        <left>0</left>
                         <top>0</top>
                         <width>280</width>
                         <height>40</height>
@@ -399,15 +359,10 @@
                     <left>140</left>
                     <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -420,15 +375,10 @@
                     <left>140</left>
                     <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -444,7 +394,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF111111</textcolor>
@@ -461,7 +410,6 @@
             <top>110</top>
             <width>920</width>
             <height>560</height>
-            <visible>true</visible>
             <onup>210</onup>
             <onleft>220</onleft>
             <onright>61</onright>
@@ -513,9 +461,6 @@
                     <align>center</align>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -531,9 +476,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -549,9 +491,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <label>[B]Upcoming game[/B]</label>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -567,9 +506,6 @@
                     <align>left</align>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font12</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -585,9 +521,6 @@
                     <align>left</align>
                     <scroll>false</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -656,9 +589,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Label2</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -674,9 +604,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -692,9 +619,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <label>[B]Upcoming game[/B]</label>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -710,9 +634,6 @@
                     <align>left</align>
                     <scroll>true</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font12</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -728,9 +649,6 @@
                     <align>left</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
