@@ -376,6 +376,9 @@ def get_weeks_games(season, week):
     game_data = make_request(url, post_data)
     game_data_dict = xmltodict.parse(game_data)['result']
     games = game_data_dict['games']['game']
+    # if only one game is returned, we explicitly put it into a list
+    if isinstance(games, dict):
+        games = [games]
 
     return games
 

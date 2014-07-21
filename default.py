@@ -98,70 +98,63 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_items = []
         self.games_list.reset()
         games = get_weeks_games(self.selected_season, self.selected_week)
-        addon_log('Game: %s' %games)
-        # if only one game is returned, we explicitly put it into a list
-        if isinstance(games, dict):
-            games = [games]
 
-        if games:
-            date_time_format = '%Y-%m-%dT%H:%M:%S.000'
-            for game in games:
-                isLive = 'false'
-                isPlayable = 'true'
-                home_team = game['homeTeam']
-                # sometimes the first item is empty
-                if home_team['name'] is None:
-                    continue
+        date_time_format = '%Y-%m-%dT%H:%M:%S.000'
+        for game in games:
+            if game['homeTeam']['name'] is None: # sometimes the first item is empty
+                continue
 
-                game_version_ids = {}
-                for key, value in {'Condensed': 'condensedId', 'Full': 'programId', 'Live': 'id'}.items():
-                    try:
-                        game_version_ids[key] = game[value]
-                    except KeyError:
-                        pass
+            isLive = 'false'
+            isPlayable = 'true'
+            home_team = game['homeTeam']
+            away_team = game['awayTeam']
+            game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
+            game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
+            game_version_ids = {}
+            for key, value in {'Condensed': 'condensedId', 'Full': 'programId', 'Live': 'id'}.items():
+                try:
+                    game_version_ids[key] = game[value]
+                except KeyError:
+                    pass
 
-                away_team = game['awayTeam']
-                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
-                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
+            if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
+                game_name_full += ' - Live'
+                isLive = 'true'
+            elif game.has_key('gameEndTimeGMT'):
+                try:
+                    start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+                    end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
+                    game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
+                except:
+                    addon_log(format_exc())
+                    if game.has_key('result'):
+                        game_info = ' - Final'
+            else:
+                try:
+                    # may want to change this to game['gameTimeGMT'] or do a setting maybe
+                    game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                    game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                    if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
+                        isPlayable = 'false'
+                        game_name_full = self.coloring(game_name_full, "disabled")
+                        game_name_shrt = self.coloring(game_name_shrt, "disabled")
+                        game_info = self.coloring(game_info, "disabled-info")
+                except:
+                    game_datetime = game['date'].split('T')
+                    game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
 
-                if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
-                    game_name_full += ' - Live'
-                    isLive = 'true'
-                elif game.has_key('gameEndTimeGMT'):
-                    try:
-                        start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
-                        end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
-                        game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
-                    except:
-                        addon_log(format_exc())
-                        if game.has_key('result'):
-                            game_info = ' - Final'
-                else:
-                    try:
-                        # may want to change this to game['gameTimeGMT'] or do a setting maybe
-                        game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
-                        game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                        if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
-                            isPlayable = 'false'
-                            game_name_full = self.coloring(game_name_full, "disabled")
-                            game_name_shrt = self.coloring(game_name_shrt, "disabled")
-                            game_info = self.coloring(game_info, "disabled-info")
-                    except:
-                        game_datetime = game['date'].split('T')
-                        game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
-
-                listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
-                listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
-                listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
-                listitem.setProperty('game_info', game_info)
-                listitem.setProperty('is_game', 'true')
-                listitem.setProperty('is_show', 'false')
-                listitem.setProperty('isPlayable', isPlayable)
-                listitem.setProperty('isLive', isLive)
-                params = {'name': game_name_full, 'url': game_version_ids}
-                url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
-                listitem.setProperty('url', url)
-                self.games_items.append(listitem)
+            listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+            listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
+            listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
+            listitem.setProperty('game_info', game_info)
+            listitem.setProperty('is_game', 'true')
+            listitem.setProperty('is_show', 'false')
+            listitem.setProperty('isPlayable', isPlayable)
+            listitem.setProperty('isLive', isLive)
+            params = {'name': game_name_full, 'url': game_version_ids}
+            url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
+            listitem.setProperty('url', url)
+            self.games_items.append(listitem)
 
             self.games_list.addItems(self.games_items)
 
