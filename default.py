@@ -280,6 +280,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.weeks_items = []
                 self.weeks_list.reset()
                 self.games_list.reset()
+                self.clicked_week = -1
+                self.clicked_game = -1
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
 
                 #mark clicked listitem, this is used in skin to display a different bg
@@ -309,6 +311,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.weeks_items.append(listitem)
                 self.weeks_list.addItems(self.weeks_items)
             elif controlId == 220: # week is clicked
+                self.clicked_game = -1
                 self.games_list.reset()
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
 
@@ -348,6 +351,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.playUrl(game_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
+                self.clicked_week = -1
+                self.clicked_game = -1
                 self.weeks_list.reset()
                 self.games_list.reset()
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
@@ -362,6 +367,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.clicked_season = self.season_list.getSelectedPosition()
                 self.display_nfl_network_archive()
             elif controlId == 220: # show is clicked
+                self.clicked_game = -1
                 self.games_list.reset()
                 show_name = self.weeks_list.getSelectedItem().getLabel()
 
