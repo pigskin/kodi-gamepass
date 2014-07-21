@@ -54,8 +54,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
-        self.window.setProperty('NW_clicked', 'true')
-        self.window.setProperty('GP_clicked', 'false')
         self.season_list = self.window.getControl(210)
         self.weeks_list = self.window.getControl(220)
         self.games_list = self.window.getControl(230)
@@ -73,6 +71,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.games_list.addItems(self.games_items)
             self.live_list.reset()
             self.live_list.addItems(self.live_items)
+        else:
+            self.window.setProperty('NW_clicked', 'false')
+            self.window.setProperty('GP_clicked', 'false')
 
         self.setFocus(self.window.getControl(self.focusId))
 
