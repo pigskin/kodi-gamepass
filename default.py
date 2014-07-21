@@ -320,7 +320,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                 #if a week was selected previously
                 if self.clicked_week > -1:
-                    self.season_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
+                    self.weeks_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
 
                 self.clicked_week = self.weeks_list.getSelectedPosition()
                 self.display_weeks_games()
@@ -376,7 +376,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                 #if a week was selected previously
                 if self.clicked_week > -1:
-                    self.season_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
+                    self.weeks_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
 
                 self.clicked_week = self.weeks_list.getSelectedPosition()
                 self.display_shows_episodes(show_name, self.selected_season)
