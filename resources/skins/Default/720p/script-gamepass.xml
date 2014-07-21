@@ -105,6 +105,13 @@
             <viewtype label="list">list</viewtype>
             <orientation>horizontal</orientation>
             <itemlayout width="110" height="36">
+                <control type="image">
+                    <width>110</width>
+                    <height>36</height>
+                    <aspectratio>stretch</aspectratio>
+                    <texture>GamePass/submenubar_focus2.png</texture>
+                    <visible>ListItem.Property(clicked)</visible>
+                </control>
                 <control type="label">
                     <description>Season text</description>
                     <left>55</left>
@@ -128,7 +135,7 @@
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
                         <texture>GamePass/submenubar_focus2.png</texture>
-                        <visible>!Control.HasFocus(210)</visible>
+                        <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="image">
                         <width>110</width>
@@ -187,6 +194,13 @@
             <orientation>horizontal</orientation>
             <autoscroll>false</autoscroll>
             <itemlayout width="200" height="36">
+                <control type="image">
+                    <width>200</width>
+                    <height>36</height>
+                    <aspectratio>stretch</aspectratio>
+                    <texture>GamePass/submenuwide_focus2.png</texture>
+                    <visible>ListItem.Property(clicked)</visible>
+                </control>
                 <control type="label">
                     <description>Live item text</description>
                     <left>100</left>
@@ -210,7 +224,7 @@
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
                         <texture>GamePass/submenuwide_focus2.png</texture>
-                        <visible>!Control.HasFocus(240)</visible>
+                        <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="image">
                         <width>200</width>
