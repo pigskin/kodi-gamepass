@@ -4,8 +4,6 @@
     <controls>
         <control type="image">
             <description>Normal Default Background Image</description>
-            <left>0</left>
-            <top>0</top>
             <width>1280</width>
             <height>720</height>
             <aspectratio>scale</aspectratio>
@@ -13,8 +11,6 @@
         </control>
         <control type="image">
             <description>Menubar background</description>
-            <left>0</left>
-            <top>0</top>
             <width>1280</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -22,7 +18,6 @@
         </control>
         <control type="image">
             <description>SubMenubar background</description>
-            <left>0</left>
             <top>56</top>
             <width>1280</width>
             <height>36</height>
@@ -32,7 +27,6 @@
         <control type="group" id="100">
               <description>Top row button group</description>
               <left>140</left>
-              <top>0</top>
               <width>1000</width>
               <height>30</height>
               <defaultcontrol condition="IsEmpty(Window.Property(gamepass))">120</defaultcontrol>
@@ -50,7 +44,6 @@
             </control>
             <control type="button" id="120">
                   <description>RedWind button</description>
-                  <left>0</left>
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
@@ -93,7 +86,6 @@
         <control type="image">
             <description>NFL Network active overlay</description>
             <left>740</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -132,8 +124,6 @@
             </itemlayout>
             <focusedlayout width="110" height="36">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -141,8 +131,6 @@
                         <visible>!Control.HasFocus(210) + !Control.HasFocus(240) + !ControlGroup(100).HasFocus</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -218,8 +206,6 @@
             </itemlayout>
             <focusedlayout width="200" height="36">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -227,8 +213,6 @@
                         <visible>!Control.HasFocus(240) + !Control.HasFocus(210) + !ControlGroup(100).HasFocus</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -287,16 +271,12 @@
             <pagecontrol>60</pagecontrol>
             <itemlayout width="280" height="40">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
                         <visible>!ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
@@ -321,16 +301,12 @@
             </itemlayout>
             <focusedlayout width="280" height="40">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
                         <visible>Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
@@ -338,16 +314,12 @@
                         <visible>Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
                         <visible>!Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
@@ -357,7 +329,6 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -373,7 +344,6 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -389,7 +359,6 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -420,7 +389,6 @@
             <itemlayout width="460" height="80">
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
@@ -428,7 +396,6 @@
                 </control>
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
@@ -548,7 +515,6 @@
             <focusedlayout width="450" height="80">
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_focus.png</texture>
@@ -556,7 +522,6 @@
                 </control>
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_focus.png</texture>
