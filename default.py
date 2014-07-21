@@ -241,7 +241,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.live_list.reset()
 
             if controlId == 110:
-                self.main_selection = 'GamePass'
+                self.main_selection = 'GamePass/Rewind'
             elif controlId == 130:
                 self.live_items = []
                 self.main_selection = 'NFL Network'
@@ -262,7 +262,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.display_seasons()
             return
 
-        if self.main_selection == 'GamePass':
+        if self.main_selection == 'GamePass/Rewind':
             if controlId == 210: # season is clicked
                 self.weeks_items = []
                 self.weeks_list.reset()
