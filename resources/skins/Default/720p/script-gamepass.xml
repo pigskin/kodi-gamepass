@@ -72,7 +72,7 @@
             <height>56</height>
             <aspectratio>stretch</aspectratio>
             <texture>GamePass/gamepass_focus2.png</texture>
-            <visible>!ControlGroup(100).HasFocus + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
+            <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
         </control>
         <control type="image">
             <description>GameRewind active overlay</description>
@@ -81,7 +81,7 @@
             <height>56</height>
             <aspectratio>stretch</aspectratio>
             <texture>GamePass/rewind_focus2.png</texture>
-            <visible>!ControlGroup(100).HasFocus + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(120)</visible>
+            <visible>!Control.HasFocus(120) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(120)</visible>
         </control>
         <control type="image">
             <description>NFL Network active overlay</description>
@@ -90,7 +90,7 @@
             <height>56</height>
             <aspectratio>stretch</aspectratio>
             <texture>GamePass/network_focus2.png</texture>
-            <visible>!ControlGroup(100).HasFocus + SubString(Window.Property(NW_clicked),true)</visible>
+            <visible>!Control.HasFocus(130) + SubString(Window.Property(NW_clicked),true)</visible>
         </control>
 
         <control type="list" id="210">
