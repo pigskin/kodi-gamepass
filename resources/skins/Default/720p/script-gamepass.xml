@@ -210,7 +210,7 @@
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
                         <texture>GamePass/submenuwide_focus2.png</texture>
-                        <visible>!Control.HasFocus(240) + !Control.HasFocus(210) + !ControlGroup(100).HasFocus</visible>
+                        <visible>!Control.HasFocus(240) + !Control.HasFocus(210) + !ControlGroup(100).HasFocus + !Control.HasFocus(220) + !Control.HasFocus(230)</visible>
                 </control>
                 <control type="image">
                         <width>200</width>
