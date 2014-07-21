@@ -49,7 +49,7 @@
                   <visible>!IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="120">
-                  <description>Redzone button</description>
+                  <description>RedWind button</description>
                   <left>0</left>
                   <width>375</width>
                   <height>56</height>
@@ -551,7 +551,7 @@
                         <top>0</top>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_focus2.png</texture>
+                        <texture>GamePass/game_focus.png</texture>
                         <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
@@ -559,7 +559,7 @@
                         <top>0</top>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_focus2.png</texture>
+                        <texture>GamePass/game_focus.png</texture>
                         <colordiffuse>CCFFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
