@@ -118,7 +118,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     pass
 
             if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
-                game_name_full += ' - Live'
+                game_info = 'Live'
                 isLive = 'true'
             elif game.has_key('gameEndTimeGMT'):
                 try:
@@ -299,7 +299,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         params[i] = params[i][0]
                     game_version_ids = eval(params['url'])
 
-                    if selectedGame.getLabel2().endswith('- Live'):
+                    if selectedGame.getProperty('isLive') == 'true':
                         game_live_url = get_live_url(game_version_ids['Live'], self.select_bitrate())
                         self.playUrl(game_live_url)
                     else:
