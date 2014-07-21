@@ -4,8 +4,6 @@
     <controls>
         <control type="image">
             <description>Normal Default Background Image</description>
-            <left>0</left>
-            <top>0</top>
             <width>1280</width>
             <height>720</height>
             <aspectratio>scale</aspectratio>
@@ -13,8 +11,6 @@
         </control>
         <control type="image">
             <description>Menubar background</description>
-            <left>0</left>
-            <top>0</top>
             <width>1280</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -22,7 +18,6 @@
         </control>
         <control type="image">
             <description>SubMenubar background</description>
-            <left>0</left>
             <top>56</top>
             <width>1280</width>
             <height>36</height>
@@ -32,41 +27,30 @@
         <control type="group" id="100">
               <description>Top row button group</description>
               <left>140</left>
-              <top></top>
               <width>1000</width>
               <height>30</height>
               <defaultcontrol condition="IsEmpty(Window.Property(gamepass))">120</defaultcontrol>
               <defaultcontrol>110</defaultcontrol>
-              <visible>true</visible>
               <control type="button" id="110">
                   <description>Gamepass button</description>
                   <left>0</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>210</ondown>
                   <onright>120</onright>
                   <texturefocus>GamePass/gamepass_focus.png</texturefocus>
                   <texturenofocus>GamePass/gamepass_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
                   <visible>!IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="120">
                   <description>Redzone button</description>
-                  <left>0</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>210</ondown>
                   <onleft>110</onleft>
                   <onright>130</onright>
                   <texturefocus>GamePass/rewind_focus.png</texturefocus>
                   <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
                   <visible>IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="130">
@@ -74,21 +58,16 @@
                   <left>600</left>
                   <width>375</width>
                   <height>56</height>
-                  <visible>true</visible>
                   <ondown>240</ondown>
                   <onleft>120</onleft>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
-                  <onclick></onclick>
-                  <onfocus></onfocus>
-                  <onunfocus></onunfocus>
             </control>
         </control>
 
         <control type="image">
             <description>Gamepass active overlay</description>
             <left>140</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -98,7 +77,6 @@
         <control type="image">
             <description>GameRewind active overlay</description>
             <left>140</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -108,7 +86,6 @@
         <control type="image">
             <description>NFL Network active overlay</description>
             <left>740</left>
-            <top>0</top>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
@@ -122,13 +99,11 @@
             <top>56</top>
             <width>500</width>
             <height>50</height>
-            <visible>true</visible>
             <onup>100</onup>
             <ondown>220</ondown>
             <onright>240</onright>
             <viewtype label="list">list</viewtype>
             <orientation>horizontal</orientation>
-            <autoscroll>false</autoscroll>
             <itemlayout width="110" height="36">
                 <control type="label">
                     <description>Season text</description>
@@ -136,15 +111,10 @@
                     <top>3</top>
                     <width>90</width>
                     <height>30</height>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -154,8 +124,6 @@
             </itemlayout>
             <focusedlayout width="110" height="36">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -163,8 +131,6 @@
                         <visible>!Control.HasFocus(210)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -180,11 +146,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -201,11 +163,7 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -222,7 +180,6 @@
             <top>56</top>
             <width>450</width>
             <height>50</height>
-            <visible>true</visible>
             <onup>100</onup>
             <ondown>220</ondown>
             <onleft>210</onleft>
@@ -236,11 +193,9 @@
                     <top>3</top>
                     <width>190</width>
                     <height>30</height>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
@@ -251,8 +206,6 @@
             </itemlayout>
             <focusedlayout width="200" height="36">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -260,8 +213,6 @@
                         <visible>!Control.HasFocus(240)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
@@ -277,7 +228,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
@@ -295,7 +245,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
@@ -313,7 +262,6 @@
             <top>110</top>
             <width>290</width>
             <height>520</height>
-            <visible>true</visible>
             <onup>210</onup>
             <onleft>60</onleft>
             <onright>230</onright>
@@ -323,16 +271,12 @@
             <pagecontrol>60</pagecontrol>
             <itemlayout width="280" height="40">
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
                         <visible>!ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_bg.png</texture>
@@ -344,14 +288,10 @@
                     <left>140</left>
                     <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -361,16 +301,12 @@
             </itemlayout>
             <focusedlayout width="280" height="40">
                 <control type="image">
-                        <left></left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
                         <visible>Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left></left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus.png</texture>
@@ -378,16 +314,12 @@
                         <visible>Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left></left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
                         <visible>!Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
-                        <left>0</left>
-                        <top>0</top>
                         <width>280</width>
                         <height>40</height>
                         <texture>GamePass/week_focus2.png</texture>
@@ -397,17 +329,11 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -418,17 +344,11 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
-                    <visible>true</visible>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -439,12 +359,10 @@
                 <control type="label">
                     <description>Week/Show text</description>
                     <left>140</left>
-                    <top>0</top>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
-                    <label>6</label>
                     <info>ListItem.Label</info>
                     <font>font13</font>
                     <textcolor>FF111111</textcolor>
@@ -461,7 +379,6 @@
             <top>110</top>
             <width>920</width>
             <height>560</height>
-            <visible>true</visible>
             <onup>210</onup>
             <onleft>220</onleft>
             <onright>61</onright>
@@ -472,7 +389,6 @@
             <itemlayout width="460" height="80">
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
@@ -480,7 +396,6 @@
                 </control>
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_bg.png</texture>
@@ -513,9 +428,6 @@
                     <align>center</align>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -531,9 +443,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -549,9 +458,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <label>[B]Upcoming game[/B]</label>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -567,9 +473,6 @@
                     <align>left</align>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font12</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -585,9 +488,6 @@
                     <align>left</align>
                     <scroll>false</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -615,7 +515,6 @@
             <focusedlayout width="450" height="80">
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_focus2.png</texture>
@@ -623,7 +522,6 @@
                 </control>
                 <control type="image">
                         <left>10</left>
-                        <top>0</top>
                         <width>440</width>
                         <height>80</height>
                         <texture>GamePass/game_focus2.png</texture>
@@ -656,9 +554,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Label2</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -674,9 +569,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -692,9 +584,6 @@
                     <align>center</align>
                     <scroll>true</scroll>
                     <label>[B]Upcoming game[/B]</label>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -710,9 +599,6 @@
                     <align>left</align>
                     <scroll>true</scroll>
                     <info>ListItem.Label</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font12</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
@@ -728,9 +614,6 @@
                     <align>left</align>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <number></number>
-                    <angle></angle>
-                    <haspath>false</haspath>
                     <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
