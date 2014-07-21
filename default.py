@@ -249,13 +249,13 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
 
-                #Check whether RedZone is on Air
-                url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-                simple_data = make_request(url, {'isFlex':'true'})
-                simple_dict = xmltodict.parse(simple_data)['result']
-                if simple_dict['rzPhase'] == 'in':
-                    listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
-                    self.live_items.append(listitem)
+                    # Check whether RedZone is on Air
+                    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
+                    simple_data = make_request(url, {'isFlex':'true'})
+                    simple_dict = xmltodict.parse(simple_data)['result']
+                    if simple_dict['rzPhase'] == 'in':
+                        listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+                        self.live_items.append(listitem)
 
                 self.live_list.addItems(self.live_items)
 
