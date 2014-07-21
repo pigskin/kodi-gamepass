@@ -128,7 +128,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 except:
                     addon_log(format_exc())
                     if game.has_key('result'):
-                        game_info = ' - Final'
+                        game_info = 'Final'
             else:
                 try:
                     # may want to change this to game['gameTimeGMT'] or do a setting maybe
