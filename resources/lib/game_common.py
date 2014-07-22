@@ -414,6 +414,15 @@ def get_video_path(game_id):
         return False
 
 
+def get_shows(season):
+    seasons_shows = []
+    for show_name, show_codes in show_archives.items():
+        if season in show_codes:
+            seasons_shows.append(show_name)
+
+    return seasons_shows
+
+
 # get episodes of archived NFL Network and RedZone shows
 # returns an empty list if no episodes are found or the showname/season are invalid
 def get_shows_episodes(show_name, season):

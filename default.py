@@ -95,9 +95,11 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_nfl_network_archive(self):
         self.weeks_items = []
-        for i in show_archives.keys():
-            listitem = xbmcgui.ListItem(i)
+        shows = get_shows(self.selected_season)
+        for show_name in shows:
+            listitem = xbmcgui.ListItem(show_name)
             self.weeks_items.append(listitem)
+
         self.weeks_list.addItems(self.weeks_items)
 
     def display_weeks_games(self):
