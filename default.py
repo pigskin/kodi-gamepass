@@ -284,10 +284,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.window.setProperty('NW_clicked', 'false')
                 self.window.setProperty('GP_clicked', 'true')
             elif controlId == 130:
+                self.main_selection = 'NFL Network'
                 self.window.setProperty('NW_clicked', 'true')
                 self.window.setProperty('GP_clicked', 'false')
                 self.live_items = []
-                self.main_selection = 'NFL Network'
                 if subscription == '0': # GamePass
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
