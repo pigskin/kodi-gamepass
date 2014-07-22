@@ -75,7 +75,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
 
-        self.setFocus(self.window.getControl(self.focusId))
+        try:
+            self.setFocus(self.window.getControl(self.focusId))
+        except:
+            addon_log('Focus not possible: %s' %self.focusId)
 
     def coloring(self, text, meaning):
         if meaning == "disabled":
@@ -229,6 +232,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         for bitrate in bitrates:
             options.append(bitrate + ' Kbps')
         dialog = xbmcgui.Dialog()
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
         ret = dialog.select(language(30003), options)
         return bitrates[ret]
 
@@ -274,6 +278,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         # user wants to be asked to select version
         if preferred_version == 2:
             dialog = xbmcgui.Dialog()
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
             ret = dialog.select(language(30016), versions)
             if ret == 1:
                 game_id = game_version_ids['Condensed']
@@ -286,6 +291,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.focusId = controlId
 
     def onClick(self, controlId):
+        xbmc.executebuiltin("ActivateWindow(busydialog)")
         if controlId in[110, 120, 130]:
             self.games_list.reset()
             self.weeks_list.reset()
@@ -319,6 +325,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.live_list.addItems(self.live_items)
 
             self.display_seasons()
+            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
             return
 
         if self.main_selection == 'GamePass/Rewind':
@@ -395,6 +402,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
                     self.playUrl(nfl_network_url)
 
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
 
 if (__name__ == "__main__"):
     addon_log('script starting')
