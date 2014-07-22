@@ -193,6 +193,34 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         del player
 
+    def init(self, level):
+        if level == 'season':
+            self.weeks_items = []
+            self.weeks_list.reset()
+            self.games_list.reset()
+            self.clicked_week = -1
+            self.clicked_game = -1
+
+            if self.clicked_season > -1: # unset previously selected season
+                self.season_list.getListItem(self.clicked_season).setProperty('clicked', 'false')
+
+            self.season_list.getSelectedItem().setProperty('clicked', 'true')
+            self.clicked_season = self.season_list.getSelectedPosition()
+        elif level == 'week/show':
+            self.games_list.reset()
+            self.clicked_game = -1
+
+            if self.clicked_week > -1: # unset previously selected week/show
+                self.weeks_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
+
+            self.weeks_list.getSelectedItem().setProperty('clicked', 'true')
+            self.clicked_week = self.weeks_list.getSelectedPosition()
+        elif level == 'game/episode':
+            if self.clicked_game > -1: # unset previously selected game/episode
+                self.games_list.getListItem(self.clicked_game).setProperty('clicked', 'false')
+
+            self.games_list.getSelectedItem().setProperty('clicked', 'true')
+            self.clicked_game = self.games_list.getSelectedPosition()
 
     def select_bitrate(self):
         preferred_bitrate = int(addon.getSetting('preferred_bitrate'))
@@ -277,21 +305,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         if self.main_selection == 'GamePass/Rewind':
             if controlId == 210: # season is clicked
-                self.weeks_items = []
-                self.weeks_list.reset()
-                self.games_list.reset()
-                self.clicked_week = -1
-                self.clicked_game = -1
+                self.init('season')
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
-
-                #mark clicked listitem, this is used in skin to display a different bg
-                self.season_list.getSelectedItem().setProperty('clicked', 'true')
-
-                #if a season was selected previously
-                if self.clicked_season > -1:
-                    self.season_list.getListItem(self.clicked_season).setProperty('clicked', 'false')
-
-                self.clicked_season = self.season_list.getSelectedPosition()
                 weeks = get_seasons_weeks(self.selected_season)
 
                 for week_code, week_name in sorted(weeks['weeks'].iteritems()):
@@ -311,30 +326,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     self.weeks_items.append(listitem)
                 self.weeks_list.addItems(self.weeks_items)
             elif controlId == 220: # week is clicked
-                self.clicked_game = -1
-                self.games_list.reset()
+                self.init('week/show')
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
 
-                #mark clicked listitem, this is used in skin to display a different bg
-                self.weeks_list.getSelectedItem().setProperty('clicked', 'true')
-
-                #if a week was selected previously
-                if self.clicked_week > -1:
-                    self.weeks_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
-
-                self.clicked_week = self.weeks_list.getSelectedPosition()
                 self.display_weeks_games()
             elif controlId == 230: # game is clicked
                 selectedGame = self.games_list.getSelectedItem()
                 if selectedGame.getProperty('isPlayable') == 'true':
-                    #mark clicked listitem, this is used in skin to display a different bg
-                    self.games_list.getSelectedItem().setProperty('clicked', 'true')
-
-                    #if a game was selected previously
-                    if self.clicked_game > -1:
-                        self.games_list.getListItem(self.clicked_game).setProperty('clicked', 'false')
-
-                    self.clicked_game = self.games_list.getSelectedPosition()
+                    self.init('game/episode')
 
                     url = selectedGame.getProperty('url')
                     params = parse_qs(urlparse(url).query)
@@ -351,50 +350,22 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.playUrl(game_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
-                self.clicked_week = -1
-                self.clicked_game = -1
-                self.weeks_list.reset()
-                self.games_list.reset()
+                self.init('season')
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
 
-                #mark clicked listitem, this is used in skin to display a different bg
-                self.season_list.getSelectedItem().setProperty('clicked', 'true')
-
-                #if a season was selected previously
-                if self.clicked_season > -1:
-                    self.season_list.getListItem(self.clicked_season).setProperty('clicked', 'false')
-
-                self.clicked_season = self.season_list.getSelectedPosition()
                 self.display_nfl_network_archive()
             elif controlId == 220: # show is clicked
-                self.clicked_game = -1
-                self.games_list.reset()
+                self.init('week/show')
                 show_name = self.weeks_list.getSelectedItem().getLabel()
 
-                #mark clicked listitem, this is used in skin to display a different bg
-                self.weeks_list.getSelectedItem().setProperty('clicked', 'true')
-
-                #if a week was selected previously
-                if self.clicked_week > -1:
-                    self.weeks_list.getListItem(self.clicked_week).setProperty('clicked', 'false')
-
-                self.clicked_week = self.weeks_list.getSelectedPosition()
                 self.display_shows_episodes(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
-                #mark clicked listitem, this is used in skin to display a different bg
-                self.games_list.getSelectedItem().setProperty('clicked', 'true')
-
-                #if a game was selected previously
-                if self.clicked_game > -1:
-                    self.games_list.getListItem(self.clicked_game).setProperty('clicked', 'false')
-
-                self.clicked_game = self.games_list.getSelectedPosition()
-
+                self.init('game/episode')
                 url = self.games_list.getSelectedItem().getProperty('url')
                 stream_url = get_episode_url(url)
+
                 self.playUrl(stream_url)
-                    #NFL-Network or RedZone - Live is selected
-            elif controlId == 240: #Live Content is selected
+            elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
                     redzone_live_url = get_live_url('rz', self.select_bitrate())
