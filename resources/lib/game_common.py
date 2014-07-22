@@ -16,7 +16,6 @@ import xmltodict
 
 import xbmc
 import xbmcaddon
-import xbmcgui
 
 
 addon = xbmcaddon.Addon()
@@ -243,45 +242,19 @@ def get_seasons_weeks(season):
 
 
 def parse_manifest(manifest):
-    try:
-        manifest_dict = xmltodict.parse(manifest)
-        if isinstance(manifest_dict['channel']['streamDatas']['streamData'][0]['httpservers']['httpserver'], list):
-            items = [{'servers': [{'name': x['@name'], 'port': x['@port']} for x in i['httpservers']['httpserver']],
-                      'url': i['@url'], 'bitrate': int(i['@bitrate']),
-                      'info': '%sx%s Bitrate: %s' %(i['video']['@height'], i['video']['@width'], i['video']['@bitrate'])}
-                     for i in manifest_dict['channel']['streamDatas']['streamData']]
-        else:
-            items = [{'servers': [{'name': x['@name'], 'port': x['@port']} for x in [i['httpservers']['httpserver']]],
-                      'url': i['@url'], 'bitrate': int(i['@bitrate']),
-                      'info': '%sx%s Bitrate: %s' %(i['video']['@height'], i['video']['@width'], i['video']['@bitrate'])}
-                     for i in manifest_dict['channel']['streamDatas']['streamData']]
+    streams = {}
+    manifest_dict = xmltodict.parse(manifest)
 
-        ret = select_bitrate(items)
+    for stream in manifest_dict['channel']['streamDatas']['streamData']:
+        try:
+            url_path = stream['@url']
+            bitrate = url_path[(url_path.rindex('_') + 1):url_path.rindex('.')]
+            stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver']['@name'], url_path)
+            streams[bitrate] = stream
+        except KeyError:
+            addon_log(format_exc())
 
-        if ret >= 0:
-            addon_log('Selected: %s' %items[ret])
-            stream_url = 'http://%s%s.m3u8' %(items[ret]['servers'][0]['name'], items[ret]['url'])
-            addon_log('Stream URL: %s' %stream_url)
-            return stream_url
-        else:
-            raise
-    except:
-        addon_log(format_exc())
-        return False
-
-
-def select_bitrate(streams):
-    preferred_bitrate = addon.getSetting('preferred_bitrate')
-    streams.sort(key=itemgetter('bitrate'), reverse=True)
-    if preferred_bitrate == '0':
-        ret = 0
-    elif len(streams) == 7 and preferred_bitrate != '8':
-        ret = int(preferred_bitrate) - 1
-    else:
-        dialog = xbmcgui.Dialog()
-        ret = dialog.select('Choose a stream', [i['info'] for i in streams])
-    addon_log('ret: %s' %ret)
-    return ret
+    return streams
 
 
 def cache_seasons_and_weeks():
@@ -383,14 +356,14 @@ def get_weeks_games(season, week):
     return games
 
 
-def get_stream_url(game_id):
+def get_game_manifest(game_id):
     set_cookies = get_current_season_and_week()
     if cache.get('mode') == '4':
         set_cookies = get_weeks_games(*eval(cache.get('current_schedule')))
     video_path = get_video_path(game_id)
-    manifest = get_manifest(video_path)
-    stream_url = parse_manifest(manifest)
-    return stream_url
+    xml_manifest = get_manifest(video_path)
+    stream_manifest = parse_manifest(xml_manifest)
+    return stream_manifest
 
 
 # the "video path" provides the info necessary to request the stream's manifest
@@ -459,10 +432,10 @@ def get_shows_episodes(show_name, season):
         return []
 
 
-def get_episode_url(url):
-    manifest = get_manifest(url)
-    stream_url = parse_manifest(manifest)
-    return stream_url
+def get_episode_manifest(url):
+    xml_manifest = get_manifest(url)
+    stream_manifest = parse_manifest(xml_manifest)
+    return stream_manifest
 
 
 def get_live_url(game_id, bitrate):

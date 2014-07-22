@@ -224,23 +224,39 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.games_list.getSelectedItem().setProperty('clicked', 'true')
             self.clicked_game = self.games_list.getSelectedPosition()
 
-    def select_bitrate(self):
-        preferred_bitrate = int(addon.getSetting('preferred_bitrate'))
+    def ask_bitrate(self, bitrates):
+        options = []
+        for bitrate in bitrates:
+            options.append(bitrate + ' Kbps')
+        dialog = xbmcgui.Dialog()
+        ret = dialog.select(language(30003), options)
+        return bitrates[ret]
+
+    def select_bitrate(self, manifest_bitrates=None):
+        bitrate_setting = int(addon.getSetting('preferred_bitrate'))
         bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
+        if bitrate_setting == 0:
+            preferred_bitrate = 'highest'
+        elif bitrate_setting < 7: # specific bitrate
+            preferred_bitrate = bitrate_values[bitrate_setting -1]
+        else:
+            preferred_bitrate = 'ask'
 
-        if preferred_bitrate == 0: # "highest"
-            bitrate = bitrate_values[0]
-        elif preferred_bitrate < 7: # specific bitrate
-            bitrate = bitrate_values[preferred_bitrate -1]
-        else: # ask
-            options = []
-            for i in range(len(bitrate_values)):
-                options.append(language(30005 + i))
-            dialog = xbmcgui.Dialog()
-            ret = dialog.select(language(30003), options)
-            bitrate = bitrate_values[ret]
-
-        return bitrate
+        if manifest_bitrates:
+            manifest_bitrates.sort(key=int, reverse=True)
+            if preferred_bitrate == 'highest':
+                return manifest_bitrates[0]
+            elif preferred_bitrate in manifest_bitrates:
+                return preferred_bitrate
+            else:
+                return self.ask_bitrate(manifest_bitrates)
+        else:
+            if preferred_bitrate == 'highest':
+                return bitrate_values[0]
+            elif preferred_bitrate != 'ask':
+                return preferred_bitrate
+            else:
+                return self.ask_bitrate(bitrate_values)
 
     # returns a gameid, while honoring user preference when applicable
     def select_version(self, game_version_ids):
@@ -348,7 +364,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.playUrl(game_live_url)
                     else:
                         game_id = self.select_version(game_version_ids)
-                        game_url = get_stream_url(game_id)
+                        game_manifest = get_game_manifest(game_id)
+                        bitrate = self.select_bitrate(game_manifest.keys())
+                        game_url = game_manifest[bitrate]['full_url']
                         self.playUrl(game_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
@@ -364,9 +382,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             elif controlId == 230: # episode is clicked
                 self.init('game/episode')
                 url = self.games_list.getSelectedItem().getProperty('url')
-                stream_url = get_episode_url(url)
-
-                self.playUrl(stream_url)
+                episode_manifest = get_episode_manifest(url)
+                bitrate = self.select_bitrate(episode_manifest.keys())
+                episode_url = episode_manifest[bitrate]['full_url']
+                self.playUrl(episode_url)
             elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
