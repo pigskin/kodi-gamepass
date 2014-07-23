@@ -76,6 +76,3 @@ A rough roadmap follows:
 * Continue work towards feature completeness
 * Stabilize Game Rewind support
 * Refactor code to be more XBMC agnostic
-* Work on a "skin" branch to convert the addon(s) to a "skin" plugin. This will
- allow us much more control over the UI. It should be prettier (more graphics)
- and more intuitive.
