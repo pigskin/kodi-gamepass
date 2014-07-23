@@ -1,4 +1,4 @@
-2014.0?.?? v0.?.? -- Jerry Rice Edition
+2014.07.23 v0.5.0 -- Jerry Rice Edition
 + New Feature: Skin Interface! (BaumSchorle and eriksoderblom)
 +   Tons of new features
 +   Games now include team logos
@@ -6,6 +6,7 @@
 +   New artwork
 +   New background (original image by charamelody)
 + Bug fix: Some archived games wouldn't play. (Alexqw)
++ Will now prompt if preferred stream bitrate isn't available (Alexqw)
 + Many small performance improvements (Alexqw)
 + Significant code refactoring (Alexqw)
 

@@ -1,5 +1,5 @@
 # NFL Game Pass/Rewind XBMC Plugin #
-**version 0.4.0 — "Doomsday Defense" Edition**
+**version 0.5.0 — Jerry Rice Edition**
 
 Before reading any further, please understand that while this plugin does
 work, not all features are supported (or fully tested) and it should be
