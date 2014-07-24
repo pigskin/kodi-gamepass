@@ -358,8 +358,6 @@ def get_weeks_games(season, week):
 
 def get_game_manifest(game_id):
     set_cookies = get_current_season_and_week()
-    if cache.get('mode') == '4':
-        set_cookies = get_weeks_games(*eval(cache.get('current_schedule')))
     video_path = get_video_path(game_id)
     xml_manifest = get_manifest(video_path)
     stream_manifest = parse_manifest(xml_manifest)
