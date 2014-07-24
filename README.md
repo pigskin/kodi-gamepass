@@ -14,7 +14,6 @@ request. Patches and (constructive) input are always welcome.
 Until this addon is part of an official XBMC repository (hopefully sometime
 soon), dependencies will not be installed automatically.
  * xmltodict (http://mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
- * plugin.cache (just install the YouTube addon, which uses it)
  * Requests (http://mirrors.xbmc.org/addons/frodo/script.module.requests2/)
 
 ## What is NFL Game Pass? ##

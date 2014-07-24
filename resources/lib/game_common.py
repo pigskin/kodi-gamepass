@@ -7,7 +7,6 @@ from operator import itemgetter
 import os
 import random
 import requests2 as requests
-import StorageServer
 import time
 from traceback import format_exc
 from urlparse import urlsplit
@@ -27,7 +26,6 @@ language = addon.getLocalizedString
 subscription = addon.getSetting('subscription')
 
 if subscription == '0': # game pass
-    cache = StorageServer.StorageServer("nfl_game_pass", 2)
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     base_url = 'https://gamepass.nfl.com/nflgp'
     show_archives = {
@@ -44,7 +42,6 @@ if subscription == '0': # game pass
         'Hard Knocks': {'2014': '220'}
     }
 else: # game rewind
-    cache = StorageServer.StorageServer("nfl_game_rewind", 2)
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
     base_url = 'https://gamerewind.nfl.com/nflgr'
     show_archives = {
@@ -90,24 +87,6 @@ def make_request(url, payload=None, headers=None):
         return r.text
     except requests.exceptions.RequestException as e:
         addon_log('Error: - %s.' %e)
-
-
-# Check age of cache, delete and update if it is older than 7200 sec (2hr)
-# TODO: This shouldn't be neccesary, as we set the cache TTL with StorageServer,
-# but that cache was not expiring correctly.
-def check_cache():
-    # for those who already have cached data, but no cachetime set
-    try:
-        eval(cache.get('cachetime'))
-    except:
-        cache.set('cachetime', "0")
-
-    if int(cache.get('cachetime')) > (time.time() - 7200):
-        addon_log('Found "young" cache')
-    else:
-        addon_log('Cache too old, updating')
-        cache.delete('seasons')
-        cache.delete('weeks')
 
 
 # Handles to neccesary steps and checks to login to NFL Game Pass.
@@ -186,61 +165,6 @@ def get_manifest(video_path):
     return manifest_data
 
 
-def get_seasons():
-    check_cache()
-
-    try:
-        seasons = eval(cache.get('seasons'))
-        return seasons
-    except:
-        pass
-
-    try:
-        cache_seasons_and_weeks()
-        seasons = eval(cache.get('seasons'))
-        return seasons
-    except:
-        raise
-
-def get_current_season():
-    try:
-        cur_season = eval(cache.get('current_season'))
-        return str(cur_season)
-    except:
-        pass
-
-    try:
-        cache_seasons_and_weeks()
-        cur_season = eval(cache.get('current_season'))
-        return str(cur_season)
-    except:
-        raise
-
-def get_seasons_weeks(season):
-    try:
-        weeks = eval(cache.get('weeks'))
-        weeks_dates = eval(cache.get('weeks_dates'))
-        output = {
-            "weeks": weeks[season],
-            "dates": weeks_dates[season]
-        }
-        return output
-    except:
-        pass
-
-    try:
-        cache_seasons_and_weeks()
-        weeks = eval(cache.get('weeks'))
-        weeks_dates = eval(cache.get('weeks_dates'))
-        output = {
-            "weeks": weeks[season],
-            "dates": weeks_dates[season]
-        }
-        return output
-    except:
-        raise
-
-
 def parse_manifest(manifest):
     streams = {}
     manifest_dict = xmltodict.parse(manifest)
@@ -257,11 +181,8 @@ def parse_manifest(manifest):
     return streams
 
 
-def cache_seasons_and_weeks():
-    seasons = []
-    weeks = {}
-    weeks_dates = {}
-    current_season = ''
+def get_seasons_and_weeks():
+    seasons_and_weeks = {}
 
     try:
         url = 'http://smb.cdnak.neulion.com/fs/nfl/nfl/mobile/weeks_v2.xml'
@@ -274,54 +195,22 @@ def cache_seasons_and_weeks():
     try:
         for season in s_w_data_dict['seasons']['season']:
             year = season['@season']
-
-            # assume that first year is current season
-            if current_season == '':
-               current_season = str(year)
-
-            seasons.append(year)
-            weeks[year] = {}
-            weeks_dates[year] = {}
+            season_dict = {}
 
             for week in season['week']:
-                # games prior to 2013 don't have dates in the xml-file, so I just
-                # put a static prior date
-                if int(year) >= 2013:
-                    week_start = week['@start']
-                else:
-                    week_start = '20010203'
-
-                if week['@section'] == "pre":
+                if week['@section'] == "pre": # preseason
                     week_code = '1' + week['@value'].zfill(2)
-                    weeks[year][week_code] = 'Preseason Week ' + week['@value']
-                    weeks_dates[year][week_code] = week_start
-                elif week['@section'] == "reg":
+                    season_dict[week_code] = week
+                else: # regular season and post season
                     week_code = '2' + week['@value'].zfill(2)
-                    weeks[year][week_code] = 'Week ' + week['@value']
-                    weeks_dates[year][week_code] = week_start
-                elif week['@section'] == "post":
-                    week_code = '2' + week['@value'].zfill(2)
-                    weeks[year][week_code] = week['@label']
-                    weeks_dates[year][week_code] = week_start
-                else:
-                    addon_log('Unknown week type: %' %week['@section'])
-    except:
+                    season_dict[week_code] = week
+
+            seasons_and_weeks[year] = season_dict
+    except KeyError:
         addon_log('Parsing season and week data failed.')
         raise
 
-    cache.set('cachetime', str(int(time.time())))
-    cache.set('seasons', repr(seasons))
-    addon_log('Seasons cached')
-    cache.set('current_season', current_season)
-    addon_log('Current season cached')
-    cache.set('weeks', repr(weeks))
-    cache.set('weeks_dates', repr(weeks_dates))
-    addon_log('Weeks cached')
-
-    addon_log('seasons: %s' %seasons)
-    addon_log('current season: %s' %current_season)
-    addon_log('weeks: %s' %weeks)
-    return True
+    return seasons_and_weeks
 
 
 # Returns the current season and week_code in a dict
@@ -338,7 +227,6 @@ def get_current_season_and_week():
 # season is in format: YYYY
 # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
 def get_weeks_games(season, week):
-    cache.set('current_schedule', repr((season, week)))
     url = servlets_url + '/servlets/games'
     post_data = {
         'isFlex': 'true',

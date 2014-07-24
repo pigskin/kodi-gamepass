@@ -46,6 +46,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     player = ''
     list_refill = 'false'
     focusId = 100
+    seasons_and_weeks = get_seasons_and_weeks()
 
 
     def __init__(self, *args, **kwargs):
@@ -90,8 +91,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_seasons(self):
         self.season_items = []
-        seasons = get_seasons()
-        for season in seasons:
+        for season in sorted(self.seasons_and_weeks.keys(), reverse=True):
             listitem = xbmcgui.ListItem(season)
             self.season_items.append(listitem)
         self.season_list.addItems(self.season_items)
@@ -332,20 +332,21 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if controlId == 210: # season is clicked
                 self.init('season')
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
-                weeks = get_seasons_weeks(self.selected_season)
+                weeks = self.seasons_and_weeks[self.selected_season]
 
-                for week_code, week_name in sorted(weeks['weeks'].iteritems()):
-                    week_date = weeks['dates'][week_code]+' 06:00'
+                for week_code, week in sorted(weeks.iteritems()):
                     future = 'false'
+                    try:
+                        week_date = week['start'] + ' 06:00'
+                        week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
+                        time_utc = str(datetime.utcnow())[:-7]
+                        time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
+                        if week_time > time_now:
+                            future = 'true'
+                    except KeyError: # some old seasons don't provide week dates
+                        pass
 
-                    week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
-                    time_utc = str(datetime.utcnow())[:-7]
-                    time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
-
-                    if week_time > time_now:
-                        future = 'true'
-
-                    listitem = xbmcgui.ListItem(week_name)
+                    listitem = xbmcgui.ListItem(week['@label'].title())
                     listitem.setProperty('week_code', week_code)
                     listitem.setProperty('future', future)
                     self.weeks_items.append(listitem)
