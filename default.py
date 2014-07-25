@@ -334,7 +334,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 for week_code, week in sorted(weeks.iteritems()):
                     future = 'false'
                     try:
-                        week_date = week['start'] + ' 06:00'
+                        week_date = week['@start'] + ' 06:00'
                         week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
                         time_utc = str(datetime.utcnow())[:-7]
                         time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
