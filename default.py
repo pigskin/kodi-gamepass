@@ -187,6 +187,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def playUrl(self, url):
         player = myPlayer(parent=self)
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
         player.play(url)
 
         while player.isPlaying():
