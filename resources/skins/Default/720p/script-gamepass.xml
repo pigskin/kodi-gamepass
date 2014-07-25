@@ -60,7 +60,8 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>240</ondown>
-                  <onleft>120</onleft>
+                  <onleft condition="IsEmpty(Window.Property(gamepass))">120</onleft>
+                  <onleft>110</onleft>
                   <onright>90</onright>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
