@@ -48,7 +48,7 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
-                  <onleft>90</onleft>
+                  <onleft>110</onleft>
                   <onright>130</onright>
                   <texturefocus>GamePass/rewind_focus.png</texturefocus>
                   <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
@@ -60,8 +60,7 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>240</ondown>
-                  <onleft condition="IsEmpty(Window.Property(gamepass))">120</onleft>
-                  <onleft>110</onleft>
+                  <onleft>120</onleft>
                   <onright>90</onright>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
