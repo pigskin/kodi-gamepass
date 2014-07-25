@@ -1,3 +1,12 @@
+2014.0?.?? v0.?.? -- ? Edition
++ Bug fix: First archived game played was wrong game (BaumSchorle)
++ Bug fix: Sometimes busy dialog wouldn't close when playing (BaumSchorle)
++ Bug fix: XBMC on OpenElec wouldn't play archived games/shows (Alexqw)
++ Bug fix: Future weeks weren't greyed out (Alexqw)
++ Dropped dependency: plugin.cache (aka StorageServer) (Alexqw)
++ Assorted performance improvements
++ Code cleanup
+
 2014.07.23 v0.5.0 -- Jerry Rice Edition
 + New Feature: Skin Interface! (BaumSchorle and eriksoderblom)
 +   Tons of new features
