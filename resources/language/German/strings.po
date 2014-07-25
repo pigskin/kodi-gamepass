@@ -88,3 +88,7 @@ msgstr ""
 msgctxt "#30019"
 msgid "Choose Subscription"
 msgstr "Abonnement wählen"
+
+msgctxt "#30020"
+msgid "Uhrzeit in lokaler Zeitzone"
+msgstr ""

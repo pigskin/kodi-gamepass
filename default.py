@@ -5,6 +5,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 import xmltodict
+import calendar
 from datetime import datetime
 from traceback import format_exc
 
@@ -140,9 +141,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_info = 'Final'
             else:
                 try:
-                    # may want to change this to game['gameTimeGMT'] or do a setting maybe
-                    game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
-                    game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                    if addon.getSetting('local_tz') == 'true':
+                        game_gmt = time.strptime(game['gameTimeGMT'], date_time_format)
+                        secs = calendar.timegm(game_gmt)
+                        game_local = time.localtime(secs)
+                        game_info = time.strftime('%A, %b %d - %I:%M %p', game_local)
+                    else:
+                        game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
+                        game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
                     if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
                         isPlayable = 'false'
                         game_name_full = self.coloring(game_name_full, "disabled")
