@@ -1,5 +1,4 @@
-﻿import urllib
-import time
+﻿import time
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -8,7 +7,6 @@ import xbmcvfs
 import xmltodict
 from datetime import datetime, timedelta, date
 from traceback import format_exc
-from urlparse import urlparse, parse_qs
 
 from resources.lib.game_common import *
 
@@ -162,9 +160,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem.setProperty('is_show', 'false')
             listitem.setProperty('isPlayable', isPlayable)
             listitem.setProperty('isLive', isLive)
-            params = {'name': game_name_full, 'url': game_version_ids}
-            url = '%s?%s' %(sys.argv[0], urllib.urlencode(params))
-            listitem.setProperty('url', url)
+            listitem.setProperty('game_version_ids', str(game_version_ids))
             self.games_items.append(listitem)
 
         self.games_list.addItems(self.games_items)
@@ -360,12 +356,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 selectedGame = self.games_list.getSelectedItem()
                 if selectedGame.getProperty('isPlayable') == 'true':
                     self.init('game/episode')
-
-                    url = selectedGame.getProperty('url')
-                    params = parse_qs(urlparse(url).query)
-                    for i in params.keys():
-                        params[i] = params[i][0]
-                    game_version_ids = eval(params['url'])
+                    game_version_ids = eval(selectedGame.getProperty('game_version_ids'))
 
                     if selectedGame.getProperty('isLive') == 'true':
                         game_live_url = get_live_url(game_version_ids['Live'], self.select_bitrate())
