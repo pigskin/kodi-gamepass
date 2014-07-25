@@ -37,6 +37,7 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
+                  <onleft>90</onleft>
                   <onright>120</onright>
                   <texturefocus>GamePass/gamepass_focus.png</texturefocus>
                   <texturenofocus>GamePass/gamepass_bg.png</texturenofocus>
@@ -47,7 +48,7 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
-                  <onleft>110</onleft>
+                  <onleft>90</onleft>
                   <onright>130</onright>
                   <texturefocus>GamePass/rewind_focus.png</texturefocus>
                   <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
@@ -60,6 +61,7 @@
                   <height>56</height>
                   <ondown>240</ondown>
                   <onleft>120</onleft>
+                  <onright>90</onright>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
             </control>
@@ -91,6 +93,20 @@
             <aspectratio>stretch</aspectratio>
             <texture>GamePass/network_focus2.png</texture>
             <visible>!Control.HasFocus(130) + SubString(Window.Property(NW_clicked),true)</visible>
+        </control>
+
+        <control type="button" id="90">
+            <description>Addon Settings button</description>
+            <left>1210</left>
+            <width>56</width>
+            <height>56</height>
+            <ondown>210</ondown>
+            <onleft>130</onleft>
+            <onright condition="IsEmpty(Window.Property(gamepass))">120</onright>
+            <onright>110</onright>
+            <texturefocus>GamePass/settings_focus.png</texturefocus>
+            <texturenofocus>GamePass/settings.png</texturenofocus>
+            <onclick>XBMC.Addon.OpenSettings(plugin.video.nfl.gamepass)</onclick>
         </control>
 
         <control type="list" id="210">
@@ -394,22 +410,7 @@
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
-                    <visible>!Control.HasFocus(220) + !ListItem.Property(future)</visible>
-                </control>
-                <control type="label">
-                    <description>Week/Show text</description>
-                    <left>140</left>
-                    <width>270</width>
-                    <align>center</align>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <info>ListItem.Label</info>
-                    <font>font13</font>
-                    <textcolor>FF111111</textcolor>
-                    <wrapmultiline>false</wrapmultiline>
-                    <scrollspeed>50</scrollspeed>
-                    <scrollsuffix> - </scrollsuffix>
-                    <visible>!Control.HasFocus(220) + ListItem.Property(future)</visible>
+                    <visible>!Control.HasFocus(220)</visible>
                 </control>
             </focusedlayout>
         </control>
