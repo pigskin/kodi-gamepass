@@ -167,7 +167,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem.setProperty('url', url)
             self.games_items.append(listitem)
 
-            self.games_list.addItems(self.games_items)
+        self.games_list.addItems(self.games_items)
 
     def display_shows_episodes(self, show_name, season):
         self.games_items = []
