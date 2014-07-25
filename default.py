@@ -5,7 +5,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 import xmltodict
-from datetime import datetime, timedelta, date
+from datetime import datetime
 from traceback import format_exc
 
 from resources.lib.game_common import *
