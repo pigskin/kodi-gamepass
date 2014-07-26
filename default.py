@@ -300,6 +300,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.weeks_list.reset()
             self.season_list.reset()
             self.live_list.reset()
+            self.games_items = []
+            self.weeks_items = []
+            self.live_items = []
             self.clicked_game = -1
             self.clicked_week = -1
             self.clicked_season = -1
@@ -312,7 +315,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.main_selection = 'NFL Network'
                 self.window.setProperty('NW_clicked', 'true')
                 self.window.setProperty('GP_clicked', 'false')
-                self.live_items = []
                 if subscription == '0': # GamePass
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
