@@ -90,5 +90,5 @@ msgid "Choose Subscription"
 msgstr ""
 
 msgctxt "#30020"
-msgid "Date/time in local time"
+msgid "Localize Game Date/Time"
 msgstr ""
