@@ -171,6 +171,27 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         self.games_list.addItems(self.games_items)
 
+    def display_seasons_weeks(self):
+        weeks = self.seasons_and_weeks[self.selected_season]
+
+        for week_code, week in sorted(weeks.iteritems()):
+            future = 'false'
+            try:
+                week_date = week['@start'] + ' 06:00'
+                week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
+                time_utc = str(datetime.utcnow())[:-7]
+                time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
+                if week_time > time_now:
+                    future = 'true'
+            except KeyError: # some old seasons don't provide week dates
+                pass
+
+            listitem = xbmcgui.ListItem(week['@label'].title())
+            listitem.setProperty('week_code', week_code)
+            listitem.setProperty('future', future)
+            self.weeks_items.append(listitem)
+        self.weeks_list.addItems(self.weeks_items)
+
     def display_shows_episodes(self, show_name, season):
         self.games_items = []
         items = get_shows_episodes(show_name, season)
@@ -337,25 +358,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if controlId == 210: # season is clicked
                 self.init('season')
                 self.selected_season = self.season_list.getSelectedItem().getLabel()
-                weeks = self.seasons_and_weeks[self.selected_season]
 
-                for week_code, week in sorted(weeks.iteritems()):
-                    future = 'false'
-                    try:
-                        week_date = week['@start'] + ' 06:00'
-                        week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
-                        time_utc = str(datetime.utcnow())[:-7]
-                        time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
-                        if week_time > time_now:
-                            future = 'true'
-                    except KeyError: # some old seasons don't provide week dates
-                        pass
-
-                    listitem = xbmcgui.ListItem(week['@label'].title())
-                    listitem.setProperty('week_code', week_code)
-                    listitem.setProperty('future', future)
-                    self.weeks_items.append(listitem)
-                self.weeks_list.addItems(self.weeks_items)
+                self.display_seasons_weeks()
             elif controlId == 220: # week is clicked
                 self.init('week/show')
                 self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
