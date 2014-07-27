@@ -177,11 +177,13 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         for week_code, week in sorted(weeks.iteritems()):
             future = 'false'
             try:
+                # convert EST to GMT by adding 6 hours
                 week_date = week['@start'] + ' 06:00'
-                week_time = int(time.mktime(time.strptime(week_date, '%Y%m%d %H:%M')))
-                time_utc = str(datetime.utcnow())[:-7]
-                time_now = int(time.mktime(time.strptime(time_utc, '%Y-%m-%d %H:%M:%S')))
-                if week_time > time_now:
+                # avoid super annoying bug http://forum.xbmc.org/showthread.php?tid=112916
+                week_datetime = datetime(*(time.strptime(week_date, '%Y%m%d %H:%M')[0:6]))
+                now_datetime = datetime.utcnow()
+
+                if week_datetime > now_datetime:
                     future = 'true'
             except KeyError: # some old seasons don't provide week dates
                 pass
