@@ -106,7 +106,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_weeks_games(self):
         self.games_items = []
-        self.games_list.reset()
         games = get_weeks_games(self.selected_season, self.selected_week)
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
@@ -353,7 +352,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.live_list.addItems(self.live_items)
 
             self.display_seasons()
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
             return
 
         if self.main_selection == 'GamePass/Rewind':
