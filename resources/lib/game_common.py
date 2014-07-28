@@ -26,7 +26,7 @@ subscription = addon.getSetting('subscription')
 if subscription == '0': # game pass
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     base_url = 'https://gamepass.nfl.com/nflgp'
-    show_archives = {
+    seasonal_shows = {
         'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
         'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
         'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
@@ -35,17 +35,21 @@ if subscription == '0': # game pass
         'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
         'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'},
         'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
-        'Superbowl Archives': {'2014': '117'},
         'NFL Films Presents': {'2014': '219', '2013': '187'},
         'Hard Knocks': {'2014': '220'}
+    }
+    non_seasonal_shows = {
+        'Super Bowl Archives': '117'
     }
 else: # game rewind
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
     base_url = 'https://gamerewind.nfl.com/nflgr'
-    show_archives = {
+    seasonal_shows = {
         'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
-        'Superbowl Archives': {'2013': '117'},
         'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
+    }
+    non_seasonal_shows = {
+        'Super Bowl Archives': '117'
     }
 
 servlets_url = base_url.replace('https', 'http')
@@ -272,22 +276,25 @@ def get_video_path(game_id):
 
 
 def get_shows(season):
-    seasons_shows = []
-    for show_name, show_codes in show_archives.items():
+    seasons_shows = non_seasonal_shows.keys()
+    for show_name, show_codes in seasonal_shows.items():
         if season in show_codes:
             seasons_shows.append(show_name)
 
-    return seasons_shows
+    return sorted(seasons_shows)
 
 
 # get episodes of archived NFL Network and RedZone shows
 # returns an empty list if no episodes are found or the showname/season are invalid
-def get_shows_episodes(show_name, season):
+def get_shows_episodes(show_name, season=None):
     url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
     try:
-        cid = show_archives[show_name][season]
+        cid = seasonal_shows[show_name][season]
     except KeyError:
-        return []
+        try:
+            cid = non_seasonal_shows[show_name]
+        except KeyError:
+            return []
 
     if show_name == 'NFL RedZone Archives':
         ps = 17
