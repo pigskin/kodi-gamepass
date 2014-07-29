@@ -457,6 +457,7 @@ if (__name__ == "__main__"):
             dialog.ok('Login Failed',
                       'Logging into NFL Game Pass/Rewind failed.',
                       'Make sure your account information is correct.')
+        sys.exit(0)
     except:
         addon_log(format_exc())
         dialog = xbmcgui.Dialog()
