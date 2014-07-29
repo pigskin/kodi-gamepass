@@ -370,12 +370,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if gpr.subscription == 'gamepass':
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
-
-                    # Check whether RedZone is on Air
-                    url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-                    simple_data = gpr.make_request(url, {'isFlex':'true'})
-                    simple_dict = xmltodict.parse(simple_data)['result']
-                    if simple_dict['rzPhase'] == 'in':
+                    if gpr.redzone_on_air():
                         listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
                         self.live_items.append(listitem)
 

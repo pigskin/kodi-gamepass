@@ -304,6 +304,19 @@ class pigskin:
 
         return streams
 
+    # Check whether RedZone is on Air
+    def redzone_on_air(self):
+        sc_url = self.servlets_url + '/servlets/simpleconsole'
+        sc_data = self.make_request(sc_url, {'isFlex': 'true'})
+
+        sc_dict = xmltodict.parse(sc_data)['result']
+        if sc_dict['rzPhase'] == 'in':
+            self.log('RedZone is on air.')
+            return True
+        else:
+            self.log('RedZone is not on air.')
+            return False
+
     # Check if Game Rewind service is blacked-out due to live games in progress
     def service_blackout(self):
         url = self.base_url + '/secure/schedule'
