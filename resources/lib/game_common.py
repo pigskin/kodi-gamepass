@@ -253,7 +253,7 @@ class pigskin:
             if username and password:
                 self.log('Not (yet) logged into Game Pass.')
                 self.login_to_account(username, password)
-                if not self.check_for_subscription:
+                if not self.check_for_subscription():
                     raise self.LoginFailure('Game Pass login failed.')
             else:
                 # might need sans-login check here, though hoping above subscription check is enough
