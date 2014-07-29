@@ -59,28 +59,26 @@ class myPlayer(xbmc.Player):
 
 
 class GamepassGUI(xbmcgui.WindowXMLDialog):
-    #Class declarations
-    season_list = ''
-    season_items = []
-    clicked_season = -1
-    weeks_list = ''
-    weeks_items = []
-    clicked_week = -1
-    games_list = ''
-    games_items = []
-    clicked_game = -1
-    live_list = ''
-    live_items = []
-    selectedSeason = ''
-    selectedWeek = ''
-    main_selection = ''
-    player = ''
-    list_refill = 'false'
-    focusId = 100
-    seasons_and_weeks = gpr.get_seasons_and_weeks()
-
-
     def __init__(self, *args, **kwargs):
+        self.season_list = ''
+        self.season_items = []
+        self.clicked_season = -1
+        self.weeks_list = ''
+        self.weeks_items = []
+        self.clicked_week = -1
+        self.games_list = ''
+        self.games_items = []
+        self.clicked_game = -1
+        self.live_list = ''
+        self.live_items = []
+        self.selectedSeason = ''
+        self.selectedWeek = ''
+        self.main_selection = ''
+        self.player = ''
+        self.list_refill = 'false'
+        self.focusId = 100
+        self.seasons_and_weeks = gpr.get_seasons_and_weeks()
+
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
