@@ -243,34 +243,24 @@ class pigskin:
 
         return games
 
-
-    # Handles to neccesary steps and checks to login to NFL Game Pass.
-    # Some regions are free, hence why username and password are optional
-    def login_gamepass(self, username=None, password=None):
+    # Handles neccesary steps and checks to login to Game Pass/Rewind
+    def login(self, username=None, password=None):
         if self.check_for_subscription():
-            self.log('Already logged into Game Pass.')
+            self.log('Already logged into %s' %self.subscription)
         else:
             if username and password:
-                self.log('Not (yet) logged into Game Pass.')
+                self.log('Not (yet) logged into %s' %self.subscription)
                 self.login_to_account(username, password)
                 if not self.check_for_subscription():
-                    raise self.LoginFailure('Game Pass login failed.')
+                    raise self.LoginFailure('%s login failed' %self.subscription)
+                elif self.subscription == 'gamerewind' and self.service_blackout():
+                    raise LoginFailure('Game Rewind Blackout')
             else:
-                # might need sans-login check here, though hoping above subscription check is enough
+                # might need sans-login check here for gamepass, though I hope the intial
+                # subscription check works for sans-login regions. Also, as of 2014, there
+                # may no longer be any sans-login regions, so it all could be moot.
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
-
-    # Handles to neccesary steps and checks to login to NFL Rewind.
-    def login_rewind(self, username, password):
-        if self.check_for_subscription():
-            self.log('Already logged into Game Rewind.')
-        else:
-            self.log('Not (yet) logged into Game Rewind.')
-            self.login_to_account(username, password)
-            if not self.check_for_subscription():
-                raise LoginFailure('Game Rewind login failed.')
-            elif self.service_blackout():
-                raise LoginFailure('Game Rewind Blackout')
 
     # NFL Game Pass/Rewind "helpfully" does not give any indication whether the
     # login was successful or not. Thus, check_for_subscription() should be used

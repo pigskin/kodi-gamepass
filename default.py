@@ -22,9 +22,13 @@ addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 
 if subscription == '0': # Game Pass
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
+    username = addon.getSetting('email')
+    password = addon.getSetting('password')
     sub_name = 'gamepass'
 else: # Game Rewind
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
+    username = addon.getSetting('gr_email')
+    password = addon.getSetting('gr_password')
     sub_name = 'gamerewind'
 
 gpr = pigskin(sub_name, cookiefile=cookie_file, debug=True)
@@ -440,10 +444,7 @@ if (__name__ == "__main__"):
         xbmcvfs.mkdir(addon_profile)
 
     try:
-        if subscription == '0': # Game Pass
-            gpr.login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
-        else: # Game Rewind
-            gpr.login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
+        gpr.login(username, password)
     except gpr.LoginFailure as e:
         dialog = xbmcgui.Dialog()
         if e.value == 'Game Rewind Blackout':
