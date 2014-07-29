@@ -9,7 +9,7 @@ import xmltodict
 import calendar
 from datetime import datetime
 from traceback import format_exc
-from resources.lib.game_common import pigskin
+from resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')
