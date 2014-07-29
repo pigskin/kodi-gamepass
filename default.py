@@ -83,7 +83,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list = self.window.getControl(230)
         self.live_list = self.window.getControl(240)
 
-        if subscription == '0': # GamePass
+        if gpr.subscription == 'gamepass':
             self.window.setProperty('gamepass', 'true')
 
         if self.list_refill == 'true':
@@ -361,7 +361,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.main_selection = 'NFL Network'
                 self.window.setProperty('NW_clicked', 'true')
                 self.window.setProperty('GP_clicked', 'false')
-                if subscription == '0': # GamePass
+                if gpr.subscription == 'gamepass':
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
 
