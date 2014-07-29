@@ -123,7 +123,7 @@ class pigskin:
         headers = {'User-Agent': 'Android'}
         m3u8_data = self.make_request(url, post_data, headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
-        self.log('NFL Dict %s.' %m3u8_dict)
+        self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
         return m3u8_url.replace('androidtab', bitrate)
 
@@ -287,7 +287,7 @@ class pigskin:
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             return r.text
         except requests.exceptions.RequestException as e:
-            self.log('Error: - %s.' %e)
+            self.log('Error: - %s' %e)
 
     def parse_manifest(self, manifest):
         streams = {}
