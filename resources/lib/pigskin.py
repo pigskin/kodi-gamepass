@@ -41,13 +41,13 @@ class pigskin:
         self.non_seasonal_shows = { 'Super Bowl Archives': '117' }
         self.servlets_url = self.base_url.replace('https', 'http')
 
-        self.s = requests.Session()
+        self.http_session = requests.Session()
         self.cookie_jar = cookielib.LWPCookieJar(cookiefile)
         try:
             self.cookie_jar.load(ignore_discard=True, ignore_expires=True)
         except IOError:
             pass
-        self.s.cookies = self.cookie_jar
+        self.http_session.cookies = self.cookie_jar
 
     class LoginFailure(Exception):
         def __init__(self, value):
@@ -281,7 +281,7 @@ class pigskin:
         self.log('Headers: %s' %headers)
 
         try:
-            r = self.s.post(url, data=payload, headers=headers, allow_redirects=False)
+            r = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
             self.log('Response code: %s' %r.status_code)
             self.log('Response: %s' %r.text)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
