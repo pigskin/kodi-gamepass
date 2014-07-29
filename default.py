@@ -1,4 +1,5 @@
-﻿import time
+﻿import os
+import time
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -8,8 +9,30 @@ import xmltodict
 import calendar
 from datetime import datetime
 from traceback import format_exc
+from resources.lib.game_common import pigskin
 
-from resources.lib.game_common import *
+addon = xbmcaddon.Addon()
+addon_id = addon.getAddonInfo('id')
+addon_version = addon.getAddonInfo('version')
+debug = addon.getSetting('debug')
+language = addon.getLocalizedString
+subscription = addon.getSetting('subscription')
+addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
+addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
+
+if subscription == '0': # Game Pass
+    cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
+    sub_name = 'gamepass'
+else: # Game Rewind
+    cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
+    sub_name = 'gamerewind'
+
+gpr = pigskin(sub_name, cookiefile=cookie_file, debug=True)
+
+def addon_log(string):
+    if debug == 'true':
+        xbmc.log("[%s-%s]: %s" %(addon_id, addon_version, string))
+
 
 class myPlayer(xbmc.Player):
     def __init__(self, parent, *args, **kwargs):
@@ -25,6 +48,7 @@ class myPlayer(xbmc.Player):
     def onPlayBackEnded(self):
         self.dawindow.list_refill = 'true'
         self.dawindow.doModal()
+
 
 class GamepassGUI(xbmcgui.WindowXMLDialog):
     #Class declarations
@@ -45,7 +69,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
     player = ''
     list_refill = 'false'
     focusId = 100
-    seasons_and_weeks = get_seasons_and_weeks()
+    seasons_and_weeks = gpr.get_seasons_and_weeks()
 
 
     def __init__(self, *args, **kwargs):
@@ -97,7 +121,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_nfl_network_archive(self):
         self.weeks_items = []
-        shows = get_shows(self.selected_season)
+        shows = gpr.get_shows(self.selected_season)
         for show_name in shows:
             listitem = xbmcgui.ListItem(show_name)
             self.weeks_items.append(listitem)
@@ -106,7 +130,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_weeks_games(self):
         self.games_items = []
-        games = get_weeks_games(self.selected_season, self.selected_week)
+        games = gpr.get_weeks_games(self.selected_season, self.selected_week)
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
         for game in games:
@@ -195,7 +219,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def display_shows_episodes(self, show_name, season):
         self.games_items = []
-        items = get_shows_episodes(show_name, season)
+        items = gpr.get_shows_episodes(show_name, season)
 
         image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
         for i in items:
@@ -343,7 +367,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                     # Check whether RedZone is on Air
                     url = 'http://gamepass.nfl.com/nflgp/servlets/simpleconsole'
-                    simple_data = make_request(url, {'isFlex':'true'})
+                    simple_data = gpr.make_request(url, {'isFlex':'true'})
                     simple_dict = xmltodict.parse(simple_data)['result']
                     if simple_dict['rzPhase'] == 'in':
                         listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
@@ -373,11 +397,11 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     game_version_ids = eval(selectedGame.getProperty('game_version_ids'))
 
                     if selectedGame.getProperty('isLive') == 'true':
-                        game_live_url = get_live_url(game_version_ids['Live'], self.select_bitrate())
+                        game_live_url = gpr.get_live_url(game_version_ids['Live'], self.select_bitrate())
                         self.playUrl(game_live_url)
                     else:
                         game_id = self.select_version(game_version_ids)
-                        game_manifest = get_game_manifest(game_id)
+                        game_manifest = gpr.get_game_manifest(game_id)
                         bitrate = self.select_bitrate(game_manifest.keys())
                         game_url = game_manifest[bitrate]['full_url']
                         self.playUrl(game_url)
@@ -395,35 +419,32 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             elif controlId == 230: # episode is clicked
                 self.init('game/episode')
                 url = self.games_list.getSelectedItem().getProperty('url')
-                episode_manifest = get_episode_manifest(url)
+                episode_manifest = gpr.get_episode_manifest(url)
                 bitrate = self.select_bitrate(episode_manifest.keys())
                 episode_url = episode_manifest[bitrate]['full_url']
                 self.playUrl(episode_url)
             elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
-                    redzone_live_url = get_live_url('rz', self.select_bitrate())
+                    redzone_live_url = gpr.get_live_url('rz', self.select_bitrate())
                     self.playUrl(redzone_live_url)
                 elif show_name == 'NFL Network - Live':
-                    nfl_network_url = get_live_url('nfl_network', self.select_bitrate())
+                    nfl_network_url = gpr.get_live_url('nfl_network', self.select_bitrate())
                     self.playUrl(nfl_network_url)
 
         xbmc.executebuiltin("Dialog.Close(busydialog)")
 
 if (__name__ == "__main__"):
     addon_log('script starting')
-
-    addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
-
     if not xbmcvfs.exists(addon_profile):
         xbmcvfs.mkdir(addon_profile)
 
     try:
         if subscription == '0': # Game Pass
-            login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
+            gpr.login_gamepass(addon.getSetting('email'), addon.getSetting('password'))
         else: # Game Rewind
-            login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
-    except LoginFailure as e:
+            gpr.login_rewind(addon.getSetting('gr_email'), addon.getSetting('gr_password'))
+    except gpr.LoginFailure as e:
         dialog = xbmcgui.Dialog()
         if e.value == 'Game Rewind Blackout':
             addon_log('Rewind is in blackout.')
