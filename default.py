@@ -17,6 +17,8 @@ addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
 addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 logging_prefix = '[%s-%s]' %(addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
+if not xbmcvfs.exists(addon_profile):
+    xbmcvfs.mkdir(addon_profile)
 
 if addon.getSetting('subscription') == '0': # Game Pass
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
@@ -28,8 +30,12 @@ else: # Game Rewind
     username = addon.getSetting('gr_email')
     password = addon.getSetting('gr_password')
     sub_name = 'gamerewind'
+if addon.getSetting('debug') == 'false':
+    debug = False
+else:
+    debug = True
 
-gpr = pigskin(sub_name, cookiefile=cookie_file, debug=True)
+gpr = pigskin(sub_name, cookiefile=cookie_file, debug=debug)
 
 def addon_log(string):
     if debug == 'true':
@@ -438,9 +444,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
 if (__name__ == "__main__"):
     addon_log('script starting')
-    if not xbmcvfs.exists(addon_profile):
-        xbmcvfs.mkdir(addon_profile)
-
     try:
         gpr.login(username, password)
     except gpr.LoginFailure as e:
