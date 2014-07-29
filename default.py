@@ -12,15 +12,13 @@ from traceback import format_exc
 from resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
-addon_id = addon.getAddonInfo('id')
-addon_version = addon.getAddonInfo('version')
-debug = addon.getSetting('debug')
 language = addon.getLocalizedString
-subscription = addon.getSetting('subscription')
 addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
 addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
+logging_prefix = '[%s-%s]' %(addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
-if subscription == '0': # Game Pass
+
+if addon.getSetting('subscription') == '0': # Game Pass
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
     username = addon.getSetting('email')
     password = addon.getSetting('password')
@@ -35,7 +33,7 @@ gpr = pigskin(sub_name, cookiefile=cookie_file, debug=True)
 
 def addon_log(string):
     if debug == 'true':
-        xbmc.log("[%s-%s]: %s" %(addon_id, addon_version, string))
+        xbmc.log("%s: %s" %(logging_prefix, string))
 
 
 class myPlayer(xbmc.Player):
