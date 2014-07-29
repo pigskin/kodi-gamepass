@@ -49,7 +49,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
 
     def __init__(self, *args, **kwargs):
-        xbmcgui.WindowXMLDialog.__init__(self)
+        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
     def onInit(self):
