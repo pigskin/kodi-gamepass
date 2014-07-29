@@ -306,11 +306,12 @@ class pigskin:
 
     # Check if Game Rewind service is blacked-out due to live games in progress
     def service_blackout(self):
-        no_service = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
-                      ' Please check back later.')
-        service_data = self.make_request('https://gamerewind.nfl.com/nflgr/secure/schedule')
+        url = self.base_url + '/secure/schedule'
+        blackout_message = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
+                            ' Please check back later.')
+        service_data = self.make_request(url)
 
-        if no_service in service_data:
+        if blackout_message in service_data:
             return True
         else:
             return False
