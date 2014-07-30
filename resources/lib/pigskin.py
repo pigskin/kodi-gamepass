@@ -61,7 +61,7 @@ class pigskin:
 
     def check_for_subscription(self):
         sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(sc_url, {'isFlex': 'true'})
+        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
 
         if '</subscription>' in sc_data:
             self.log('Subscription detected.')
@@ -84,14 +84,14 @@ class pigskin:
     def get_manifest(self, video_path):
         parsed_url = urlsplit(video_path)
         url = 'http://' + parsed_url.netloc + '/play?url=' + parsed_url.path + '&' + parsed_url.query
-        manifest_data = self.make_request(url)
+        manifest_data = self.make_request(url=url, method='get')
         return manifest_data
 
     # Returns the current season and week_code in a dict
     # e.g. {'2014': '210'}
     def get_current_season_and_week(self):
         sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(sc_url, {'isFlex': 'true'})
+        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
 
         sc_dict = xmltodict.parse(sc_data)['result']
         current_s_w = {sc_dict['currentSeason']: sc_dict['currentWeek']}
@@ -121,7 +121,7 @@ class pigskin:
             post_data = {'id': game_id, 'type': 'game', 'nt': '1', 'gt': 'live'}
 
         headers = {'User-Agent': 'Android'}
-        m3u8_data = self.make_request(url, post_data, headers)
+        m3u8_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
@@ -160,7 +160,7 @@ class pigskin:
             'pn': 1
         }
 
-        archive_data = self.make_request(url, post_data)
+        archive_data = self.make_request(url=url, method='post', payload=post_data)
         archive_dict = xmltodict.parse(archive_data)['result']
 
         count = int(archive_dict['paging']['count'])
@@ -178,7 +178,7 @@ class pigskin:
 
         try:
             url = 'http://smb.cdnak.neulion.com/fs/nfl/nfl/mobile/weeks_v2.xml'
-            s_w_data = self.make_request(url)
+            s_w_data = self.make_request(url=url, method='get')
             s_w_data_dict = xmltodict.parse(s_w_data)
         except:
             self.log('Acquiring season and week data failed.')
@@ -214,7 +214,7 @@ class pigskin:
             'type': 'fgpa',
             'isFlex': 'true'
         }
-        video_path_data = self.make_request(url, post_data)
+        video_path_data = self.make_request(url=url, method='post', payload=post_data)
 
         try:
             video_path_dict = xmltodict.parse(video_path_data)['result']
@@ -234,7 +234,7 @@ class pigskin:
             'week': week
         }
 
-        game_data = self.make_request(url, post_data)
+        game_data = self.make_request(url=url, method='post', payload=post_data)
         game_data_dict = xmltodict.parse(game_data)['result']
         games = game_data_dict['games']['game']
         # if only one game is returned, we explicitly put it into a list
@@ -274,14 +274,17 @@ class pigskin:
             'error_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
             'success_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
         }
-        login_data = self.make_request(url, post_data)
+        login_data = self.make_request(url=url, method='post', payload=post_data)
 
-    def make_request(self, url, payload=None, headers=None):
+    def make_request(self, url, method, payload=None, headers=None):
         self.log('Request URL: %s' %url)
         self.log('Headers: %s' %headers)
 
         try:
-            r = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
+            if method == 'get':
+                r = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
+            else: # post
+                r = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
             self.log('Response code: %s' %r.status_code)
             self.log('Response: %s' %r.text)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
@@ -307,7 +310,7 @@ class pigskin:
     # Check whether RedZone is on Air
     def redzone_on_air(self):
         sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(sc_url, {'isFlex': 'true'})
+        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
 
         sc_dict = xmltodict.parse(sc_data)['result']
         if sc_dict['rzPhase'] == 'in':
@@ -322,7 +325,7 @@ class pigskin:
         url = self.base_url + '/secure/schedule'
         blackout_message = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
                             ' Please check back later.')
-        service_data = self.make_request(url)
+        service_data = self.make_request(url=url, method='get')
 
         if blackout_message in service_data:
             return True
