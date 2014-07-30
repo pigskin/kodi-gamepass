@@ -38,7 +38,7 @@ class pigskin:
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
-        self.non_seasonal_shows = { 'Super Bowl Archives': '117' }
+        self.non_seasonal_shows = {'Super Bowl Archives': '117'}
         self.servlets_url = self.base_url.replace('https', 'http')
 
         self.http_session = requests.Session()
@@ -60,8 +60,12 @@ class pigskin:
             print '[pigskin]: %s' %string
 
     def check_for_subscription(self):
-        sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
+        """Return whether a subscription is detected. Helps to confirm a
+        successful login.
+        """
+        url = self.servlets_url + '/servlets/simpleconsole'
+        post_data = {'isFlex': 'true'}
+        sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         if '</subscription>' in sc_data:
             self.log('Subscription detected.')
@@ -70,34 +74,36 @@ class pigskin:
             self.log('No subscription was detected.')
             return False
 
-    # The plid parameter used when requesting the video path appears to be an MD5 of... something.
-    # I don't know what it is an "id" of, since the value seems to change constantly.
-    # Reusing a plid doesn't work, so I'm guessing it's a unique id for the /instance/ of the player.
-    # This pseudorandom approach seems to work.
     def gen_plid(self):
+        """Return a "unique" MD5 hash. Getting the video path requires a plid,
+        which looks like an and always changes. Reusing a plid does not work,
+        so our guess is that it's a id for each instance of the player.
+        """
         rand = random.getrandbits(10)
         mac_address = str(get_mac())
         m = hashlib.md5(str(rand) + mac_address)
         return m.hexdigest()
 
-    # the XML manifest of all available streams for a game
     def get_manifest(self, video_path):
+        """Return the XML manifest of a stream."""
         parsed_url = urlsplit(video_path)
-        url = 'http://' + parsed_url.netloc + '/play?url=' + parsed_url.path + '&' + parsed_url.query
+        url = ('http://' + parsed_url.netloc + '/play' +
+               '?url=' + parsed_url.path + '&' + parsed_url.query)
         manifest_data = self.make_request(url=url, method='get')
         return manifest_data
 
-    # Returns the current season and week_code in a dict
-    # e.g. {'2014': '210'}
     def get_current_season_and_week(self):
-        sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
+        """Return the current season and week_code (e.g. 210) in a dict."""
+        url = self.servlets_url + '/servlets/simpleconsole'
+        post_data = {'isFlex': 'true'}
+        sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         sc_dict = xmltodict.parse(sc_data)['result']
         current_s_w = {sc_dict['currentSeason']: sc_dict['currentWeek']}
         return current_s_w
 
     def get_stream_manifest(self, vpath, vtype):
+        """Return, as a dict, the manifest of a stream."""
         set_cookies = self.get_current_season_and_week()
         video_path = self.get_video_path(vpath, vtype)
         xml_manifest = self.get_manifest(video_path)
@@ -105,6 +111,7 @@ class pigskin:
         return stream_manifest
 
     def get_live_url(self, game_id, bitrate):
+        """Return the URL of a live stream."""
         set_cookies = self.get_current_season_and_week()
         url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
 
@@ -123,6 +130,7 @@ class pigskin:
         return m3u8_url.replace('androidtab', bitrate)
 
     def get_shows(self, season):
+        """Return a list of all shows for a season."""
         seasons_shows = self.non_seasonal_shows.keys()
         for show_name, show_codes in self.seasonal_shows.items():
             if season in show_codes:
@@ -130,9 +138,10 @@ class pigskin:
 
         return sorted(seasons_shows)
 
-    # get episodes of archived NFL Network and RedZone shows
-    # returns an empty list if no episodes are found or the showname/season are invalid
     def get_shows_episodes(self, show_name, season=None):
+        """Return a list of episodes for a show. Return empty list if none are
+        found or if an error occurs.
+        """
         url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
         try:
             cid = self.seasonal_shows[show_name][season]
@@ -169,6 +178,7 @@ class pigskin:
             return []
 
     def get_seasons_and_weeks(self):
+        """Return a multidimensional array of all seasons and weeks."""
         seasons_and_weeks = {}
 
         try:
@@ -199,8 +209,8 @@ class pigskin:
 
         return seasons_and_weeks
 
-    # the "video path" provides the info necessary to request the stream's manifest
     def get_video_path(self, vpath, vtype):
+        """Return the "video path", which is the URL of stream's manifest."""
         url = self.servlets_url + '/servlets/encryptvideopath'
         plid = self.gen_plid()
         post_data = {
@@ -219,14 +229,13 @@ class pigskin:
             self.log('Video Path Acquisition Failed.')
             return False
 
-    # season is in format: YYYY
-    # week is in format 101 (1st week preseason) or 213 (13th week of regular season)
-    def get_weeks_games(self, season, week):
+    def get_weeks_games(self, season, week_code):
+        """Return a list of games for a week."""
         url = self.servlets_url + '/servlets/games'
         post_data = {
             'isFlex': 'true',
             'season': season,
-            'week': week
+            'week': week_code
         }
 
         game_data = self.make_request(url=url, method='post', payload=post_data)
@@ -240,6 +249,9 @@ class pigskin:
 
     # Handles neccesary steps and checks to login to Game Pass/Rewind
     def login(self, username=None, password=None):
+        """Complete the login process for Game Pass/Rewind. Raise LoginFailure
+        on failure.
+        """
         if self.check_for_subscription():
             self.log('Already logged into %s' %self.subscription)
         else:
@@ -257,10 +269,10 @@ class pigskin:
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
 
-    # NFL Game Pass/Rewind "helpfully" does not give any indication whether the
-    # login was successful or not. Thus, check_for_subscription() should be used
-    # afterwards to determine success or failure.
     def login_to_account(self, username, password):
+        """Blindly authenticate to Game Pass/Rewind. Use
+        check_for_subscription() to determine success.
+        """
         url = 'https://id.s.nfl.com/login'
         post_data = {
             'username': username,
@@ -272,6 +284,7 @@ class pigskin:
         login_data = self.make_request(url=url, method='post', payload=post_data)
 
     def make_request(self, url, method, payload=None, headers=None):
+        """Make an http request. Return the response."""
         self.log('Request URL: %s' %url)
         self.log('Headers: %s' %headers)
 
@@ -288,6 +301,9 @@ class pigskin:
             self.log('Error: - %s' %e)
 
     def parse_manifest(self, manifest):
+        """Return a dict of the supplied XML manifest. Builds and adds
+        "full_url" for convenience.
+        """
         streams = {}
         manifest_dict = xmltodict.parse(manifest)
 
@@ -302,10 +318,11 @@ class pigskin:
 
         return streams
 
-    # Check whether RedZone is on Air
     def redzone_on_air(self):
-        sc_url = self.servlets_url + '/servlets/simpleconsole'
-        sc_data = self.make_request(url=sc_url, method='post', payload={'isFlex': 'true'})
+        """Return whether RedZone Live is currently broadcasting."""
+        url = self.servlets_url + '/servlets/simpleconsole'
+        post_data = {'isFlex': 'true'}
+        sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         sc_dict = xmltodict.parse(sc_data)['result']
         if sc_dict['rzPhase'] == 'in':
@@ -315,8 +332,8 @@ class pigskin:
             self.log('RedZone is not on air.')
             return False
 
-    # Check if Game Rewind service is blacked-out due to live games in progress
     def service_blackout(self):
+        """Return whether Game Rewind is blacked out."""
         url = self.base_url + '/secure/schedule'
         blackout_message = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
                             ' Please check back later.')
