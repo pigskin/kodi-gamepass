@@ -97,14 +97,9 @@ class pigskin:
         current_s_w = {sc_dict['currentSeason']: sc_dict['currentWeek']}
         return current_s_w
 
-    def get_episode_manifest(self, url):
-        xml_manifest = self.get_manifest(url)
-        stream_manifest = self.parse_manifest(xml_manifest)
-        return stream_manifest
-
-    def get_game_manifest(self, game_id):
+    def get_stream_manifest(self, vpath, vtype):
         set_cookies = self.get_current_season_and_week()
-        video_path = self.get_video_path(game_id)
+        video_path = self.get_video_path(vpath, vtype)
         xml_manifest = self.get_manifest(video_path)
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
@@ -205,13 +200,13 @@ class pigskin:
         return seasons_and_weeks
 
     # the "video path" provides the info necessary to request the stream's manifest
-    def get_video_path(self, game_id):
+    def get_video_path(self, vpath, vtype):
         url = self.servlets_url + '/servlets/encryptvideopath'
         plid = self.gen_plid()
         post_data = {
-            'path': game_id,
+            'path': vpath,
             'plid': plid,
-            'type': 'fgpa',
+            'type': vtype,
             'isFlex': 'true'
         }
         video_path_data = self.make_request(url=url, method='post', payload=post_data)

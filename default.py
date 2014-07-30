@@ -234,6 +234,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 listitem.setProperty('game_info', i['name'])
                 listitem.setProperty('away_thumb', image_path + i['image'])
                 listitem.setProperty('url', i['publishPoint'])
+                listitem.setProperty('type', i['type'])
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
@@ -402,7 +403,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.playUrl(game_live_url)
                     else:
                         game_id = self.select_version(game_version_ids)
-                        game_manifest = gpr.get_game_manifest(game_id)
+                        game_manifest = gpr.get_stream_manifest(vpath=game_id, vtype='fgpa')
                         bitrate = self.select_bitrate(game_manifest.keys())
                         game_url = game_manifest[bitrate]['full_url']
                         self.playUrl(game_url)
@@ -420,7 +421,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             elif controlId == 230: # episode is clicked
                 self.init('game/episode')
                 url = self.games_list.getSelectedItem().getProperty('url')
-                episode_manifest = gpr.get_episode_manifest(url)
+                vtype = self.games_list.getSelectedItem().getProperty('type')
+                episode_manifest = gpr.get_stream_manifest(vpath=url, vtype=vtype)
                 bitrate = self.select_bitrate(episode_manifest.keys())
                 episode_url = episode_manifest[bitrate]['full_url']
                 self.playUrl(episode_url)
