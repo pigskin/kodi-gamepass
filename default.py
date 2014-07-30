@@ -245,14 +245,21 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list.addItems(self.games_items)
 
     def playUrl(self, url):
-        player = myPlayer(parent=self)
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
-        player.play(url)
+        if 'nlds53' in url:
+            dialog = xbmcgui.Dialog()
+            addon_log('nlds53 url found: %s' %url)
+            dialog.ok('Cannot Play This Stream',
+                      "This addon currently doesn't support this type of stream.",
+                      "We're working on it, but it's a tough one.")
+        else:
+            player = myPlayer(parent=self)
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
+            player.play(url)
 
-        while player.isPlaying():
-            xbmc.sleep(2000)
+            while player.isPlaying():
+                xbmc.sleep(2000)
 
-        del player
+            del player
 
     def init(self, level):
         if level == 'season':
