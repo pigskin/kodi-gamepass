@@ -4,10 +4,14 @@ An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 import cookielib
 import hashlib
 import random
-import requests2 as requests
 from traceback import format_exc
-from urlparse import urlsplit
 from uuid import getnode as get_mac
+from urlparse import urlsplit
+
+try:
+    import requests
+except ImportError: # XBMC calls v2 requests2... :-/
+    import requests2 as requests
 import xmltodict
 
 class pigskin:
