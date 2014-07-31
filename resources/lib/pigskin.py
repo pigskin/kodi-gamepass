@@ -311,7 +311,11 @@ class pigskin:
             try:
                 url_path = stream['@url']
                 bitrate = url_path[(url_path.rindex('_') + 1):url_path.rindex('.')]
-                stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver']['@name'], url_path)
+                try:
+                    stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver']['@name'], url_path)
+                except TypeError: # if multiple servers are returned, use the first in the list
+                    stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver'][0]['@name'], url_path)
+
                 streams[bitrate] = stream
             except KeyError:
                 self.log(format_exc())
