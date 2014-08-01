@@ -26,6 +26,7 @@ class pigskin(object):
 
         if subscription == 'gamepass':
             self.base_url = 'https://gamepass.nfl.com/nflgp'
+            self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
             self.seasonal_shows.update({
                 'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
                 'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
@@ -38,10 +39,9 @@ class pigskin(object):
             })
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
+            self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
-
-        self.servlets_url = self.base_url.replace('https', 'http')
 
         self.http_session = requests.Session()
         self.cookie_jar = cookielib.LWPCookieJar(cookiefile)
@@ -64,7 +64,7 @@ class pigskin(object):
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
         whether a login was successful."""
-        url = self.servlets_url + '/servlets/simpleconsole'
+        url = self.servlets_url + '/simpleconsole'
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
@@ -98,7 +98,7 @@ class pigskin(object):
 
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
-        url = self.servlets_url + '/servlets/simpleconsole'
+        url = self.servlets_url + '/simpleconsole'
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
@@ -117,7 +117,7 @@ class pigskin(object):
     def get_live_url(self, game_id, bitrate):
         """Return the URL of a live stream."""
         self.get_current_season_and_week() # set cookies
-        url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
+        url = self.servlets_url + '/publishpoint'
 
         if game_id == 'nfl_network':
             post_data = {'id': '1', 'type': 'channel', 'nt': '1'}
@@ -146,7 +146,7 @@ class pigskin(object):
         """Return a list of episodes for a show. Return empty list if none are
         found or if an error occurs.
         """
-        url = 'http://gamepass.nfl.com/nflgp/servlets/browse'
+        url = self.servlets_url + '/browse'
         try:
             cid = self.seasonal_shows[show_name][season]
         except KeyError:
@@ -215,7 +215,7 @@ class pigskin(object):
 
     def get_video_path(self, vpath, vtype):
         """Return the "video path", which is the URL of stream's manifest."""
-        url = self.servlets_url + '/servlets/encryptvideopath'
+        url = self.servlets_url + '/encryptvideopath'
         plid = self.gen_plid()
         post_data = {
             'path': vpath,
@@ -235,7 +235,7 @@ class pigskin(object):
 
     def get_weeks_games(self, season, week_code):
         """Return a list of games for a week."""
-        url = self.servlets_url + '/servlets/games'
+        url = self.servlets_url + '/games'
         post_data = {
             'isFlex': 'true',
             'season': season,
@@ -327,7 +327,7 @@ class pigskin(object):
 
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""
-        url = self.servlets_url + '/servlets/simpleconsole'
+        url = self.servlets_url + '/simpleconsole'
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
