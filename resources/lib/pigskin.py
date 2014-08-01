@@ -265,7 +265,7 @@ class pigskin(object):
                 if not self.check_for_subscription():
                     raise self.LoginFailure('%s login failed' %self.subscription)
                 elif self.subscription == 'gamerewind' and self.service_blackout():
-                    raise LoginFailure('Game Rewind Blackout')
+                    raise self.LoginFailure('Game Rewind Blackout')
             else:
                 # might need sans-login check here for Game Pass, though as of
                 # 2014, there /may/ no longer be any sans-login regions.
