@@ -454,23 +454,18 @@ if (__name__ == "__main__"):
         dialog = xbmcgui.Dialog()
         if e.value == 'Game Rewind Blackout':
             addon_log('Rewind is in blackout.')
-            dialog.ok(language(30018),
-                      'Due to broadcast restrictions',
-                      'NFL Game Rewind is currently unavailable.',
-                      'Please try again later.')
+            dialog.ok(language(30021),
+                      language(30022))
         else:
-            addon_log('auth failure')
-            dialog.ok('Login Failed',
-                      'Logging into NFL Game Pass/Rewind failed.',
-                      'Make sure that your account information is correct ',
-                      'and your subscription is valid.')
+            addon_log('login failed')
+            dialog.ok(language(30021),
+                      language(30023))
         sys.exit(0)
     except:
         addon_log(format_exc())
         dialog = xbmcgui.Dialog()
         dialog.ok('Epic Failure',
-                  'Some bad jujumagumbo just went down.',
-                  'Please enable debuging, and submit a bug report.')
+                  language(30024))
         sys.exit(0)
 
     gui = GamepassGUI('script-gamepass.xml', addon_path)
