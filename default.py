@@ -462,7 +462,8 @@ if (__name__ == "__main__"):
             addon_log('auth failure')
             dialog.ok('Login Failed',
                       'Logging into NFL Game Pass/Rewind failed.',
-                      'Make sure your account information is correct.')
+                      'Make sure that your account information is correct ',
+                      'and your subscription is valid.')
         sys.exit(0)
     except:
         addon_log(format_exc())

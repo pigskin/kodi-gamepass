@@ -64,19 +64,21 @@ class pigskin:
             print '[pigskin]: %s' %string
 
     def check_for_subscription(self):
-        """Return whether a subscription is detected. Helps to confirm a
-        successful login.
-        """
+        """Return whether a subscription and user name are detected. Determines
+        whether a login was successful."""
         url = self.servlets_url + '/servlets/simpleconsole'
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
-        if '</subscription>' in sc_data:
-            self.log('Subscription detected.')
-            return True
-        else:
-            self.log('No subscription was detected.')
+        if '</userName>' not in sc_data:
+            self.log('No user name detected.')
             return False
+        elif '</subscription>' not in sc_data:
+            self.log('No subscription detected.')
+            return False
+        else:
+            self.log('Subscription and user name detected.')
+            return True
 
     def gen_plid(self):
         """Return a "unique" MD5 hash. Getting the video path requires a plid,
@@ -253,8 +255,8 @@ class pigskin:
 
     # Handles neccesary steps and checks to login to Game Pass/Rewind
     def login(self, username=None, password=None):
-        """Complete the login process for Game Pass/Rewind. Raise LoginFailure
-        on failure.
+        """Complete login process for Game Pass/Rewind. Errors (auth issues,
+        blackout, etc) are raised as LoginFailure.
         """
         if self.check_for_subscription():
             self.log('Already logged into %s' %self.subscription)
