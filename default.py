@@ -1,4 +1,7 @@
-﻿import calendar
+﻿"""
+An XBMC addon/skin for NFL Game Pass and Game Rewind.
+"""
+import calendar
 from datetime import datetime
 import os
 import sys
@@ -55,7 +58,7 @@ class myPlayer(xbmc.Player):
         self.onPlayBackEnded()
 
     def onPlayBackEnded(self):
-        self.dawindow.list_refill = 'true'
+        self.dawindow.list_refill = True
         self.dawindow.doModal()
 
 
@@ -76,7 +79,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.selectedWeek = None
         self.main_selection = None
         self.player = None
-        self.list_refill = 'false'
+        self.list_refill = False
         self.focusId = 100
         self.seasons_and_weeks = gpr.get_seasons_and_weeks()
 
@@ -93,7 +96,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         if gpr.subscription == 'gamepass':
             self.window.setProperty('gamepass', 'true')
 
-        if self.list_refill == 'true':
+        if self.list_refill:
             self.season_list.reset()
             self.season_list.addItems(self.season_items)
             self.weeks_list.reset()
@@ -445,7 +448,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
         xbmc.executebuiltin("Dialog.Close(busydialog)")
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     addon_log('script starting')
     try:
         gpr.login(username, password)
