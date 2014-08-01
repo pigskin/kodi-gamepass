@@ -450,9 +450,9 @@ if (__name__ == "__main__"):
     addon_log('script starting')
     try:
         gpr.login(username, password)
-    except gpr.LoginFailure as e:
+    except gpr.LoginFailure as error:
         dialog = xbmcgui.Dialog()
-        if e.value == 'Game Rewind Blackout':
+        if error.value == 'Game Rewind Blackout':
             addon_log('Rewind is in blackout.')
             dialog.ok(language(30021),
                       language(30022))

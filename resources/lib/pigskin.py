@@ -14,35 +14,33 @@ except ImportError: # XBMC calls v2 requests2... :-/
     import requests2 as requests
 import xmltodict
 
-class pigskin:
+class pigskin(object):
     def __init__(self, subscription, cookiefile, debug=False):
         self.subscription = subscription
         self.debug = debug
+        self.non_seasonal_shows = {'Super Bowl Archives': '117'}
+        self.seasonal_shows = {
+            'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
+            'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
+        }
 
         if subscription == 'gamepass':
             self.base_url = 'https://gamepass.nfl.com/nflgp'
-            self.seasonal_shows = {
-                'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
+            self.seasonal_shows.update({
                 'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
                 'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
                 'NFL RedZone Archives': {'2014': '221', '2013': '182', '2012': '149'},
                 'Sound FX': {'2014': '215', '2013': '183', '2012': '150'},
                 'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
-                'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'},
                 'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
                 'NFL Films Presents': {'2014': '219', '2013': '187'},
                 'Hard Knocks': {'2014': '220'}
-            }
+            })
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
-            self.seasonal_shows = {
-                'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
-                'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
-            }
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
-        self.non_seasonal_shows = {'Super Bowl Archives': '117'}
         self.servlets_url = self.base_url.replace('https', 'http')
 
         self.http_session = requests.Session()
@@ -87,8 +85,8 @@ class pigskin:
         """
         rand = random.getrandbits(10)
         mac_address = str(get_mac())
-        m = hashlib.md5(str(rand) + mac_address)
-        return m.hexdigest()
+        md5 = hashlib.md5(str(rand) + mac_address)
+        return md5.hexdigest()
 
     def get_manifest(self, video_path):
         """Return the XML manifest of a stream."""
@@ -110,7 +108,7 @@ class pigskin:
 
     def get_stream_manifest(self, vpath, vtype):
         """Return, as a dict, the manifest of a stream."""
-        set_cookies = self.get_current_season_and_week()
+        self.get_current_season_and_week() # set cookies
         video_path = self.get_video_path(vpath, vtype)
         xml_manifest = self.get_manifest(video_path)
         stream_manifest = self.parse_manifest(xml_manifest)
@@ -118,7 +116,7 @@ class pigskin:
 
     def get_live_url(self, game_id, bitrate):
         """Return the URL of a live stream."""
-        set_cookies = self.get_current_season_and_week()
+        self.get_current_season_and_week() # set cookies
         url = "http://gamepass.nfl.com/nflgp/servlets/publishpoint"
 
         if game_id == 'nfl_network':
@@ -269,9 +267,8 @@ class pigskin:
                 elif self.subscription == 'gamerewind' and self.service_blackout():
                     raise LoginFailure('Game Rewind Blackout')
             else:
-                # might need sans-login check here for gamepass, though I hope the intial
-                # subscription check works for sans-login regions. Also, as of 2014, there
-                # may no longer be any sans-login regions, so it all could be moot.
+                # might need sans-login check here for Game Pass, though as of
+                # 2014, there /may/ no longer be any sans-login regions.
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
 
@@ -287,7 +284,7 @@ class pigskin:
             'error_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
             'success_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
         }
-        login_data = self.make_request(url=url, method='post', payload=post_data)
+        self.make_request(url=url, method='post', payload=post_data)
 
     def make_request(self, url, method, payload=None, headers=None):
         """Make an http request. Return the response."""
@@ -296,15 +293,15 @@ class pigskin:
 
         try:
             if method == 'get':
-                r = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
+                req = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
             else: # post
-                r = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
-            self.log('Response code: %s' %r.status_code)
-            self.log('Response: %s' %r.text)
+                req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
+            self.log('Response code: %s' %req.status_code)
+            self.log('Response: %s' %req.text)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
-            return r.text
-        except requests.exceptions.RequestException as e:
-            self.log('Error: - %s' %e)
+            return req.text
+        except requests.exceptions.RequestException as error:
+            self.log('Error: - %s' %error.value)
 
     def parse_manifest(self, manifest):
         """Return a dict of the supplied XML manifest. Builds and adds
