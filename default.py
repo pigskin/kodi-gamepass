@@ -1,15 +1,14 @@
 ﻿import calendar
 from datetime import datetime
 import os
+import sys
 import time
 from traceback import format_exc
 
 import xbmc
 import xbmcaddon
 import xbmcgui
-import xbmcplugin
 import xbmcvfs
-import xmltodict
 
 from resources.lib.pigskin import pigskin
 
