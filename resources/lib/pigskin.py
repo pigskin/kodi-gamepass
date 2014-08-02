@@ -171,14 +171,13 @@ class pigskin(object):
         archive_data = self.make_request(url=url, method='post', payload=post_data)
         archive_dict = xmltodict.parse(archive_data)['result']
 
-        count = int(archive_dict['paging']['count'])
-        if count >= 1:
+        try:
             items = archive_dict['programs']['program']
             # if only one episode is returned, we explicitly put it into a list
             if isinstance(items, dict):
                 items = [items]
             return items
-        else:
+        except TypeError:
             return []
 
     def get_seasons_and_weeks(self):
