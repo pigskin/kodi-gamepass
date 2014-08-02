@@ -42,7 +42,7 @@ else:
 gpr = pigskin(sub_name, cookiefile=cookie_file, debug=debug)
 
 def addon_log(string):
-    if debug == 'true':
+    if debug:
         xbmc.log("%s: %s" %(logging_prefix, string))
 
 
