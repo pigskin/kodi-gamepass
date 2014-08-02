@@ -48,7 +48,7 @@ def addon_log(string):
 
 class myPlayer(xbmc.Player):
     def __init__(self, parent, *args, **kwargs):
-        xbmc.Player.__init__(self)
+        xbmc.Player.__init__(self, *args, **kwargs)
         self.dawindow = parent
 
     def onPlayBackStarted(self):
@@ -75,8 +75,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.clicked_game = -1
         self.live_list = None
         self.live_items = []
-        self.selectedSeason = None
-        self.selectedWeek = None
+        self.selected_season = ''
+        self.selected_week = ''
         self.main_selection = None
         self.player = None
         self.list_refill = False
@@ -115,6 +115,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             addon_log('Focus not possible: %s' %self.focusId)
 
     def coloring(self, text, meaning):
+        """Return the text wrapped in appropriate color markup."""
         if meaning == "disabled":
             color = "FF000000"
         elif meaning == "disabled-info":
@@ -123,6 +124,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         return colored_text
 
     def display_seasons(self):
+        """List seasons"""
         self.season_items = []
         for season in sorted(self.seasons_and_weeks.keys(), reverse=True):
             listitem = xbmcgui.ListItem(season)
@@ -130,6 +132,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.season_list.addItems(self.season_items)
 
     def display_nfl_network_archive(self):
+        """List shows for a given season"""
         self.weeks_items = []
         shows = gpr.get_shows(self.selected_season)
         for show_name in shows:
@@ -139,6 +142,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.weeks_list.addItems(self.weeks_items)
 
     def display_weeks_games(self):
+        """Show games for a given season/week"""
         self.games_items = []
         games = gpr.get_weeks_games(self.selected_season, self.selected_week)
 
@@ -205,6 +209,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list.addItems(self.games_items)
 
     def display_seasons_weeks(self):
+        """List weeks for a given season"""
         weeks = self.seasons_and_weeks[self.selected_season]
 
         for week_code, week in sorted(weeks.iteritems()):
@@ -228,6 +233,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.weeks_list.addItems(self.weeks_items)
 
     def display_shows_episodes(self, show_name, season):
+        """Show episodes for a given season/show"""
         self.games_items = []
         items = gpr.get_shows_episodes(show_name, season)
 
@@ -295,6 +301,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.clicked_game = self.games_list.getSelectedPosition()
 
     def ask_bitrate(self, bitrates):
+        """Presents a dialog for user to select from a list of bitrates.
+        Returns the value of the selected bitrate.
+        """
         options = []
         for bitrate in bitrates:
             options.append(bitrate + ' Kbps')
@@ -304,6 +313,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         return bitrates[ret]
 
     def select_bitrate(self, manifest_bitrates=None):
+        """Returns a bitrate, while honoring the user's /preference/."""
         bitrate_setting = int(addon.getSetting('preferred_bitrate'))
         bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
         if bitrate_setting == 0:
@@ -329,8 +339,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             else:
                 return self.ask_bitrate(bitrate_values)
 
-    # returns a gameid, while honoring user preference when applicable
     def select_version(self, game_version_ids):
+        """Returns a gameid, while honoring the user's /preference/."""
         preferred_version = int(addon.getSetting('preferred_game_version'))
 
         # the full version is always available, but not always the condensed
@@ -354,12 +364,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
     def onFocus(self, controlId):
         #save currently focused list
-        if controlId in[210, 220, 230, 240]:
+        if controlId in [210, 220, 230, 240]:
             self.focusId = controlId
 
     def onClick(self, controlId):
         xbmc.executebuiltin("ActivateWindow(busydialog)")
-        if controlId in[110, 120, 130]:
+        if controlId in [110, 120, 130]:
             self.games_list.reset()
             self.weeks_list.reset()
             self.season_list.reset()
