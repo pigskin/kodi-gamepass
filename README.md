@@ -1,10 +1,10 @@
 # NFL Game Pass/Rewind XBMC Plugin #
 **version 0.5.1 — Tom Landry Edition**
 
-Before reading any further, please understand that while this plugin does
+Before reading any further, please understand that while this addon does
 work, not all features are supported (or fully tested) and it should be
 regarded as an alpha release. It may crash, spay your puppy, and/or cause your
-oven to not heat to 400° F properly. The plugin is under development, and needs
+oven to not heat to 400° F properly. The addon is under development, and needs
 a whole lot of love.
 
 If you're interested in helping out, just drop us an email or send a pull
@@ -42,7 +42,7 @@ simply distracting. We're here to watch a game, nothing else.
 
 By now, most core features are supported.
 
- * Archived games from 2011 to 2013 (both full and condensed)
+ * Archived games from 2012 to 2014 (both full and condensed)
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
  * A Football Life
@@ -55,11 +55,11 @@ By now, most core features are supported.
  * NFL Total Access
 
 Currently unsupported features:
- * Archived games prior to 2011
+ * Archived games prior to 2012
  * Alternate team audio
  * Coaches film (22 man view)
  * Coaches Show
- * Superbowl Archives
+ * Super Bowl Archives
  * Top 100 Players
 
 ## Release names ##
@@ -74,4 +74,4 @@ A rough roadmap follows:
 
 * Continue work towards feature completeness
 * Stabilize Game Rewind support
-* Refactor code to be more XBMC agnostic
+* Submit to main XBMC repository
