@@ -8,10 +8,10 @@ from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
 
-try:
-    import requests
-except ImportError: # XBMC calls v2 requests2... :-/
+try: # XBMC calls v2 requests2... :-/
     import requests2 as requests
+except ImportError:
+    import requests
 import xmltodict
 
 class pigskin(object):
