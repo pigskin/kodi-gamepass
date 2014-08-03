@@ -381,7 +381,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.clicked_week = -1
             self.clicked_season = -1
 
-            if controlId == 110:
+            if controlId in [110, 120]:
                 self.main_selection = 'GamePass/Rewind'
                 self.window.setProperty('NW_clicked', 'false')
                 self.window.setProperty('GP_clicked', 'true')
