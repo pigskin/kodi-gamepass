@@ -1,5 +1,5 @@
 # NFL Game Pass/Rewind XBMC Plugin #
-**version 0.5.1 — Tom Landry Edition**
+**version 0.5.2 — Reggie White "The Minister of Defense" Edition**
 
 Before reading any further, please understand that while this addon does
 work, not all features are supported (or fully tested) and it should be
