@@ -115,20 +115,23 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_publishpoint_url(self, game_id, gp_type, game_type):
+    def get_publishpoint_url(self, video_id, gp_type, game_type):
         """Return the URL of a live stream."""
         streams = {}
         self.get_current_season_and_week() # set cookies
         url = self.servlets_url + '/publishpoint'
 
-        if game_id == 'nfl_network':
+        if video_id == 'nfl_network':
             post_data = {'id': '1', 'type': gp_type, 'nt': '1'}
-        elif game_id == 'rz':
+        elif video_id == 'rz':
             post_data = {'id': '2', 'type': gp_type, 'nt': '1'}
         elif gp_type == 'game':
-            post_data = {'id': game_id, 'type': gp_type, 'nt': '1', 'gt': game_type}
+            post_data = {'id': video_id, 'type': gp_type, 'nt': '1', 'gt': game_type}
+        else:
+            post_data = {'id': video_id, 'type': gp_type, 'nt': '1'}
 
         headers = {'User-Agent': 'Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'}
+        self.log('POST-data: %s' %post_data)
         m3u8_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
@@ -137,9 +140,12 @@ class pigskin(object):
         #Parse m3u8 playlist for bitrates
         m3u8_obj = m3u8.load(m3u8_url)
 
-        for playlist in m3u8_obj.playlists:
-            bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
-            streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
+        if m3u8_obj.is_variant:
+            for playlist in m3u8_obj.playlists:
+                bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
+                streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
+        else:
+            streams['only available'] = m3u8_url
 
         return streams    
 

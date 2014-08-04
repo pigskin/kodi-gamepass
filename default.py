@@ -249,6 +249,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 listitem.setProperty('game_info', i['name'])
                 listitem.setProperty('away_thumb', image_path + i['image'])
                 listitem.setProperty('url', i['publishPoint'])
+                listitem.setProperty('id', i['id'])
                 listitem.setProperty('type', i['type'])
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
@@ -446,12 +447,20 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.display_shows_episodes(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 self.init('game/episode')
-                url = self.games_list.getSelectedItem().getProperty('url')
-                vtype = self.games_list.getSelectedItem().getProperty('type')
-                episode_manifest = gpr.get_stream_manifest(vpath=url, vtype=vtype)
-                bitrate = self.select_bitrate(episode_manifest.keys())
-                episode_url = episode_manifest[bitrate]['full_url']
-                self.playUrl(episode_url)
+                if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'): 
+                    video_id = self.games_list.getSelectedItem().getProperty('id')
+                    video_streams = gpr.get_publishpoint_url(video_id, 'video', '')
+                    addon_log('Video-Streams: %s' %video_streams)
+                    bitrate = self.select_bitrate(video_streams.keys())
+                    video_url = video_streams[bitrate]
+                    self.playUrl(video_url)
+                else:
+                    url = self.games_list.getSelectedItem().getProperty('url')
+                    vtype = self.games_list.getSelectedItem().getProperty('type')
+                    episode_manifest = gpr.get_stream_manifest(vpath=url, vtype=vtype)
+                    bitrate = self.select_bitrate(episode_manifest.keys())
+                    episode_url = episode_manifest[bitrate]['full_url']
+                    self.playUrl(episode_url)
             elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
