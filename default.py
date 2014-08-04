@@ -260,21 +260,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list.addItems(self.games_items)
 
     def playUrl(self, url):
-        if 'nlds53' in url:
-            dialog = xbmcgui.Dialog()
-            addon_log('nlds53 url found: %s' %url)
-            dialog.ok('Cannot Play This Stream',
-                      "This addon currently doesn't support this type of stream.",
-                      "We're working on it, but it's a tough one.")
-        else:
-            player = myPlayer(parent=self)
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
-            player.play(url)
+        player = myPlayer(parent=self)
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        player.play(url)
 
-            while player.isPlaying():
-                xbmc.sleep(2000)
+        while player.isPlaying():
+            xbmc.sleep(2000)
 
-            del player
+        del player
 
     def init(self, level):
         if level == 'season':
@@ -344,18 +337,15 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             else:
                 return self.ask_bitrate(bitrate_values)
 
-    def select_version(self, game_version_ids):
+    def select_version(self, versions):
         """Returns a gameid, while honoring the user's /preference/."""
         preferred_version = int(addon.getSetting('preferred_game_version'))
 
         # the full version is always available, but not always the condensed
-        game_id = game_version_ids['Full']
-        versions = [language(30014)]
+        game_version = 'archive'
 
-        if game_version_ids.has_key('Condensed'):
-            versions.append(language(30015))
-            if preferred_version == 1:
-                game_id = game_version_ids['Condensed']
+        if preferred_version == 1:
+           game_version = 'condensed'
 
         # user wants to be asked to select version
         if preferred_version == 2:
@@ -363,9 +353,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             xbmc.executebuiltin("Dialog.Close(busydialog)")
             ret = dialog.select(language(30016), versions)
             if ret == 1:
-                game_id = game_version_ids['Condensed']
+                game_version = 'condensed'
 
-        return game_id
+        return game_version
 
     def onFocus(self, controlId):
         #save currently focused list
@@ -425,13 +415,23 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     game_version_ids = eval(selectedGame.getProperty('game_version_ids'))
 
                     if selectedGame.getProperty('isLive') == 'true':
-                        game_live_url = gpr.get_live_url(game_version_ids['Live'], self.select_bitrate())
+                        if selectedGame.getProperty('game_info') == 'Final':
+                            game_live_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', 'dvr')
+                        else:
+                            game_live_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', 'live')
+                        bitrate = self.select_bitrate(game_live_streams.keys())
+                        game_live_url = game_live_streams[bitrate]
                         self.playUrl(game_live_url)
                     else:
-                        game_id = self.select_version(game_version_ids)
-                        game_manifest = gpr.get_stream_manifest(vpath=game_id, vtype='fgpa')
-                        bitrate = self.select_bitrate(game_manifest.keys())
-                        game_url = game_manifest[bitrate]['full_url']
+                        versions = [language(30014)]
+                        if game_version_ids.has_key('Condensed'):
+                            versions.append(language(30015))
+
+                        game_version = self.select_version(versions)
+                        game_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', game_version)
+                        addon_log('Game-Streams: %s' %game_streams)
+                        bitrate = self.select_bitrate(game_streams.keys())
+                        game_url = game_streams[bitrate]
                         self.playUrl(game_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
@@ -455,11 +455,15 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
-                    redzone_live_url = gpr.get_live_url('rz', self.select_bitrate())
-                    self.playUrl(redzone_live_url)
+                    rz_live_streams = gpr.get_publishpoint_url('rz', 'channel', '')
+                    bitrate = self.select_bitrate(rz_live_streams.keys())
+                    rz_live_url = rz_live_streams[bitrate]
+                    self.playUrl(rz_live_url)
                 elif show_name == 'NFL Network - Live':
-                    nfl_network_url = gpr.get_live_url('nfl_network', self.select_bitrate())
-                    self.playUrl(nfl_network_url)
+                    nw_live_streams = gpr.get_publishpoint_url('nfl_network', 'channel', '')
+                    bitrate = self.select_bitrate(nw_live_streams.keys())
+                    nw_live_url = nw_live_streams[bitrate]
+                    self.playUrl(nw_live_url)
 
         xbmc.executebuiltin("Dialog.Close(busydialog)")
 

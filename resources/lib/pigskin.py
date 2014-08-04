@@ -4,6 +4,7 @@ An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 import cookielib
 import hashlib
 import random
+import m3u8
 from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
@@ -114,24 +115,33 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_live_url(self, game_id, bitrate):
+    def get_publishpoint_url(self, game_id, gp_type, game_type):
         """Return the URL of a live stream."""
+        streams = {}
         self.get_current_season_and_week() # set cookies
         url = self.servlets_url + '/publishpoint'
 
         if game_id == 'nfl_network':
-            post_data = {'id': '1', 'type': 'channel', 'nt': '1'}
+            post_data = {'id': '1', 'type': gp_type, 'nt': '1'}
         elif game_id == 'rz':
-            post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
-        else:
-            post_data = {'id': game_id, 'type': 'game', 'nt': '1', 'gt': 'live'}
+            post_data = {'id': '2', 'type': gp_type, 'nt': '1'}
+        elif gp_type == 'game':
+            post_data = {'id': game_id, 'type': gp_type, 'nt': '1', 'gt': game_type}
 
-        headers = {'User-Agent': 'Android'}
+        headers = {'User-Agent': 'Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'}
         m3u8_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
-        return m3u8_url.replace('androidtab', bitrate)
+
+        #Parse m3u8 playlist for bitrates
+        m3u8_obj = m3u8.load(m3u8_url)
+
+        for playlist in m3u8_obj.playlists:
+            bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
+            streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
+
+        return streams    
 
     def get_shows(self, season):
         """Return a list of all shows for a season."""
