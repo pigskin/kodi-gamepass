@@ -151,6 +151,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             if game['homeTeam']['name'] is None: # sometimes the first item is empty
                 continue
 
+            game_info = ''
             isLive = 'false'
             isPlayable = 'true'
             home_team = game['homeTeam']
@@ -164,10 +165,14 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 except KeyError:
                     pass
 
-            if game.has_key('isLive') and not game.has_key('gameEndTimeGMT'): # sometimes isLive lies
-                game_info = 'Live'
+            if game.has_key('isLive'):
                 isLive = 'true'
-            elif game.has_key('gameEndTimeGMT'):
+                if not game.has_key('gameEndTimeGMT'):
+                    # "Live" games take 1-2 days to migrate to non-publishpoint
+                    # servers
+                    game_info = 'Live'
+
+            if game.has_key('gameEndTimeGMT'):
                 try:
                     start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
                     end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
