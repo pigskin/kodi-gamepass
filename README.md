@@ -42,7 +42,7 @@ simply distracting. We're here to watch a game, nothing else.
 
 By now, most core features are supported.
 
- * Archived games from 2012 to 2014 (both full and condensed)
+ * Archived games from 2011 to 2014 (both full and condensed)
  * Live games (requires Gotham)
  * NFL Network - Live (requires Gotham)
  * A Football Life
@@ -52,14 +52,14 @@ By now, most core features are supported.
  * NFL RedZone Archives
  * NFL RedZone - Live (requires Gotham)
  * Sound FX
+ * Super Bowl Archives
  * NFL Total Access
 
 Currently unsupported features:
- * Archived games prior to 2012
+ * Archived games prior to 2011
  * Alternate team audio
  * Coaches film (22 man view)
  * Coaches Show
- * Super Bowl Archives
  * Top 100 Players
 
 ## Release names ##
