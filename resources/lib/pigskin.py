@@ -130,8 +130,7 @@ class pigskin(object):
         else:
             post_data = {'id': video_id, 'type': stream_type, 'nt': '1'}
 
-        headers = {'User-Agent': 'Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'}
-        self.log('POST-data: %s' %post_data)
+        headers = {'User-Agent': 'iPad'}
         m3u8_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
