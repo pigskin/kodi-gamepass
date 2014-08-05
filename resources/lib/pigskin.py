@@ -136,17 +136,15 @@ class pigskin(object):
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
 
-        #Parse m3u8 playlist for bitrates
         m3u8_obj = m3u8.load(m3u8_url)
-
-        if m3u8_obj.is_variant:
+        if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
             for playlist in m3u8_obj.playlists:
                 bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
                 streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
         else:
             streams['only available'] = m3u8_url
 
-        return streams    
+        return streams
 
     def get_shows(self, season):
         """Return a list of all shows for a season."""

@@ -440,7 +440,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.display_shows_episodes(show_name, self.selected_season)
             elif controlId == 230: # episode is clicked
                 self.init('game/episode')
-                if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'): 
+                if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'):
                     video_id = self.games_list.getSelectedItem().getProperty('id')
                     video_streams = gpr.get_publishpoint_streams(video_id, 'video')
                     addon_log('Video-Streams: %s' %video_streams)
