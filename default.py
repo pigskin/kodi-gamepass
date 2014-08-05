@@ -423,7 +423,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     else:
                         game_version = self.select_version(game_versions)
 
-                    game_streams = gpr.get_publishpoint_url(game_id, 'game', game_version)
+                    game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
                     bitrate = self.select_bitrate(game_streams.keys())
                     game_url = game_streams[bitrate]
                     self.playUrl(game_url)
@@ -442,7 +442,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 self.init('game/episode')
                 if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'): 
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gpr.get_publishpoint_url(video_id, 'video', '')
+                    video_streams = gpr.get_publishpoint_streams(video_id, 'video')
                     addon_log('Video-Streams: %s' %video_streams)
                     bitrate = self.select_bitrate(video_streams.keys())
                     video_url = video_streams[bitrate]
@@ -457,12 +457,12 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             elif controlId == 240: # Live content (though not games)
                 show_name = self.live_list.getSelectedItem().getLabel()
                 if show_name == 'RedZone - Live':
-                    rz_live_streams = gpr.get_publishpoint_url('rz', 'channel', '')
+                    rz_live_streams = gpr.get_publishpoint_streams('redzone')
                     bitrate = self.select_bitrate(rz_live_streams.keys())
                     rz_live_url = rz_live_streams[bitrate]
                     self.playUrl(rz_live_url)
                 elif show_name == 'NFL Network - Live':
-                    nw_live_streams = gpr.get_publishpoint_url('nfl_network', 'channel', '')
+                    nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
                     bitrate = self.select_bitrate(nw_live_streams.keys())
                     nw_live_url = nw_live_streams[bitrate]
                     self.playUrl(nw_live_url)

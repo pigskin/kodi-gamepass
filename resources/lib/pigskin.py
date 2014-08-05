@@ -115,20 +115,20 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_publishpoint_url(self, video_id, gp_type, game_type):
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
         """Return the URL of a live stream."""
         streams = {}
         self.get_current_season_and_week() # set cookies
         url = self.servlets_url + '/publishpoint'
 
         if video_id == 'nfl_network':
-            post_data = {'id': '1', 'type': gp_type, 'nt': '1'}
-        elif video_id == 'rz':
-            post_data = {'id': '2', 'type': gp_type, 'nt': '1'}
-        elif gp_type == 'game':
-            post_data = {'id': video_id, 'type': gp_type, 'nt': '1', 'gt': game_type}
+            post_data = {'id': '1', 'type': 'channel', 'nt': '1'}
+        elif video_id == 'redzone':
+            post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
+        elif stream_type == 'game':
+            post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
         else:
-            post_data = {'id': video_id, 'type': gp_type, 'nt': '1'}
+            post_data = {'id': video_id, 'type': stream_type, 'nt': '1'}
 
         headers = {'User-Agent': 'Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'}
         self.log('POST-data: %s' %post_data)
