@@ -28,6 +28,7 @@ class pigskin(object):
         if subscription == 'gamepass':
             self.base_url = 'https://gamepass.nfl.com/nflgp'
             self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
+            self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr/'
             self.seasonal_shows.update({
                 'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
                 'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
@@ -41,6 +42,7 @@ class pigskin(object):
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
             self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
+            self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr/'
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
@@ -115,7 +117,18 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
+    def get_coachestape_playIds(self, game_id, season):
+        url = self.boxscore_url + season + '/' + game_id + '.xml'
+        boxscore = self.make_request(url=url, method='get', payload=None, headers=None)
+        boxscore_dict = xmltodict.parse(boxscore)
+
+        playIds = []
+        for row in boxscore_dict['dataset']['table']['row']:
+            playIds.append(row['@PlayID'])
+
+        return playIds
+
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, game_date=None, event_id=None):
         """Return the URL of a live stream."""
         streams = {}
         self.get_current_season_and_week() # set cookies
@@ -126,7 +139,10 @@ class pigskin(object):
         elif video_id == 'redzone':
             post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
         elif stream_type == 'game':
-            post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
+            if game_type == 'coach':
+                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type, 'event': event_id, 'bitrate': '1600', 'gdate': game_date}
+            else:
+                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
         else:
             post_data = {'id': video_id, 'type': stream_type, 'nt': '1'}
 
@@ -136,13 +152,16 @@ class pigskin(object):
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
 
-        m3u8_obj = m3u8.load(m3u8_url)
-        if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
-            for playlist in m3u8_obj.playlists:
-                bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
-                streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
+        if m3u8_url.find('.m3u8') > 0:
+            m3u8_obj = m3u8.load(m3u8_url)
+            if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
+                for playlist in m3u8_obj.playlists:
+                    bitrate = str(int(playlist.stream_info.bandwidth)/1000)
+                    streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
+            else:
+                streams['9999'] = m3u8_url
         else:
-            streams['only available'] = m3u8_url
+            streams['9999'] = m3u8_url
 
         return streams
 

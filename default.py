@@ -58,12 +58,14 @@ class myPlayer(xbmc.Player):
         self.onPlayBackEnded()
 
     def onPlayBackEnded(self):
+        self.daWindow.playBackStop = True
         self.dawindow.list_refill = True
         self.dawindow.doModal()
 
 
 class GamepassGUI(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
+        self.playBackStop = False
         self.season_list = None
         self.season_items = []
         self.clicked_season = -1
@@ -164,6 +166,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if game.has_key(value):
                     game_versions.append(key)
 
+            #Coaches Film has no programId; assume if condensed is available, coaches film will also be available
+            if 'Condensed' in game_versions: 
+                game_versions.append('Coach')
+
             if game.has_key('gameEndTimeGMT'):
                 try:
                     start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
@@ -204,6 +210,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem.setProperty('is_show', 'false')
             listitem.setProperty('isPlayable', isPlayable)
             listitem.setProperty('game_id', game_id)
+            listitem.setProperty('game_date', game['date'].split('T')[0])
             listitem.setProperty('game_versions', ' '.join(game_versions))
             self.games_items.append(listitem)
 
@@ -346,12 +353,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             versions = [language(30014)]
             if 'Condensed' in game_versions:
                 versions.append(language(30015))
+            if 'Coach' in game_versions:
+                versions.append(language(30025))
             dialog = xbmcgui.Dialog()
             xbmc.executebuiltin("Dialog.Close(busydialog)")
             preferred_version = dialog.select(language(30016), versions)
 
         if preferred_version == 1 and 'Condensed' in game_versions:
             game_version = 'condensed'
+        elif preferred_version == 2 and 'Coach' in game_versions:
+            game_version = 'coach'
         else:
             game_version = 'archive'
 
@@ -424,10 +435,22 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         else:
                             game_version = self.select_version(game_versions)
 
-                        game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
-                        bitrate = self.select_bitrate(game_streams.keys())
-                        game_url = game_streams[bitrate]
-                        self.playUrl(game_url)
+                        if game_version == 'coach':
+                            playIds = gpr.get_coachestape_playIds(game_id, self.selected_season)
+                            pl=xbmc.PlayList(1)
+                            pl.clear()
+                            game_date = selectedGame.getProperty('game_date').replace('-', '/')
+                            self.playBackStop = False
+                            for playId in playIds:
+                                if self.playBackStop == True:
+                                    break
+                                game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, playId)
+                                self.playUrl(game_streams['9999'])
+                        else:
+                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
+                            bitrate = self.select_bitrate(game_streams.keys())
+                            game_url = game_streams[bitrate]
+                            self.playUrl(game_url)
             elif self.main_selection == 'NFL Network':
                 if controlId == 210: # season is clicked
                     self.init('season')
