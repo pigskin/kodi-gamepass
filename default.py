@@ -152,25 +152,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 continue
 
             game_info = ''
-            isLive = 'false'
+            game_id = game['id']
+            game_versions = []
             isPlayable = 'true'
             home_team = game['homeTeam']
             away_team = game['awayTeam']
             game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
             game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-            game_version_ids = {}
-            for key, value in {'Condensed': 'condensedId', 'Full': 'programId', 'Live': 'id'}.items():
-                try:
-                    game_version_ids[key] = game[value]
-                except KeyError:
-                    pass
 
-            if game.has_key('isLive'):
-                isLive = 'true'
-                if not game.has_key('gameEndTimeGMT'):
-                    # "Live" games take 1-2 days to migrate to non-publishpoint
-                    # servers
-                    game_info = 'Live'
+            for key, value in {'Condensed': 'condensedId', 'Full': 'programId'}.items():
+                if game.has_key(value):
+                    game_versions.append(key)
 
             if game.has_key('gameEndTimeGMT'):
                 try:
@@ -182,6 +174,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     if game.has_key('result'):
                         game_info = 'Final'
             else:
+                if game.has_key('isLive'):
+                    game_versions.append('Live')
+                    game_info = 'Live'
+
                 try:
                     if addon.getSetting('local_tz') == 'true':
                         game_gmt = time.strptime(game['gameTimeGMT'], date_time_format)
@@ -207,8 +203,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem.setProperty('is_game', 'true')
             listitem.setProperty('is_show', 'false')
             listitem.setProperty('isPlayable', isPlayable)
-            listitem.setProperty('isLive', isLive)
-            listitem.setProperty('game_version_ids', str(game_version_ids))
+            listitem.setProperty('game_id', game_id)
+            listitem.setProperty('game_versions', ' '.join(game_versions))
             self.games_items.append(listitem)
 
         self.games_list.addItems(self.games_items)
@@ -338,23 +334,26 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             else:
                 return self.ask_bitrate(bitrate_values)
 
-    def select_version(self, versions):
-        """Returns a gameid, while honoring the user's /preference/."""
+    def select_version(self, game_versions):
+        """Returns a game version, while honoring the user's /preference/.
+        Note: the full version is always be available, but not always the
+        condensed.
+        """
         preferred_version = int(addon.getSetting('preferred_game_version'))
-
-        # the full version is always available, but not always the condensed
-        game_version = 'archive'
-
-        if preferred_version == 1:
-           game_version = 'condensed'
 
         # user wants to be asked to select version
         if preferred_version == 2:
+            versions = [language(30014)]
+            if 'Condensed' in game_versions:
+                versions.append(language(30015))
             dialog = xbmcgui.Dialog()
             xbmc.executebuiltin("Dialog.Close(busydialog)")
-            ret = dialog.select(language(30016), versions)
-            if ret == 1:
-                game_version = 'condensed'
+            preferred_version = dialog.select(language(30016), versions)
+
+        if preferred_version == 1 and 'Condensed' in game_versions:
+            game_version = 'condensed'
+        else:
+            game_version = 'archive'
 
         return game_version
 
@@ -413,27 +412,21 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 selectedGame = self.games_list.getSelectedItem()
                 if selectedGame.getProperty('isPlayable') == 'true':
                     self.init('game/episode')
-                    game_version_ids = eval(selectedGame.getProperty('game_version_ids'))
+                    game_id = selectedGame.getProperty('game_id')
+                    game_versions = selectedGame.getProperty('game_versions')
 
-                    if selectedGame.getProperty('isLive') == 'true':
-                        if selectedGame.getProperty('game_info') == 'Final':
-                            game_live_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', 'dvr')
+                    if 'Live' in game_versions:
+                        if 'Final' in selectedGame.getProperty('game_info'):
+                            game_version = 'dvr'
                         else:
-                            game_live_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', 'live')
-                        bitrate = self.select_bitrate(game_live_streams.keys())
-                        game_live_url = game_live_streams[bitrate]
-                        self.playUrl(game_live_url)
+                            game_version = 'live'
                     else:
-                        versions = [language(30014)]
-                        if game_version_ids.has_key('Condensed'):
-                            versions.append(language(30015))
+                        game_version = self.select_version(game_versions)
 
-                        game_version = self.select_version(versions)
-                        game_streams = gpr.get_publishpoint_url(game_version_ids['Live'], 'game', game_version)
-                        addon_log('Game-Streams: %s' %game_streams)
-                        bitrate = self.select_bitrate(game_streams.keys())
-                        game_url = game_streams[bitrate]
-                        self.playUrl(game_url)
+                    game_streams = gpr.get_publishpoint_url(game_id, 'game', game_version)
+                    bitrate = self.select_bitrate(game_streams.keys())
+                    game_url = game_streams[bitrate]
+                    self.playUrl(game_url)
         elif self.main_selection == 'NFL Network':
             if controlId == 210: # season is clicked
                 self.init('season')
