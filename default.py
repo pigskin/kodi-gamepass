@@ -363,111 +363,117 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             self.focusId = controlId
 
     def onClick(self, controlId):
-        xbmc.executebuiltin("ActivateWindow(busydialog)")
-        if controlId in [110, 120, 130]:
-            self.games_list.reset()
-            self.weeks_list.reset()
-            self.season_list.reset()
-            self.live_list.reset()
-            self.games_items = []
-            self.weeks_items = []
-            self.live_items = []
-            self.clicked_game = -1
-            self.clicked_week = -1
-            self.clicked_season = -1
+        try:
+            xbmc.executebuiltin("ActivateWindow(busydialog)")
+            if controlId in [110, 120, 130]:
+                self.games_list.reset()
+                self.weeks_list.reset()
+                self.season_list.reset()
+                self.live_list.reset()
+                self.games_items = []
+                self.weeks_items = []
+                self.live_items = []
+                self.clicked_game = -1
+                self.clicked_week = -1
+                self.clicked_season = -1
 
-            if controlId in [110, 120]:
-                self.main_selection = 'GamePass/Rewind'
-                self.window.setProperty('NW_clicked', 'false')
-                self.window.setProperty('GP_clicked', 'true')
-            elif controlId == 130:
-                self.main_selection = 'NFL Network'
-                self.window.setProperty('NW_clicked', 'true')
-                self.window.setProperty('GP_clicked', 'false')
-                if gpr.subscription == 'gamepass':
-                    listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
-                    self.live_items.append(listitem)
-                    if gpr.redzone_on_air():
-                        listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+                if controlId in [110, 120]:
+                    self.main_selection = 'GamePass/Rewind'
+                    self.window.setProperty('NW_clicked', 'false')
+                    self.window.setProperty('GP_clicked', 'true')
+                elif controlId == 130:
+                    self.main_selection = 'NFL Network'
+                    self.window.setProperty('NW_clicked', 'true')
+                    self.window.setProperty('GP_clicked', 'false')
+                    if gpr.subscription == 'gamepass':
+                        listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                         self.live_items.append(listitem)
+                        if gpr.redzone_on_air():
+                            listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
+                            self.live_items.append(listitem)
 
-                self.live_list.addItems(self.live_items)
+                    self.live_list.addItems(self.live_items)
 
-            self.display_seasons()
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
-            return
+                self.display_seasons()
+                xbmc.executebuiltin("Dialog.Close(busydialog)")
+                return
 
-        if self.main_selection == 'GamePass/Rewind':
-            if controlId == 210: # season is clicked
-                self.init('season')
-                self.selected_season = self.season_list.getSelectedItem().getLabel()
+            if self.main_selection == 'GamePass/Rewind':
+                if controlId == 210: # season is clicked
+                    self.init('season')
+                    self.selected_season = self.season_list.getSelectedItem().getLabel()
 
-                self.display_seasons_weeks()
-            elif controlId == 220: # week is clicked
-                self.init('week/show')
-                self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
+                    self.display_seasons_weeks()
+                elif controlId == 220: # week is clicked
+                    self.init('week/show')
+                    self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
 
-                self.display_weeks_games()
-            elif controlId == 230: # game is clicked
-                selectedGame = self.games_list.getSelectedItem()
-                if selectedGame.getProperty('isPlayable') == 'true':
-                    self.init('game/episode')
-                    game_id = selectedGame.getProperty('game_id')
-                    game_versions = selectedGame.getProperty('game_versions')
+                    self.display_weeks_games()
+                elif controlId == 230: # game is clicked
+                    selectedGame = self.games_list.getSelectedItem()
+                    if selectedGame.getProperty('isPlayable') == 'true':
+                        self.init('game/episode')
+                        game_id = selectedGame.getProperty('game_id')
+                        game_versions = selectedGame.getProperty('game_versions')
 
-                    if 'Live' in game_versions:
-                        if 'Final' in selectedGame.getProperty('game_info'):
-                            game_version = 'dvr'
+                        if 'Live' in game_versions:
+                            if 'Final' in selectedGame.getProperty('game_info'):
+                                game_version = 'dvr'
+                            else:
+                                game_version = 'live'
                         else:
-                            game_version = 'live'
+                            game_version = self.select_version(game_versions)
+
+                        game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
+                        bitrate = self.select_bitrate(game_streams.keys())
+                        game_url = game_streams[bitrate]
+                        self.playUrl(game_url)
+            elif self.main_selection == 'NFL Network':
+                if controlId == 210: # season is clicked
+                    self.init('season')
+                    self.selected_season = self.season_list.getSelectedItem().getLabel()
+
+                    self.display_nfl_network_archive()
+                elif controlId == 220: # show is clicked
+                    self.init('week/show')
+                    show_name = self.weeks_list.getSelectedItem().getLabel()
+
+                    self.display_shows_episodes(show_name, self.selected_season)
+                elif controlId == 230: # episode is clicked
+                    self.init('game/episode')
+                    if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'):
+                        video_id = self.games_list.getSelectedItem().getProperty('id')
+                        video_streams = gpr.get_publishpoint_streams(video_id, 'video')
+                        addon_log('Video-Streams: %s' %video_streams)
+                        bitrate = self.select_bitrate(video_streams.keys())
+                        video_url = video_streams[bitrate]
+                        self.playUrl(video_url)
                     else:
-                        game_version = self.select_version(game_versions)
-
-                    game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
-                    bitrate = self.select_bitrate(game_streams.keys())
-                    game_url = game_streams[bitrate]
-                    self.playUrl(game_url)
-        elif self.main_selection == 'NFL Network':
-            if controlId == 210: # season is clicked
-                self.init('season')
-                self.selected_season = self.season_list.getSelectedItem().getLabel()
-
-                self.display_nfl_network_archive()
-            elif controlId == 220: # show is clicked
-                self.init('week/show')
-                show_name = self.weeks_list.getSelectedItem().getLabel()
-
-                self.display_shows_episodes(show_name, self.selected_season)
-            elif controlId == 230: # episode is clicked
-                self.init('game/episode')
-                if self.weeks_list.getSelectedItem().getLabel() in ('Super Bowl Archives', 'Top 100 Players'):
-                    video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gpr.get_publishpoint_streams(video_id, 'video')
-                    addon_log('Video-Streams: %s' %video_streams)
-                    bitrate = self.select_bitrate(video_streams.keys())
-                    video_url = video_streams[bitrate]
-                    self.playUrl(video_url)
-                else:
-                    url = self.games_list.getSelectedItem().getProperty('url')
-                    vtype = self.games_list.getSelectedItem().getProperty('type')
-                    episode_manifest = gpr.get_stream_manifest(vpath=url, vtype=vtype)
-                    bitrate = self.select_bitrate(episode_manifest.keys())
-                    episode_url = episode_manifest[bitrate]['full_url']
-                    self.playUrl(episode_url)
-            elif controlId == 240: # Live content (though not games)
-                show_name = self.live_list.getSelectedItem().getLabel()
-                if show_name == 'RedZone - Live':
-                    rz_live_streams = gpr.get_publishpoint_streams('redzone')
-                    bitrate = self.select_bitrate(rz_live_streams.keys())
-                    rz_live_url = rz_live_streams[bitrate]
-                    self.playUrl(rz_live_url)
-                elif show_name == 'NFL Network - Live':
-                    nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
-                    bitrate = self.select_bitrate(nw_live_streams.keys())
-                    nw_live_url = nw_live_streams[bitrate]
-                    self.playUrl(nw_live_url)
-
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+                        url = self.games_list.getSelectedItem().getProperty('url')
+                        vtype = self.games_list.getSelectedItem().getProperty('type')
+                        episode_manifest = gpr.get_stream_manifest(vpath=url, vtype=vtype)
+                        bitrate = self.select_bitrate(episode_manifest.keys())
+                        episode_url = episode_manifest[bitrate]['full_url']
+                        self.playUrl(episode_url)
+                elif controlId == 240: # Live content (though not games)
+                    show_name = self.live_list.getSelectedItem().getLabel()
+                    if show_name == 'RedZone - Live':
+                        rz_live_streams = gpr.get_publishpoint_streams('redzone')
+                        bitrate = self.select_bitrate(rz_live_streams.keys())
+                        rz_live_url = rz_live_streams[bitrate]
+                        self.playUrl(rz_live_url)
+                    elif show_name == 'NFL Network - Live':
+                        nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
+                        bitrate = self.select_bitrate(nw_live_streams.keys())
+                        nw_live_url = nw_live_streams[bitrate]
+                        self.playUrl(nw_live_url)
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
+        except Exception: # catch anything that might fail
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
+            addon_log(format_exc())
+            dialog = xbmcgui.Dialog()
+            dialog.ok(language(30021),
+                      language(30024))
 
 if __name__ == "__main__":
     addon_log('script starting')
