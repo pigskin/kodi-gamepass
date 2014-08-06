@@ -157,7 +157,7 @@ class pigskin(object):
             if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
                 for playlist in m3u8_obj.playlists:
                     bitrate = str(int(playlist.stream_info.bandwidth)/1000)
-                    streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1]
+                    streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri
             else:
                 streams['9999'] = m3u8_url
         else:
