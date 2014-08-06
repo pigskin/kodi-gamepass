@@ -58,14 +58,12 @@ class myPlayer(xbmc.Player):
         self.onPlayBackEnded()
 
     def onPlayBackEnded(self):
-        self.daWindow.playBackStop = True
         self.dawindow.list_refill = True
         self.dawindow.doModal()
 
 
 class GamepassGUI(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
-        self.playBackStop = False
         self.season_list = None
         self.season_items = []
         self.clicked_season = -1
@@ -436,16 +434,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                             game_version = self.select_version(game_versions)
 
                         if game_version == 'coach':
+                            xbmc.executebuiltin("ActivateWindow(busydialog)")
                             playIds = gpr.get_coachestape_playIds(game_id, self.selected_season)
                             pl=xbmc.PlayList(1)
                             pl.clear()
                             game_date = selectedGame.getProperty('game_date').replace('-', '/')
                             self.playBackStop = False
+                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dmy')
                             for playId in playIds:
-                                if self.playBackStop == True:
-                                    break
-                                game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, playId)
-                                self.playUrl(game_streams['9999'])
+                                cf_url = str(game_streams['9999']).replace('dmy', playId)
+                                pl.add(cf_url)
+                            self.playUrl(pl)
                         else:
                             game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
                             bitrate = self.select_bitrate(game_streams.keys())
