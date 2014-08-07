@@ -1,0 +1,73 @@
+<window type="window" id="9507">
+    <allowoverlay>yes</allowoverlay>
+    <defaultcontrol always="true">110</defaultcontrol>
+    <controls>
+        <control type="image">
+            <description>Normal Default Background Image</description>
+            <width>1280</width>
+            <height>720</height>
+            <aspectratio>scale</aspectratio>
+            <texture>../../../../fanart.jpg</texture>
+        </control>
+        <control type="videowindow" id="100">
+              <description>My first video control</description>
+              <posx>0</posx>
+              <posy>0</posy>
+              <width>1000</width>
+              <visible>true</visible>
+        </control>
+        <control type="list" id="110">
+            <description>Week/Show list container</description>
+            <left>1000</left>
+            <top>0</top>
+            <width>280</width>
+            <height>720</height>
+            <viewtype label="list">list</viewtype>
+            <orientation>vertical</orientation>
+            <autoscroll>false</autoscroll>
+            <pagecontrol>60</pagecontrol>
+            <itemlayout width="280" height="40">
+                <control type="image">
+                        <width>280</width>
+                        <height>40</height>
+                        <texture>GamePass/week_bg.png</texture>
+                </control>
+                <control type="label">
+                    <description>Week/Show text</description>
+                    <left>140</left>
+                    <width>270</width>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <scroll>false</scroll>
+                    <info>ListItem.Label</info>
+                    <font>font13</font>
+                    <textcolor>FF333333</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>50</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                </control>
+            </itemlayout>
+            <focusedlayout width="280" height="40">
+                <control type="image">
+                        <width>280</width>
+                        <height>40</height>
+                        <texture>GamePass/week_focus.png</texture>
+                </control>
+                <control type="label">
+                    <description>Week/Show text</description>
+                    <left>140</left>
+                    <width>270</width>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <scroll>false</scroll>
+                    <info>ListItem.Label</info>
+                    <font>font13</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <wrapmultiline>false</wrapmultiline>
+                    <scrollspeed>50</scrollspeed>
+                    <scrollsuffix> - </scrollsuffix>
+                </control>
+            </focusedlayout>
+        </control>
+    </controls>
+</window>

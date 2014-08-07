@@ -436,15 +436,18 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         if game_version == 'coach':
                             xbmc.executebuiltin("ActivateWindow(busydialog)")
                             playIds = gpr.get_coachestape_playIds(game_id, self.selected_season)
-                            pl=xbmc.PlayList(1)
-                            pl.clear()
+                            coachesItems = []
                             game_date = selectedGame.getProperty('game_date').replace('-', '/')
                             self.playBackStop = False
                             game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dmy')
-                            for playId in playIds:
+                            for playId in playIds.keys():
                                 cf_url = str(game_streams['9999']).replace('dmy', playId)
-                                pl.add(cf_url)
-                            self.playUrl(pl)
+                                item = xbmcgui.ListItem(playIds[playId])
+                                item.setProperty('url', cf_url)
+                                coachesItems.append(item)
+                            coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
+                            coachGui.doModal()
+                            del coachGui
                         else:
                             game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
                             bitrate = self.select_bitrate(game_streams.keys())
@@ -497,6 +500,24 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             dialog.ok(language(30021),
                       language(30024))
 
+class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin = "Default", defaultRes = "720p"):
+        self.playsList = None
+        self.playsItems = plays
+
+        xbmcgui.WindowXMLDialog.__init__(self, xmlFilename, scriptPath, defaultSkin, defaultRes)
+        self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
+
+    def onInit(self):
+        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        self.playsList = self.window.getControl(110)
+        self.playsList.addItems(self.playsItems)
+        self.setFocus(self.playsList)
+
+    def onClick(self, controlId):
+        if controlId == 110:
+            url = self.playsList.getSelectedItem().getProperty('url')
+            xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
 if __name__ == "__main__":
     addon_log('script starting')
     try:

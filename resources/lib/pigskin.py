@@ -131,9 +131,9 @@ class pigskin(object):
         boxscore = self.make_request(url=url, method='get', payload=None, headers=None)
         boxscore_dict = xmltodict.parse(boxscore)
 
-        playIds = []
+        playIds = {}
         for row in boxscore_dict['dataset']['table']['row']:
-            playIds.append(row['@PlayID'])
+            playIds[row['@PlayID']] = row['@PlayDescription']
 
         return playIds
 
