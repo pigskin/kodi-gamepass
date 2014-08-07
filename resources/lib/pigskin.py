@@ -1,6 +1,7 @@
 """
 An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 """
+import codecs
 import cookielib
 import hashlib
 import random
@@ -62,7 +63,13 @@ class pigskin(object):
 
     def log(self, string):
         if self.debug:
-            print '[pigskin]: %s' %string
+            try:
+                print '[pigskin]: %s' %string
+            except UnicodeEncodeError:
+                # we can't anticipate everything in unicode they might throw at
+                # us, but we can handle a simple BOM
+                bom = unicode(codecs.BOM_UTF8, 'utf8')
+                print '[pigskin]: %s' %string.replace(bom, '')
 
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
