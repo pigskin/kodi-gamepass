@@ -36,7 +36,7 @@ class pigskin(object):
                 'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
                 'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
                 'NFL Films Presents': {'2014': '219', '2013': '187'},
-                'Hard Knocks': {'2014': '220'}
+                'Hard Knocks': {'2014': '220', '2013': '223'}
             })
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
