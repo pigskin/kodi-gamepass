@@ -70,6 +70,8 @@ class pigskin(object):
                 # us, but we can handle a simple BOM
                 bom = unicode(codecs.BOM_UTF8, 'utf8')
                 print '[pigskin]: %s' %string.replace(bom, '')
+            except:
+                pass
 
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
@@ -335,9 +337,9 @@ class pigskin(object):
             else: # post
                 req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
             self.log('Response code: %s' %req.status_code)
-            self.log('Response: %s' %req.text)
+            self.log('Response: %s' %req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
-            return req.text
+            return req.content
         except requests.exceptions.RequestException as error:
             self.log('Error: - %s' %error.value)
 
