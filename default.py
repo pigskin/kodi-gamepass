@@ -420,7 +420,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
-                                game_version = 'dvr'
+                                game_versions.replace('Live', '')
+                                game_version = self.select_version(game_versions)
+                                if game_version == 'archive':
+                                    game_version = 'dvr'
                             else:
                                 game_version = 'live'
                         else:
