@@ -164,10 +164,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if game.has_key(value):
                     game_versions.append(key)
 
+            if game.has_key('isLive'):
+                game_versions.append('Live')
+
             if game.has_key('gameEndTimeGMT'):
-                if game.has_key('isLive'):
-                    game_versions.append('Live')
-                    game_info = 'Live'
                 try:
                     start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
                     end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
@@ -178,7 +178,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_info = 'Final'
             else:
                 if game.has_key('isLive'):
-                    game_versions.append('Live')
                     game_info = 'Live'
 
                 try:
@@ -421,10 +420,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
-                                game_versions.replace('Live', '')
-                                game_version = self.select_version(game_versions)
-                                if game_version == 'archive':
-                                    game_version = 'dvr'
+                                game_version = 'dvr'
                             else:
                                 game_version = 'live'
                         else:
