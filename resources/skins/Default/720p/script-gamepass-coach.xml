@@ -50,6 +50,36 @@
             <visible>!IsEmpty(Window.Property(coach_lite))</visible>
         </control>
 
+        <control type="group">
+            <visible>Control.IsVisible(100) + Player.HasMedia</visible>
+
+            <control type="progress">
+                <left>8</left>
+                <top>630</top>
+                <width>968</width>
+                <height>20</height>
+                <texturebg border="8" colordiffuse="66CCCCCC">GamePass/progressbg.png</texturebg>
+                <lefttexture>-</lefttexture>
+                <midtexture border="8" colordiffuse="CCFFFFFF">GamePass/progress.png</midtexture>
+                <righttexture>-</righttexture>
+                <overlaytexture>-</overlaytexture>
+                <info>Player.Progress</info>   
+            </control>
+
+            <control type="label">
+                <description>Remaining time</description>
+                <top>645</top>
+                <left>760</left>
+                <height>30</height>
+                <width>200</width>
+                <align>right</align>
+                <aligny>center</aligny>
+                <label>$INFO[Player.Time] / $INFO[Player.Duration]</label>
+                <font>font12</font>
+                <textcolor>FFEEEEEE</textcolor>
+            </control>
+        </control>
+
         <control type="list" id="110">
             <description>Play list container</description>
             <left>985</left>
