@@ -136,6 +136,7 @@ class pigskin(object):
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('adaptive://', 'http://')
+        m3u8_url = m3u8_dict['path'].replace('_ipad', '')
 
         m3u8_obj = m3u8.load(m3u8_url)
         if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
