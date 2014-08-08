@@ -112,3 +112,7 @@ msgstr ""
 msgctxt "#30025"
 msgid "Coaches Film"
 msgstr ""
+
+msgctxt "#30026"
+msgid "Coaches Film Full Screen"
+msgstr ""

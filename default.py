@@ -514,7 +514,11 @@ class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        if addon.getSetting('coach_lite') == 'true':
+            self.window.setProperty('coach_lite', 'true')
+
         self.playsList = self.window.getControl(110)
+        self.window.getControl(99).setLabel(language(30025))
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
 
