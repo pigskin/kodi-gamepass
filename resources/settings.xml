@@ -8,5 +8,6 @@
   <setting id="sans_login" type="bool" label="Sans-Login Region" default="false" visible="eq(-6,0)" enable="eq(-6,0)"/>
   <setting id="preferred_game_version" type="select" label="30013" lvalues="30014|30015|30012" default="0"/>
   <setting id="local_tz" type="bool" label="30020" default="false"/>
+  <setting id="game_duration_shown" type="bool" label="Game Duration Shown" default="true"/>
   <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
 </settings>

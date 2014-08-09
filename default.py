@@ -168,14 +168,18 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 game_versions.append('Live')
 
             if game.has_key('gameEndTimeGMT'):
-                try:
-                    start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
-                    end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
-                    game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
-                except:
-                    addon_log(format_exc())
-                    if game.has_key('result'):
-                        game_info = 'Final'
+                #Show game duration only if user wants to see it
+				if addon.getSetting('game_duration_shown') == 'true': 
+					try:
+						start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+						end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
+						game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
+					except:
+						addon_log(format_exc())
+						if game.has_key('result'):
+							game_info = 'Final'
+				else:
+					game_info = 'Final'
             else:
                 if game.has_key('isLive'):
                     game_info = 'Live'
