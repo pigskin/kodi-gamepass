@@ -108,3 +108,15 @@ msgstr ""
 msgctxt "#30024"
 msgid "Some bad jujumagumbo just went down. Please enable debuging, and submit a bug report."
 msgstr ""
+
+msgctxt "#30025"
+msgid "No"
+msgstr ""
+
+msgctxt "#30026"
+msgid "12-hour clock (AM/PM)"
+msgstr ""
+
+msgctxt "#30027"
+msgid "24-hour clock"
+msgstr ""
