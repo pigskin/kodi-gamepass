@@ -1,4 +1,4 @@
-﻿"""
+"""
 An XBMC addon/skin for NFL Game Pass and Game Rewind.
 """
 import calendar
@@ -169,17 +169,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if game.has_key('gameEndTimeGMT'):
                 #Show game duration only if user wants to see it
-				if addon.getSetting('game_duration_shown') == 'true': 
-					try:
-						start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
-						end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
-						game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
-					except:
-						addon_log(format_exc())
-						if game.has_key('result'):
-							game_info = 'Final'
-				else:
-					game_info = 'Final'
+                if addon.getSetting('hide_game_length') == 'false': 
+                    try:
+                        start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
+                        end_time = datetime(*(time.strptime(game['gameEndTimeGMT'], date_time_format)[0:6]))
+                        game_info = 'Final [CR] Duration: %s' %time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
+                    except:
+                        addon_log(format_exc())
+                        if game.has_key('result'):
+                            game_info = 'Final'
+                else:
+                    game_info = 'Final'
             else:
                 if game.has_key('isLive'):
                     game_info = 'Live'
