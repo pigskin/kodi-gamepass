@@ -112,3 +112,15 @@ msgstr ""
 msgctxt "#30025"
 msgid "Hide game length"
 msgstr ""
+
+msgctxt "#30026"
+msgid "No"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Yes, with 12-hour clock (AM/PM)"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Yes, with 24-hour clock"
+msgstr ""

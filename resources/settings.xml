@@ -7,7 +7,7 @@
   <setting id="preferred_bitrate" type="select" label="30003" lvalues="30004|30005|30006|30007|30008|30009|30010|30011|30012" default="8"/>
   <setting id="sans_login" type="bool" label="Sans-Login Region" default="false" visible="eq(-6,0)" enable="eq(-6,0)"/>
   <setting id="preferred_game_version" type="select" label="30013" lvalues="30014|30015|30012" default="0"/>
-  <setting id="local_tz" type="bool" label="30020" default="false"/>
+  <setting id="local_tz" type="enum" label="30020" lvalues="30026|30027|30028" default="0"/>
   <setting id="hide_game_length" type="bool" label="30025" default="false"/>
   <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
 </settings>

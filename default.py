@@ -185,12 +185,17 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                     game_info = 'Live'
 
                 try:
-                    if addon.getSetting('local_tz') == 'true':
+                    if addon.getSetting('local_tz') == '1': # Localize and use 12-hour clock
                         game_gmt = time.strptime(game['gameTimeGMT'], date_time_format)
                         secs = calendar.timegm(game_gmt)
                         game_local = time.localtime(secs)
                         game_info = time.strftime('%A, %b %d - %I:%M %p', game_local)
-                    else:
+                    elif addon.getSetting('local_tz') == '2': # Localize and use 24-hour clock
+                        game_gmt = time.strptime(game['gameTimeGMT'], date_time_format)
+                        secs = calendar.timegm(game_gmt)
+                        game_local = time.localtime(secs)
+                        game_info = time.strftime('%A, %b %d - %H:%M', game_local)
+                    else: # don't localize
                         game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
                     if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):

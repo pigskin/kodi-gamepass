@@ -90,8 +90,8 @@ msgid "Choose Subscription"
 msgstr "Abonnement wählen"
 
 msgctxt "#30020"
-msgid "Uhrzeit in lokaler Zeitzone"
-msgstr ""
+msgid "Date/time in local time"
+msgstr "Uhrzeit in lokaler Zeitzone"
 
 msgctxt "#30021"
 msgid "Error"
@@ -113,3 +113,14 @@ msgctxt "#30025"
 msgid "Hide game length"
 msgstr ""
 
+msgctxt "#30026"
+msgid "No"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Yes, with 12-hour clock (AM/PM)"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Yes, with 24-hour clock"
+msgstr ""
