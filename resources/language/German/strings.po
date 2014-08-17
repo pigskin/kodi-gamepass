@@ -124,3 +124,15 @@ msgstr ""
 msgctxt "#30028"
 msgid "Yes, with 24-hour clock"
 msgstr ""
+
+msgctxt "#30029"
+msgid "General"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Display/Video"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Advanced"
+msgstr ""
