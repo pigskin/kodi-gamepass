@@ -17,3 +17,4 @@
     <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
   </category>
 </settings>
+
