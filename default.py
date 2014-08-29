@@ -164,10 +164,6 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                 if game.has_key(value):
                     game_versions.append(key)
 
-            #Coaches Film has no programId; assume if condensed is available, coaches film will also be available
-            if 'Condensed' in game_versions: 
-                game_versions.append('Coach')
-
             if game.has_key('isLive'):
                 game_versions.append('Live')
                
@@ -426,6 +422,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.init('game/episode')
                         game_id = selectedGame.getProperty('game_id')
                         game_versions = selectedGame.getProperty('game_versions')
+
+                        #Check for coaches film availability
+                        if gpr.check_coachestape(game_id, self.selected_season):
+                            game_versions = game_versions + ' Coach'
 
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
