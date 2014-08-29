@@ -439,14 +439,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                         if game_version == 'coach':
                             xbmc.executebuiltin("ActivateWindow(busydialog)")
-                            playIds = gpr.get_coachestape_playIds(game_id, self.selected_season)
+                            plays = gpr.get_coachestape_playIds(game_id, self.selected_season)
                             coachesItems = []
                             game_date = selectedGame.getProperty('game_date').replace('-', '/')
                             self.playBackStop = False
                             game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dmy')
-                            for playId in playIds.keys():
+                            playIds = plays.keys()
+                            playIds.sort(key=int)
+                            for playId in playIds:
                                 cf_url = str(game_streams['9999']).replace('dmy', playId)
-                                item = xbmcgui.ListItem(playIds[playId])
+                                item = xbmcgui.ListItem(plays[playId])
                                 item.setProperty('url', cf_url)
                                 coachesItems.append(item)
                             coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
@@ -521,11 +523,14 @@ class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
         self.window.getControl(99).setLabel(language(30025))
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
+        url = self.playsList.getListItem(0).getProperty('url')
+        xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
 
     def onClick(self, controlId):
         if controlId == 110:
             url = self.playsList.getSelectedItem().getProperty('url')
             xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
+
 if __name__ == "__main__":
     addon_log('script starting')
     try:
