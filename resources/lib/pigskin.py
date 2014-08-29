@@ -143,9 +143,12 @@ class pigskin(object):
         boxscore = self.make_request(url=url, method='get', payload=None, headers=None)
         boxscore_dict = xmltodict.parse(boxscore)
 
-        if boxscore_dict['dataset']['@coach'] == 'true':
-            return True
-        else:
+        try:
+            if boxscore_dict['dataset']['@coach'] == 'true':
+                return True
+            else:
+                return False
+        except KeyError:
             return False
 
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, game_date=None, event_id=None):

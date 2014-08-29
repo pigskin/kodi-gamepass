@@ -40,14 +40,6 @@
             <left>12</left>
             <top>0</top>
             <width>960</width>
-            <visible>IsEmpty(Window.Property(coach_lite))</visible>
-        </control>
-        <control type="videowindow" id="101">
-            <description>Fullscreen Video</description>
-            <left></left>
-            <top>0</top>
-            <width>1280</width>
-            <visible>!IsEmpty(Window.Property(coach_lite))</visible>
         </control>
 
         <control type="group">
