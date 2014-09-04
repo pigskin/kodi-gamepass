@@ -215,6 +215,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             listitem.setProperty('is_show', 'false')
             listitem.setProperty('isPlayable', isPlayable)
             listitem.setProperty('game_id', game_id)
+            listitem.setProperty('game_date', game['date'].split('T')[0])
             listitem.setProperty('game_versions', ' '.join(game_versions))
             self.games_items.append(listitem)
 
@@ -357,12 +358,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             versions = [language(30014)]
             if 'Condensed' in game_versions:
                 versions.append(language(30015))
+            if 'Coach' in game_versions:
+                versions.append(language(30032))
             dialog = xbmcgui.Dialog()
             xbmc.executebuiltin("Dialog.Close(busydialog)")
             preferred_version = dialog.select(language(30016), versions)
 
         if preferred_version == 1 and 'Condensed' in game_versions:
             game_version = 'condensed'
+        elif preferred_version == 2 and 'Coach' in game_versions:
+            game_version = 'coach'
         else:
             game_version = 'archive'
 
@@ -427,6 +432,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_id = selectedGame.getProperty('game_id')
                         game_versions = selectedGame.getProperty('game_versions')
 
+                        # Check for coaches film availability
+                        if gpr.check_for_coachestape(game_id, self.selected_season):
+                            game_versions = game_versions + ' Coach'
+
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
                                 game_version = self.select_version(game_versions)
@@ -437,10 +446,28 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         else:
                             game_version = self.select_version(game_versions)
 
-                        game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
-                        bitrate = self.select_bitrate(game_streams.keys())
-                        game_url = game_streams[bitrate]
-                        self.playUrl(game_url)
+                        if game_version == 'coach':
+                            xbmc.executebuiltin("ActivateWindow(busydialog)")
+                            coachesItems = []
+                            game_date = selectedGame.getProperty('game_date').replace('-', '/')
+                            self.playBackStop = False
+
+                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dummy')
+                            plays = gpr.get_coachestape_playIDs(game_id, self.selected_season)
+                            for playID in sorted(plays, key=int):
+                                cf_url = str(game_streams['only available']).replace('dummy', playID)
+                                item = xbmcgui.ListItem(plays[playID])
+                                item.setProperty('url', cf_url)
+                                coachesItems.append(item)
+
+                            coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
+                            coachGui.doModal()
+                            del coachGui
+                        else:
+                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
+                            bitrate = self.select_bitrate(game_streams.keys())
+                            game_url = game_streams[bitrate]
+                            self.playUrl(game_url)
             elif self.main_selection == 'NFL Network':
                 if controlId == 210: # season is clicked
                     self.init('season')
@@ -487,6 +514,31 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             dialog = xbmcgui.Dialog()
             dialog.ok(language(30021),
                       language(30024))
+
+class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin = "Default", defaultRes = "720p"):
+        self.playsList = None
+        self.playsItems = plays
+
+        xbmcgui.WindowXMLDialog.__init__(self, xmlFilename, scriptPath, defaultSkin, defaultRes)
+        self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
+
+    def onInit(self):
+        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        if addon.getSetting('coach_lite') == 'true':
+            self.window.setProperty('coach_lite', 'true')
+
+        self.playsList = self.window.getControl(110)
+        self.window.getControl(99).setLabel(language(30032))
+        self.playsList.addItems(self.playsItems)
+        self.setFocus(self.playsList)
+        url = self.playsList.getListItem(0).getProperty('url')
+        xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
+
+    def onClick(self, controlId):
+        if controlId == 110:
+            url = self.playsList.getSelectedItem().getProperty('url')
+            xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
 
 if __name__ == "__main__":
     addon_log('script starting')

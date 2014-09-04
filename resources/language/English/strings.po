@@ -136,3 +136,7 @@ msgstr ""
 msgctxt "#30031"
 msgid "Advanced"
 msgstr ""
+
+msgctxt "#30032"
+msgid "Coaches Film"
+msgstr ""

@@ -1,6 +1,7 @@
 """
 An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
 """
+import codecs
 import cookielib
 import hashlib
 import random
@@ -24,6 +25,7 @@ class pigskin(object):
             'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
             'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
         }
+        self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
 
         if subscription == 'gamepass':
             self.base_url = 'https://gamepass.nfl.com/nflgp'
@@ -42,6 +44,7 @@ class pigskin(object):
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
             self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
+
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
@@ -61,7 +64,29 @@ class pigskin(object):
 
     def log(self, string):
         if self.debug:
-            print '[pigskin]: %s' %string
+            try:
+                print '[pigskin]: %s' %string
+            except UnicodeEncodeError:
+                # we can't anticipate everything in unicode they might throw at
+                # us, but we can handle a simple BOM
+                bom = unicode(codecs.BOM_UTF8, 'utf8')
+                print '[pigskin]: %s' %string.replace(bom, '')
+            except:
+                pass
+
+    def check_for_coachestape(self, game_id, season):
+        """Return whether coaches tape is available for a given game."""
+        url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
+        boxscore = self.make_request(url=url, method='get')
+        boxscore_dict = xmltodict.parse(boxscore)
+
+        try:
+            if boxscore_dict['dataset']['@coach'] == 'true':
+                return True
+            else:
+                return False
+        except KeyError:
+            return False
 
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
@@ -98,6 +123,18 @@ class pigskin(object):
         manifest_data = self.make_request(url=url, method='get')
         return manifest_data
 
+    def get_coachestape_playIDs(self, game_id, season):
+        """Return a dict of play IDs with associated play descriptions."""
+        playIDs = {}
+        url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
+
+        boxscore = self.make_request(url=url, method='get')
+        boxscore_dict = xmltodict.parse(boxscore)
+        for row in boxscore_dict['dataset']['table']['row']:
+            playIDs[row['@PlayID']] = row['@PlayDescription']
+
+        return playIDs
+
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
         url = self.servlets_url + '/simpleconsole'
@@ -116,7 +153,7 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, game_date=None, event_id=None):
         """Return the URL of a live stream."""
         streams = {}
         self.get_current_season_and_week() # set cookies
@@ -127,7 +164,10 @@ class pigskin(object):
         elif video_id == 'redzone':
             post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
         elif stream_type == 'game':
-            post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
+            if game_type == 'coach':
+                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type, 'event': event_id, 'bitrate': '1600', 'gdate': game_date}
+            else:
+                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
         else:
             post_data = {'id': video_id, 'type': stream_type, 'nt': '1'}
 
@@ -311,9 +351,9 @@ class pigskin(object):
             else: # post
                 req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
             self.log('Response code: %s' %req.status_code)
-            self.log('Response: %s' %req.text)
+            self.log('Response: %s' %req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
-            return req.text
+            return req.content
         except requests.exceptions.RequestException as error:
             self.log('Error: - %s' %error.value)
 
