@@ -166,7 +166,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
             if game.has_key('isLive'):
                 game_versions.append('Live')
-               
+
             if game.has_key('gameEndTimeGMT'):
                 try:
                     start_time = datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6]))
@@ -423,8 +423,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         game_id = selectedGame.getProperty('game_id')
                         game_versions = selectedGame.getProperty('game_versions')
 
-                        #Check for coaches film availability
-                        if gpr.check_coachestape(game_id, self.selected_season):
+                        # Check for coaches film availability
+                        if gpr.check_for_coachestape(game_id, self.selected_season):
                             game_versions = game_versions + ' Coach'
 
                         if 'Live' in game_versions:
@@ -439,18 +439,18 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
 
                         if game_version == 'coach':
                             xbmc.executebuiltin("ActivateWindow(busydialog)")
-                            plays = gpr.get_coachestape_playIds(game_id, self.selected_season)
                             coachesItems = []
                             game_date = selectedGame.getProperty('game_date').replace('-', '/')
                             self.playBackStop = False
-                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dmy')
-                            playIds = plays.keys()
-                            playIds.sort(key=int)
-                            for playId in playIds:
-                                cf_url = str(game_streams['9999']).replace('dmy', playId)
-                                item = xbmcgui.ListItem(plays[playId])
+
+                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dummy')
+                            plays = gpr.get_coachestape_playIDs(game_id, self.selected_season)
+                            for playID in sorted(plays, key=int):
+                                cf_url = str(game_streams['9999']).replace('dummy', playID)
+                                item = xbmcgui.ListItem(plays[playID])
                                 item.setProperty('url', cf_url)
                                 coachesItems.append(item)
+
                             coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
                             coachGui.doModal()
                             del coachGui

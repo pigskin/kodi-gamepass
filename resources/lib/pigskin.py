@@ -25,11 +25,11 @@ class pigskin(object):
             'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
             'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
         }
+        self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
 
         if subscription == 'gamepass':
             self.base_url = 'https://gamepass.nfl.com/nflgp'
             self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
-            self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr/'
             self.seasonal_shows.update({
                 'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
                 'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
@@ -44,7 +44,7 @@ class pigskin(object):
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
             self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
-            self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr/'
+
         else:
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
@@ -73,6 +73,20 @@ class pigskin(object):
                 print '[pigskin]: %s' %string.replace(bom, '')
             except:
                 pass
+
+    def check_for_coachestape(self, game_id, season):
+        """Return whether coaches tape is available for a given game."""
+        url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
+        boxscore = self.make_request(url=url, method='get')
+        boxscore_dict = xmltodict.parse(boxscore)
+
+        try:
+            if boxscore_dict['dataset']['@coach'] == 'true':
+                return True
+            else:
+                return False
+        except KeyError:
+            return False
 
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
@@ -109,6 +123,18 @@ class pigskin(object):
         manifest_data = self.make_request(url=url, method='get')
         return manifest_data
 
+    def get_coachestape_playIDs(self, game_id, season):
+        """Return a dict of play IDs with associated play descriptions."""
+        playIDs = {}
+        url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
+
+        boxscore = self.make_request(url=url, method='get')
+        boxscore_dict = xmltodict.parse(boxscore)
+        for row in boxscore_dict['dataset']['table']['row']:
+            playIDs[row['@PlayID']] = row['@PlayDescription']
+
+        return playIDs
+
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
         url = self.servlets_url + '/simpleconsole'
@@ -126,30 +152,6 @@ class pigskin(object):
         xml_manifest = self.get_manifest(video_path)
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
-
-    def get_coachestape_playIds(self, game_id, season):
-        url = self.boxscore_url + season + '/' + game_id + '.xml'
-        boxscore = self.make_request(url=url, method='get', payload=None, headers=None)
-        boxscore_dict = xmltodict.parse(boxscore)
-
-        playIds = {}
-        for row in boxscore_dict['dataset']['table']['row']:
-            playIds[row['@PlayID']] = row['@PlayDescription']
-
-        return playIds
-
-    def check_coachestape(self, game_id, season):
-        url = self.boxscore_url + season + '/' + game_id + '.xml'
-        boxscore = self.make_request(url=url, method='get', payload=None, headers=None)
-        boxscore_dict = xmltodict.parse(boxscore)
-
-        try:
-            if boxscore_dict['dataset']['@coach'] == 'true':
-                return True
-            else:
-                return False
-        except KeyError:
-            return False
 
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, game_date=None, event_id=None):
         """Return the URL of a live stream."""
