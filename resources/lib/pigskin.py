@@ -123,7 +123,7 @@ class pigskin(object):
         manifest_data = self.make_request(url=url, method='get')
         return manifest_data
 
-    def get_coachestape_playIDs(self, game_id, season):
+    def get_coaches_playIDs(self, game_id, season):
         """Return a dict of play IDs with associated play descriptions."""
         playIDs = {}
         url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
@@ -134,6 +134,19 @@ class pigskin(object):
             playIDs[row['@PlayID']] = row['@PlayDescription']
 
         return playIDs
+
+    def get_coaches_url(self, game_id, game_date, event_id):
+        """Return the URL for a coaches-film play."""
+        self.get_current_season_and_week() # set cookies
+        url = self.servlets_url + '/publishpoint'
+
+        post_data = {'id': game_id, 'type': 'game', 'nt': '1', 'gt': 'coach',
+                     'event': event_id, 'bitrate': '1600', 'gdate': game_date}
+        headers = {'User-Agent': 'iPad'}
+        coach_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
+        coach_dict = xmltodict.parse(coach_data)['result']
+
+        return coach_dict['path']
 
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
@@ -153,8 +166,8 @@ class pigskin(object):
         stream_manifest = self.parse_manifest(xml_manifest)
         return stream_manifest
 
-    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, game_date=None, event_id=None):
-        """Return the URL of a live stream."""
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
+        """Return the URL for a stream."""
         streams = {}
         self.get_current_season_and_week() # set cookies
         url = self.servlets_url + '/publishpoint'
@@ -164,10 +177,7 @@ class pigskin(object):
         elif video_id == 'redzone':
             post_data = {'id': '2', 'type': 'channel', 'nt': '1'}
         elif stream_type == 'game':
-            if game_type == 'coach':
-                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type, 'event': event_id, 'bitrate': '1600', 'gdate': game_date}
-            else:
-                post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
+            post_data = {'id': video_id, 'type': stream_type, 'nt': '1', 'gt': game_type}
         else:
             post_data = {'id': video_id, 'type': stream_type, 'nt': '1'}
 

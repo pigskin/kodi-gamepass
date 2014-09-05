@@ -452,10 +452,10 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                             game_date = selectedGame.getProperty('game_date').replace('-', '/')
                             self.playBackStop = False
 
-                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version, game_date, 'dummy')
-                            plays = gpr.get_coachestape_playIDs(game_id, self.selected_season)
+                            play_stream = gpr.get_coaches_url(game_id, game_date, 'dummy')
+                            plays = gpr.get_coaches_playIDs(game_id, self.selected_season)
                             for playID in sorted(plays, key=int):
-                                cf_url = str(game_streams['only available']).replace('dummy', playID)
+                                cf_url = str(play_stream).replace('dummy', playID)
                                 item = xbmcgui.ListItem(plays[playID])
                                 item.setProperty('url', cf_url)
                                 coachesItems.append(item)
