@@ -497,7 +497,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                         self.playUrl(episode_url)
                 elif controlId == 240: # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
-                    if show_name == 'RedZone - Live':
+                    if show_name == 'NFL RedZone - Live':
                         rz_live_streams = gpr.get_publishpoint_streams('redzone')
                         bitrate = self.select_bitrate(rz_live_streams.keys())
                         rz_live_url = rz_live_streams[bitrate]
