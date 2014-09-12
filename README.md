@@ -3,7 +3,7 @@
 
 Before reading any further, please understand that while this addon does
 work, not all features are supported (or fully tested) and it should be
-regarded as an alpha release. It may crash, spay your puppy, and/or cause your
+regarded as a beta release. It may crash, spay your puppy, and/or cause your
 oven to not heat to 400° F properly. The addon is under development, and needs
 a whole lot of love.
 
@@ -14,7 +14,7 @@ request. Patches and (constructive) input are always welcome.
 Until this addon is part of an official XBMC repository (hopefully sometime
 soon), dependencies will not be installed automatically.
  * xmltodict (http://mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
- * Requests (http://mirrors.xbmc.org/addons/frodo/script.module.requests2/)
+ * Requests 2.x (http://mirrors.xbmc.org/addons/frodo/script.module.requests/)
 
 ## What is NFL Game Pass? ##
 
@@ -44,6 +44,7 @@ By now, most core features are supported.
 
  * Archived games from 2011 to 2014 (both full and condensed)
  * Live games (requires Gotham)
+ * Coaches Film (22 man view)
  * NFL Network - Live (requires Gotham)
  * A Football Life
  * NFL Films Presents
@@ -58,7 +59,6 @@ By now, most core features are supported.
 Currently unsupported features:
  * Archived games prior to 2011
  * Alternate team audio
- * Coaches film (22 man view)
  * Coaches Show
  * Top 100 Players
 
