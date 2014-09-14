@@ -6,7 +6,7 @@
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.xmltodict" version="0.2.0"/>
-    <import addon="script.module.requests2" version="2.2.1"/>
+    <import addon="script.module.requests" version="2.3.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
