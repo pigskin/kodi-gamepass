@@ -45,24 +45,7 @@ def addon_log(string):
     if debug:
         xbmc.log("%s: %s" %(logging_prefix, string))
 
-
-class myPlayer(xbmc.Player):
-    def __init__(self, parent, *args, **kwargs):
-        xbmc.Player.__init__(self, *args, **kwargs)
-        self.dawindow = parent
-
-    def onPlayBackStarted(self):
-        self.dawindow.close()
-
-    def onPlayBackStopped(self):
-        self.onPlayBackEnded()
-
-    def onPlayBackEnded(self):
-        self.dawindow.list_refill = True
-        self.dawindow.doModal()
-
-
-class GamepassGUI(xbmcgui.WindowXMLDialog):
+class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
         self.season_list = None
         self.season_items = []
@@ -83,11 +66,11 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.focusId = 100
         self.seasons_and_weeks = gpr.get_seasons_and_weeks()
 
-        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+        xbmcgui.WindowXML.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
     def onInit(self):
-        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
         self.season_list = self.window.getControl(210)
         self.weeks_list = self.window.getControl(220)
         self.games_list = self.window.getControl(230)
@@ -108,6 +91,8 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         else:
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
+
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -269,14 +254,9 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
         self.games_list.addItems(self.games_items)
 
     def playUrl(self, url):
-        player = myPlayer(parent=self)
         xbmc.executebuiltin("Dialog.Close(busydialog)")
-        player.play(url)
-
-        while player.isPlaying():
-            xbmc.sleep(2000)
-
-        del player
+        self.list_refill = True
+        xbmc.Player().play(url)
 
     def init(self, level):
         if level == 'season':
@@ -460,6 +440,7 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
                                 item.setProperty('url', cf_url)
                                 coachesItems.append(item)
 
+                            self.list_refill = True
                             coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
                             coachGui.doModal()
                             del coachGui
@@ -515,16 +496,16 @@ class GamepassGUI(xbmcgui.WindowXMLDialog):
             dialog.ok(language(30021),
                       language(30024))
 
-class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
+class CoachesFilmGUI(xbmcgui.WindowXML):
     def __init__(self, xmlFilename, scriptPath, plays, defaultSkin = "Default", defaultRes = "720p"):
         self.playsList = None
         self.playsItems = plays
 
-        xbmcgui.WindowXMLDialog.__init__(self, xmlFilename, scriptPath, defaultSkin, defaultRes)
+        xbmcgui.WindowXML.__init__(self, xmlFilename, scriptPath, defaultSkin, defaultRes)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
     def onInit(self):
-        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowDialogId())
+        self.window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
         if addon.getSetting('coach_lite') == 'true':
             self.window.setProperty('coach_lite', 'true')
 
@@ -533,6 +514,7 @@ class CoachesFilmGUI(xbmcgui.WindowXMLDialog):
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
         url = self.playsList.getListItem(0).getProperty('url')
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
         xbmc.executebuiltin('PlayMedia(%s,False,1)' %url)
 
     def onClick(self, controlId):
