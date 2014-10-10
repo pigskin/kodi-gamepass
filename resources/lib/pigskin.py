@@ -6,6 +6,7 @@ import cookielib
 import hashlib
 import random
 import m3u8
+import urllib
 from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
@@ -186,12 +187,14 @@ class pigskin(object):
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
         self.log('NFL Dict %s' %m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('_ipad', '')
+        temp_path, temp_parm = m3u8_url.split('?', 1)
+        m3u8_header = {'Cookie' : 'nlqptid=' + temp_parm, 'User-Agent' : 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Accept-encoding' : 'identity', 'Connection' : 'keep-alive'}
 
         m3u8_obj = m3u8.load(m3u8_url)
         if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
             for playlist in m3u8_obj.playlists:
                 bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
-                streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1]
+                streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
         else:
             streams['only available'] = m3u8_url
 
