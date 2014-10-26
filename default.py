@@ -113,6 +113,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.season_items = []
         for season in sorted(self.seasons_and_weeks.keys(), reverse=True):
             listitem = xbmcgui.ListItem(season)
+
             self.season_items.append(listitem)
         self.season_list.addItems(self.season_items)
 
@@ -377,6 +378,14 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.main_selection = 'GamePass/Rewind'
                     self.window.setProperty('NW_clicked', 'false')
                     self.window.setProperty('GP_clicked', 'true')
+
+                    #display games of current week for usability purposes
+                    cur_s_w = gpr.get_current_season_and_week()
+                    self.selected_season = cur_s_w.keys()[0]
+                    self.selected_week = cur_s_w.values()[0]
+
+                    self.display_seasons_weeks()
+                    self.display_weeks_games()
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
@@ -412,10 +421,6 @@ class GamepassGUI(xbmcgui.WindowXML):
                         game_id = selectedGame.getProperty('game_id')
                         game_versions = selectedGame.getProperty('game_versions')
 
-                        # Check for coaches film availability
-                        if gpr.check_for_coachestape(game_id, self.selected_season):
-                            game_versions = game_versions + ' Coach'
-
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
                                 game_version = self.select_version(game_versions)
@@ -424,6 +429,10 @@ class GamepassGUI(xbmcgui.WindowXML):
                             else:
                                 game_version = 'live'
                         else:
+                            # Check for coaches film availability
+                            if gpr.check_for_coachestape(game_id, self.selected_season):
+                                game_versions = game_versions + ' Coach'
+
                             game_version = self.select_version(game_versions)
 
                         if game_version == 'coach':
@@ -449,6 +458,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             bitrate = self.select_bitrate(game_streams.keys())
                             game_url = game_streams[bitrate]
                             self.playUrl(game_url)
+
             elif self.main_selection == 'NFL Network':
                 if controlId == 210: # season is clicked
                     self.init('season')
