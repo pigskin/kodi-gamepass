@@ -1,4 +1,18 @@
-2014.08.0? v0.5.2 -- Reggie White "The Minister of Defense" Edition
+2014.11.10 v0.6.0 -- Dan Marino Edition
++ New Feature: Coaches Film (22 man view) (BaumSchorle)
++   Interface work (BaumSchorle and eriksoderblom)
++ New Feature: Super Bowl Archives (BaumSchorle)
++ New Feature/Setting: Hide Game Duration (Veronit)
++ New Feature/Setting: Display time in 12 or 24 hour clock (dahlSTROM)
++ Bug fix: Hard Knocks 2013 fixed (BaumSchorle)
++ Bug fix: UTF-8 issues (Alexqw)
++ Split settings page into categories (eriksoderblom)
++ Unify stream logic so all use publishpoint (BaumSchorle)
++ New internal dependency: m3u8
++ Assorted bug fixes
++ Code cleanup
+
+2014.08.03 v0.5.2 -- Reggie White "The Minister of Defense" Edition
 + Bug fix: Visually distinguish selected past week from unselected future week (eriksoderblom)
 + Bug fix: Skin opened despite login failure (Alexqw)
 + Bug fix: Playing Total Access 2014 froze addon (Alexqw)
