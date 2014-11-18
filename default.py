@@ -39,7 +39,21 @@ if addon.getSetting('debug') == 'false':
 else:
     debug = True
 
-gpr = pigskin(sub_name, cookiefile=cookie_file, debug=debug)
+proxy_config = None
+if addon.getSetting('proxy_enabled') == 'true':
+    proxy_config = {
+        'scheme': addon.getSetting('proxy_scheme'),
+        'host': addon.getSetting('proxy_host'),
+        'port': addon.getSetting('proxy_port'),
+        'auth': {
+            'username': addon.getSetting('proxy_username'),
+            'password': addon.getSetting('proxy_password'),
+        },
+    }
+    if proxy_config['auth']['username'] == '' and proxy_config['auth']['password'] == '':
+        proxy_config['auth'] = None
+
+gpr = pigskin(sub_name, proxy_config, cookiefile=cookie_file, debug=debug)
 
 def addon_log(string):
     if debug:

@@ -18,7 +18,7 @@ except ImportError:
 import xmltodict
 
 class pigskin(object):
-    def __init__(self, subscription, cookiefile, debug=False):
+    def __init__(self, subscription, proxy_config, cookiefile, debug=False):
         self.subscription = subscription
         self.debug = debug
         self.non_seasonal_shows = {'Super Bowl Archives': '117'}
@@ -50,6 +50,13 @@ class pigskin(object):
             raise ValueError('"%s" is not a supported subscription.' %subscription)
 
         self.http_session = requests.Session()
+        if proxy_config is not None:
+            proxy_url = self.build_proxy_url(proxy_config)
+            if proxy_url != '':
+                self.http_session.proxies = {
+                    'http': proxy_url,
+                    'https': proxy_url,
+                }
         self.cookie_jar = cookielib.LWPCookieJar(cookiefile)
         try:
             self.cookie_jar.load(ignore_discard=True, ignore_expires=True)
@@ -74,6 +81,40 @@ class pigskin(object):
                 print '[pigskin]: %s' %string.replace(bom, '')
             except:
                 pass
+
+    def build_proxy_url(self, config):
+        proxy_url = ''
+
+        if 'scheme' in config:
+            scheme = config['scheme'].lower().strip()
+            if scheme != 'http' and scheme != 'https':
+                return ''
+            proxy_url += scheme + '://'
+
+        if 'auth' in config and config['auth'] is not None:
+            try:
+                username = config['auth']['username']
+                password = config['auth']['password']
+                if username == '' or password == '':
+                    return ''
+                proxy_url += '%s:%s@' % (urllib.quote(username), urllib.quote(password))
+            except KeyError:
+                return ''
+
+        if 'host' not in config or config['host'].strip() == '':
+            return ''
+        proxy_url += config['host'].strip()
+
+        if 'port' in config:
+            try:
+                port = int(config['port'])
+                if port <= 0 or port > 65535:
+                    return ''
+                proxy_url += ':' + str(port)
+            except ValueError:
+                return ''
+
+        return proxy_url
 
     def check_for_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
