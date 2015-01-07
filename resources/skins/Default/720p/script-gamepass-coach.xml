@@ -92,8 +92,8 @@
                     <texture>GamePass/week_bg.png</texture>
                 </control>
                 <control type="label">
-                    <description>Week/Show text</description>
-                    <left>140</left>
+                    <description>Clip description, not focused</description>
+                    <left>5</left>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -120,8 +120,8 @@
                     <visible>!Control.HasFocus(110)</visible>
                 </control>
                 <control type="label">
-                    <description>Week/Show text</description>
-                    <left>140</left>
+                    <description>Clip description, focused</description>
+                    <left>5</left>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
@@ -135,8 +135,8 @@
                     <visible>Control.HasFocus(110)</visible>
                 </control>
                 <control type="label">
-                    <description>Week/Show text</description>
-                    <left>140</left>
+                    <description>Clip description, not focused</description>
+                    <left>5</left>
                     <width>270</width>
                     <align>center</align>
                     <aligny>center</aligny>
