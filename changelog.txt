@@ -1,3 +1,11 @@
+2015.01.?? v0.7.0 -- ? Edition
++ Support for HTTP proxies (timewasted)
++   Direct support in lib/pigskin for testing
++   Support via Kodi in the addon's settings
++ Skin support for Helix (eriksoderblom)
++ Reflect upstream rename from XBMC to Kodi (Alexqw)
++ Dropped support for Gotham and earlier
+
 2014.11.10 v0.6.0 -- Dan Marino Edition
 + New Feature: Coaches Film (22 man view) (BaumSchorle)
 +   Interface work (BaumSchorle and eriksoderblom)
