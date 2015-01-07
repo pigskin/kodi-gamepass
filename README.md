@@ -1,4 +1,4 @@
-# NFL Game Pass/Rewind XBMC Plugin #
+# NFL Game Pass/Rewind Kodi Plugin #
 **version 0.6.0 — Dan Marino Edition**
 
 Before reading any further, please understand that while this addon does
@@ -11,10 +11,15 @@ If you're interested in helping out, just drop us an email or send a pull
 request. Patches and (constructive) input are always welcome.
 
 ## Any Dependencies? ##
-Until this addon is part of an official XBMC repository (hopefully sometime
-soon), dependencies will not be installed automatically.
- * xmltodict (http://mirrors.xbmc.org/addons/frodo/script.module.xmltodict/)
- * Requests 2.x (http://mirrors.xbmc.org/addons/frodo/script.module.requests/)
+
+This addon requires Kodi Helix or later. XBMC Gotham and earlier are no longer
+supported due to upstream changes in the skinning system.
+
+Now that this addon is part of the official Kodi repository, all dependencies
+are installed automatically. However, if you're installing straight from
+source, make sure the following two dependencies are installed:
+ * xmltodict (http://mirrors.kodi.tv/addons/frodo/script.module.xmltodict/)
+ * Requests 2.x (http://mirrors.kodi.tv/addons/frodo/script.module.requests/)
 
 ## What is NFL Game Pass? ##
 
@@ -30,9 +35,9 @@ NFL Game Rewind is the USA version of Game Pass, but the service is blacked out
 during live games, and doesn't have access to NFL Network - Live, many of the
 archived shows, etc.
 
-## Why write a plugin for XBMC? ##
+## Why write a plugin for Kodi? ##
 
-First off, we love XBMC and like consuming media through its interface.
+First off, we love Kodi and like consuming media through its interface.
 Secondly, while there is a nice Flash interface, it's... well... written in
 Flash. The client is a resource hog, the interface is frequently buggy, and it
 includes a bunch of bells and whistles (social media, for example) that are
@@ -43,15 +48,15 @@ simply distracting. We're here to watch a game, nothing else.
 By now, most core features are supported.
 
  * Archived games from 2011 to 2014 (both full and condensed)
- * Live games (requires Gotham)
+ * Live games
  * Coaches Film (22 man view)
- * NFL Network - Live (requires Gotham)
+ * NFL Network - Live
  * A Football Life
  * NFL Films Presents
  * NFL Gameday
  * Playbook
  * NFL RedZone Archives
- * NFL RedZone - Live (requires Gotham)
+ * NFL RedZone - Live
  * Sound FX
  * Super Bowl Archives
  * NFL Total Access
@@ -74,4 +79,3 @@ A rough roadmap follows:
 
 * Continue work towards feature completeness
 * Stabilize Game Rewind support
-* Submit to main XBMC repository
