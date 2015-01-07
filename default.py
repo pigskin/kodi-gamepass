@@ -1,5 +1,5 @@
 """
-An XBMC addon/skin for NFL Game Pass and Game Rewind.
+A Kodi addon/skin for NFL Game Pass and Game Rewind.
 """
 import calendar
 from datetime import datetime
@@ -230,7 +230,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             try:
                 # convert EST to GMT by adding 6 hours
                 week_date = week['@start'] + ' 06:00'
-                # avoid super annoying bug http://forum.xbmc.org/showthread.php?tid=112916
+                # avoid super annoying bug http://forum.kodi.tv/showthread.php?tid=112916
                 week_datetime = datetime(*(time.strptime(week_date, '%Y%m%d %H:%M')[0:6]))
                 now_datetime = datetime.utcnow()
 

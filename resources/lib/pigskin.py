@@ -1,5 +1,5 @@
 """
-An XBMC plugin agnostic library for NFL Game Pass and Game Rewind support.
+A Kodi-agnostic library for NFL Game Pass and Game Rewind support.
 """
 import codecs
 import cookielib
@@ -11,7 +11,7 @@ from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
 
-try: # XBMC calls v2 requests2... :-/
+try: # Kodi calls v2 requests2... :-/
     import requests2 as requests
 except ImportError:
     import requests

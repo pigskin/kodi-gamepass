@@ -1,4 +1,4 @@
-# XBMC NFL Game Pass language file
+# Kodi NFL Game Pass language file
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-GamePass\n"
