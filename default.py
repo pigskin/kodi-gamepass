@@ -148,18 +148,20 @@ class GamepassGUI(xbmcgui.WindowXML):
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
         for game in games:
-            if game['homeTeam']['name'] is None: # sometimes the first item is empty
-                continue
-
+            
             game_info = ''
             game_id = game['id']
             game_versions = []
             isPlayable = 'true'
             home_team = game['homeTeam']
             away_team = game['awayTeam']
-            game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
-            game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-
+            if self.selected_week != '221':
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
+                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
+            else:
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['city'], home_team['city'])
+                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %('', away_team['city'], '', home_team['city'])
+            
             for key, value in {'Condensed': 'condensedId', 'Full': 'programId'}.items():
                 if game.has_key(value):
                     game_versions.append(key)
@@ -208,8 +210,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                     game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
 
             listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
-            listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
-            listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/5.31/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
+            listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/6.11/img/logos/teams-matte-80x53/%s.png' %away_team['id'])
+            listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/6.11/img/logos/teams-matte-80x53/%s.png' %home_team['id'])
             listitem.setProperty('game_info', game_info)
             listitem.setProperty('is_game', 'true')
             listitem.setProperty('is_show', 'false')
