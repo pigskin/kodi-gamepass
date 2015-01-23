@@ -148,6 +148,8 @@ class GamepassGUI(xbmcgui.WindowXML):
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
         for game in games:
+            if game['homeTeam']['id'] is None: # sometimes the first item is empty
+                continue
             
             game_info = ''
             game_id = game['id']
@@ -155,13 +157,16 @@ class GamepassGUI(xbmcgui.WindowXML):
             isPlayable = 'true'
             home_team = game['homeTeam']
             away_team = game['awayTeam']
-            if self.selected_week != '221':
+
+            # Pro-bowl doesn't have a team "name" only a team city, which is the
+            # team name... wtf
+            if game['homeTeam']['name'] is None:
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['city'], home_team['city'])
+                game_name_full = game_name_shrt
+            else:
                 game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['name'], home_team['name'])
                 game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %(away_team['city'], away_team['name'], home_team['city'], home_team['name'])
-            else:
-                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' %(away_team['city'], home_team['city'])
-                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' %('', away_team['city'], '', home_team['city'])
-            
+
             for key, value in {'Condensed': 'condensedId', 'Full': 'programId'}.items():
                 if game.has_key(value):
                     game_versions.append(key)
