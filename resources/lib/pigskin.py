@@ -117,7 +117,13 @@ class pigskin(object):
         """Return whether coaches tape is available for a given game."""
         url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
         boxscore = self.make_request(url=url, method='get')
-        boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        try:
+            boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        except xmltodict.expat.ExpatError:
+            try:
+                boxscore_dict = xmltodict.parse(boxscore)
+            except xmltodict.expat.ExpatError:
+                return False
 
         try:
             if boxscore_dict['dataset']['@coach'] == 'true':
@@ -168,7 +174,13 @@ class pigskin(object):
         url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
 
         boxscore = self.make_request(url=url, method='get')
-        boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        try:
+            boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        except xmltodict.expat.ExpatError:
+            try:
+                boxscore_dict = xmltodict.parse(boxscore)
+            except xmltodict.expat.ExpatError:
+                return False
         for row in boxscore_dict['dataset']['table']['row']:
             playIDs[row['@PlayID']] = row['@PlayDescription']
 
