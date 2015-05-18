@@ -555,6 +555,8 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
 
 if __name__ == "__main__":
     addon_log('script starting')
+    xbmc.executebuiltin("Dialog.Close(busydialog)")
+
     try:
         gpr.login(username, password)
     except gpr.LoginFailure as error:
