@@ -26,12 +26,12 @@ if not xbmcvfs.exists(addon_profile):
 
 if addon.getSetting('subscription') == '0': # Game Pass
     cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
-    username = addon.getSetting('email')
+    username = addon.getSetting('username')
     password = addon.getSetting('password')
     sub_name = 'gamepass'
 else: # Game Rewind
     cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
-    username = addon.getSetting('gr_email')
+    username = addon.getSetting('gr_username')
     password = addon.getSetting('gr_password')
     sub_name = 'gamerewind'
 if addon.getSetting('debug') == 'false':
