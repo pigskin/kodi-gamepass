@@ -13,6 +13,12 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+"""
+Imports for font management
+"""
+from resources.lib.skinutils.skinutils import reload_skin
+from resources.lib.skinutils.fonts import FontManager
+
 from resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
@@ -556,6 +562,22 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
 if __name__ == "__main__":
     addon_log('script starting')
     xbmc.executebuiltin("Dialog.Close(busydialog)")
+
+    #Install custom fonts
+    try:
+        fm = FontManager()
+        skin_dir = os.path.join(addon_path, "resources/skins/Default")
+        xml_path = os.path.join(skin_dir, "720p/fonts.xml")
+        font_dir = os.path.join(skin_dir, "fonts")
+        fm.install_file(xml_path, font_dir)
+
+        reload_skin()
+    except:
+        addon_log(format_exc())
+        dialog = xbmcgui.Dialog()
+        dialog.ok('Epic Failure',
+                  language(30024))
+        sys.exit(0)
 
     try:
         gpr.login(username, password)
