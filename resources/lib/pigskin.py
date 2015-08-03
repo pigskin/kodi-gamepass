@@ -117,7 +117,13 @@ class pigskin(object):
         """Return whether coaches tape is available for a given game."""
         url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
         boxscore = self.make_request(url=url, method='get')
-        boxscore_dict = xmltodict.parse(boxscore)
+        try:
+            boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        except xmltodict.expat.ExpatError:
+            try:
+                boxscore_dict = xmltodict.parse(boxscore)
+            except xmltodict.expat.ExpatError:
+                return False
 
         try:
             if boxscore_dict['dataset']['@coach'] == 'true':
@@ -154,21 +160,19 @@ class pigskin(object):
         md5 = hashlib.md5(str(rand) + mac_address)
         return md5.hexdigest()
 
-    def get_manifest(self, video_path):
-        """Return the XML manifest of a stream."""
-        parsed_url = urlsplit(video_path)
-        url = ('http://' + parsed_url.netloc + '/play' +
-               '?url=' + parsed_url.path + '&' + parsed_url.query)
-        manifest_data = self.make_request(url=url, method='get')
-        return manifest_data
-
     def get_coaches_playIDs(self, game_id, season):
         """Return a dict of play IDs with associated play descriptions."""
         playIDs = {}
         url = self.boxscore_url + '/' + season + '/' + game_id + '.xml'
 
         boxscore = self.make_request(url=url, method='get')
-        boxscore_dict = xmltodict.parse(boxscore)
+        try:
+            boxscore_dict = xmltodict.parse(boxscore, encoding='cp1252')
+        except xmltodict.expat.ExpatError:
+            try:
+                boxscore_dict = xmltodict.parse(boxscore)
+            except xmltodict.expat.ExpatError:
+                return False
         for row in boxscore_dict['dataset']['table']['row']:
             playIDs[row['@PlayID']] = row['@PlayDescription']
 
@@ -196,14 +200,6 @@ class pigskin(object):
         sc_dict = xmltodict.parse(sc_data)['result']
         current_s_w = {sc_dict['currentSeason']: sc_dict['currentWeek']}
         return current_s_w
-
-    def get_stream_manifest(self, vpath, vtype):
-        """Return, as a dict, the manifest of a stream."""
-        self.get_current_season_and_week() # set cookies
-        video_path = self.get_video_path(vpath, vtype)
-        xml_manifest = self.get_manifest(video_path)
-        stream_manifest = self.parse_manifest(xml_manifest)
-        return stream_manifest
 
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
         """Return the URL for a stream."""
@@ -316,26 +312,6 @@ class pigskin(object):
             raise
 
         return seasons_and_weeks
-
-    def get_video_path(self, vpath, vtype):
-        """Return the "video path", which is the URL of stream's manifest."""
-        url = self.servlets_url + '/encryptvideopath'
-        plid = self.gen_plid()
-        post_data = {
-            'path': vpath,
-            'plid': plid,
-            'type': vtype,
-            'isFlex': 'true'
-        }
-        video_path_data = self.make_request(url=url, method='post', payload=post_data)
-
-        try:
-            video_path_dict = xmltodict.parse(video_path_data)['result']
-            self.log('Video Path Acquired Successfully.')
-            return video_path_dict['path']
-        except:
-            self.log('Video Path Acquisition Failed.')
-            return False
 
     def get_weeks_games(self, season, week_code):
         """Return a list of games for a week."""
