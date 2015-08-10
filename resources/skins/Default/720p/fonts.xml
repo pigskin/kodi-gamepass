@@ -1,0 +1,19 @@
+<fonts>
+	<fontset id="Default">
+		<font>
+			<name>nflgamepass_font10</name>
+			<filename>nflgamepass.ttf</filename>
+			<size>14</size>
+		</font>
+		<font>
+			<name>nflgamepass_font12</name>
+			<filename>nflgamepass.ttf</filename>
+			<size>17</size>
+		</font>
+		<font>
+			<name>nflgamepass_font13</name>
+			<filename>nflgamepass.ttf</filename>
+			<size>20</size>
+		</font>
+	</fontset>
+</fonts>
