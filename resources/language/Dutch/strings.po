@@ -86,7 +86,7 @@ msgid "Game Rewind"
 msgstr "Game Rewind"
 
 msgctxt "#30019"
-msgid "Choose Subscription"
+msgid "Subscription Type"
 msgstr "Kies abonnement"
 
 msgctxt "#30020"
