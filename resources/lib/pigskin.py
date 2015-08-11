@@ -14,6 +14,7 @@ from urlparse import urlsplit
 import requests
 import xmltodict
 
+
 class pigskin(object):
     def __init__(self, subscription, proxy_config, cookiefile, debug=False):
         self.subscription = subscription
@@ -44,7 +45,7 @@ class pigskin(object):
             self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
 
         else:
-            raise ValueError('"%s" is not a supported subscription.' %subscription)
+            raise ValueError('"%s" is not a supported subscription.' % subscription)
 
         self.http_session = requests.Session()
         if proxy_config is not None:
@@ -64,18 +65,19 @@ class pigskin(object):
     class LoginFailure(Exception):
         def __init__(self, value):
             self.value = value
+
         def __str__(self):
             return repr(self.value)
 
     def log(self, string):
         if self.debug:
             try:
-                print '[pigskin]: %s' %string
+                print '[pigskin]: %s' % string
             except UnicodeEncodeError:
                 # we can't anticipate everything in unicode they might throw at
                 # us, but we can handle a simple BOM
                 bom = unicode(codecs.BOM_UTF8, 'utf8')
-                print '[pigskin]: %s' %string.replace(bom, '')
+                print '[pigskin]: %s' % string.replace(bom, '')
             except:
                 pass
 
@@ -182,7 +184,7 @@ class pigskin(object):
 
     def get_coaches_url(self, game_id, game_date, event_id):
         """Return the URL for a coaches-film play."""
-        self.get_current_season_and_week() # set cookies
+        self.get_current_season_and_week()  # set cookies
         url = self.servlets_url + '/publishpoint'
 
         post_data = {'id': game_id, 'type': 'game', 'nt': '1', 'gt': 'coach',
@@ -206,7 +208,7 @@ class pigskin(object):
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None):
         """Return the URL for a stream."""
         streams = {}
-        self.get_current_season_and_week() # set cookies
+        self.get_current_season_and_week()  # set cookies
         url = self.servlets_url + '/publishpoint'
 
         if video_id == 'nfl_network':
@@ -221,13 +223,13 @@ class pigskin(object):
         headers = {'User-Agent': 'iPad'}
         m3u8_data = self.make_request(url=url, method='post', payload=post_data, headers=headers)
         m3u8_dict = xmltodict.parse(m3u8_data)['result']
-        self.log('NFL Dict %s' %m3u8_dict)
+        self.log('NFL Dict %s' % m3u8_dict)
         m3u8_url = m3u8_dict['path'].replace('_ipad', '')
         temp_path, temp_parm = m3u8_url.split('?', 1)
-        m3u8_header = {'Cookie' : 'nlqptid=' + temp_parm, 'User-Agent' : 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Accept-encoding' : 'identity', 'Connection' : 'keep-alive'}
+        m3u8_header = {'Cookie': 'nlqptid=' + temp_parm, 'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Accept-encoding': 'identity', 'Connection': 'keep-alive'}
 
         m3u8_obj = m3u8.load(m3u8_url)
-        if m3u8_obj.is_variant: # if this m3u8 contains links to other m3u8s
+        if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
             for playlist in m3u8_obj.playlists:
                 bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
                 streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
@@ -301,10 +303,10 @@ class pigskin(object):
                 season_dict = {}
 
                 for week in season['week']:
-                    if week['@section'] == "pre": # preseason
+                    if week['@section'] == "pre":  # preseason
                         week_code = '1' + week['@value'].zfill(2)
                         season_dict[week_code] = week
-                    else: # regular season and post season
+                    else:  # regular season and post season
                         week_code = '2' + week['@value'].zfill(2)
                         season_dict[week_code] = week
 
@@ -333,19 +335,19 @@ class pigskin(object):
 
         return games
 
-    # Handles neccesary steps and checks to login to Game Pass/Rewind
+    # Handles necessary steps and checks to login to Game Pass/Rewind
     def login(self, username=None, password=None):
         """Complete login process for Game Pass/Rewind. Errors (auth issues,
         blackout, etc) are raised as LoginFailure.
         """
         if self.check_for_subscription():
-            self.log('Already logged into %s' %self.subscription)
+            self.log('Already logged into %s' % self.subscription)
         else:
             if username and password:
-                self.log('Not (yet) logged into %s' %self.subscription)
+                self.log('Not (yet) logged into %s' % self.subscription)
                 self.login_to_account(username, password)
                 if not self.check_for_subscription():
-                    raise self.LoginFailure('%s login failed' %self.subscription)
+                    raise self.LoginFailure('%s login failed' % self.subscription)
                 elif self.subscription == 'gamerewind' and self.service_blackout():
                     raise self.LoginFailure('Game Rewind Blackout')
             else:
@@ -370,20 +372,20 @@ class pigskin(object):
 
     def make_request(self, url, method, payload=None, headers=None):
         """Make an http request. Return the response."""
-        self.log('Request URL: %s' %url)
-        self.log('Headers: %s' %headers)
+        self.log('Request URL: %s' % url)
+        self.log('Headers: %s' % headers)
 
         try:
             if method == 'get':
                 req = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
-            else: # post
+            else:  # post
                 req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
-            self.log('Response code: %s' %req.status_code)
-            self.log('Response: %s' %req.content)
+            self.log('Response code: %s' % req.status_code)
+            self.log('Response: %s' % req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             return req.content
         except requests.exceptions.RequestException as error:
-            self.log('Error: - %s' %error.value)
+            self.log('Error: - %s' % error.value)
 
     def parse_manifest(self, manifest):
         """Return a dict of the supplied XML manifest. Builds and adds
@@ -397,9 +399,9 @@ class pigskin(object):
                 url_path = stream['@url']
                 bitrate = url_path[(url_path.rindex('_') + 1):url_path.rindex('.')]
                 try:
-                    stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver']['@name'], url_path)
-                except TypeError: # if multiple servers are returned, use the first in the list
-                    stream['full_url'] = 'http://%s%s.m3u8' %(stream['httpservers']['httpserver'][0]['@name'], url_path)
+                    stream['full_url'] = 'http://%s%s.m3u8' % (stream['httpservers']['httpserver']['@name'], url_path)
+                except TypeError:  # if multiple servers are returned, use the first in the list
+                    stream['full_url'] = 'http://%s%s.m3u8' % (stream['httpservers']['httpserver'][0]['@name'], url_path)
 
                 streams[bitrate] = stream
             except KeyError:
