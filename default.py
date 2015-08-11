@@ -176,13 +176,13 @@ class GamepassGUI(xbmcgui.WindowXML):
                 game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (away_team['city'], away_team['name'], home_team['city'], home_team['name'])
 
             for key, value in {'Condensed': 'condensedId', 'Full': 'programId'}.items():
-                if game.has_key(value):
+                if value in game:
                     game_versions.append(key)
 
-            if game.has_key('isLive'):
+            if 'isLive' in game:
                 game_versions.append('Live')
 
-            if game.has_key('gameEndTimeGMT'):
+            if 'gameEndTimeGMT' in game:
                 # Show game duration only if user wants to see it
                 if addon.getSetting('hide_game_length') == 'false':
                     try:
@@ -191,12 +191,12 @@ class GamepassGUI(xbmcgui.WindowXML):
                         game_info = 'Final [CR] Duration: %s' % time.strftime('%H:%M:%S', time.gmtime((end_time - start_time).seconds))
                     except:
                         addon_log(format_exc())
-                        if game.has_key('result'):
+                        if 'result' in game:
                             game_info = 'Final'
                 else:
                     game_info = 'Final'
             else:
-                if game.has_key('isLive'):
+                if 'isLive' in game:
                     game_info = 'Live'
 
                 try:
