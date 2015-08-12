@@ -21,8 +21,8 @@ class pigskin(object):
         self.debug = debug
         self.non_seasonal_shows = {'Super Bowl Archives': '117'}
         self.seasonal_shows = {
-            'NFL Gameday': {'2014': '212', '2013': '179', '2012': '146'},
-            'Top 100 Players': {'2014': '217', '2013': '185', '2012': '153'}
+            'NFL Gameday': {'2015': '252', '2014': '212', '2013': '179', '2012': '146'},
+            'Top 100 Players': {'2015': '257', '2014': '217', '2013': '185', '2012': '153'}
         }
         self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
 
@@ -30,15 +30,15 @@ class pigskin(object):
             self.base_url = 'https://gamepass.nfl.com/nflgp'
             self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
             self.seasonal_shows.update({
-                'Playbook': {'2014': '213', '2013': '180', '2012': '147'},
-                'NFL Total Access': {'2014': '214', '2013': '181', '2012': '148'},
-                'NFL RedZone Archives': {'2014': '221', '2013': '182', '2012': '149'},
-                'Sound FX': {'2014': '215', '2013': '183', '2012': '150'},
+                'Playbook': {'2015': '255', '2014': '213', '2013': '180', '2012': '147'},
+                'NFL Total Access': {'2015': '254', '2014': '214', '2013': '181', '2012': '148'},
+                'NFL RedZone Archives': {'2015': '248', '2014': '221', '2013': '182', '2012': '149'},
+                'Sound FX': {'2015': '256', '2014': '215', '2013': '183', '2012': '150'},
                 'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
-                'A Football Life': {'2014': '218', '2013': '186', '2012': '154'},
+                'A Football Life': {'2015': '249', '2014': '218', '2013': '186', '2012': '154'},
                 'NFL Films Presents': {'2014': '219', '2013': '187'},
-                'Hard Knocks': {'2014': '220', '2013': '223'},
-                'Hall of Fame': {'2014': '222'}
+                'Hard Knocks': {'2015': '251', '2014': '220', '2013': '223'},
+                'Hall of Fame': {'2015': '253', '2014': '222'}
             })
         elif subscription == 'gamerewind':
             self.base_url = 'https://gamerewind.nfl.com/nflgr'
