@@ -11,10 +11,10 @@
         </control>
         <control type="label" id="99">
             <description>Title text</description>
-            <left>92</left>
+            <left>15</left>
             <height>60</height>
             <top>10</top>
-            <width>1300</width>
+            <width>1320</width>
             <align>center</align>
             <aligny>center</aligny>
             <info></info>
@@ -27,8 +27,8 @@
 
         <control type="image">
             <description>Video shadow</description>
-            <left>7</left>
-            <top>85</top>
+            <left>17</left>
+            <top>175</top>
             <width>1290</width>
             <height>730</height>
             <aspectratio>stretch</aspectratio>
@@ -37,7 +37,7 @@
         </control>
         <control type="videowindow" id="100">
             <description>1280x720 Video</description>
-            <left>12</left>
+            <left>22</left>
             <top>0</top>
             <width>1280</width>
         </control>
@@ -46,37 +46,37 @@
             <visible>Control.IsVisible(100) + Player.HasMedia</visible>
 
             <control type="progress">
-                <left>8</left>
-                <top>830</top>
-                <width>968</width>
+                <left>18</left>
+                <top>920</top>
+                <width>1288</width>
                 <height>20</height>
                 <texturebg border="8" colordiffuse="66CCCCCC">GamePass/progressbg.png</texturebg>
                 <lefttexture>-</lefttexture>
                 <midtexture border="8" colordiffuse="CCFFFFFF">GamePass/progress.png</midtexture>
                 <righttexture>-</righttexture>
                 <overlaytexture>-</overlaytexture>
-                <info>Player.Progress</info>   
+                <info>Player.Progress</info>
             </control>
 
             <control type="label">
                 <description>Remaining time</description>
-                <top>845</top>
-                <left>760</left>
+                <top>940</top>
+                <left>988</left>
                 <height>30</height>
-                <width>200</width>
+                <width>300</width>
                 <align>right</align>
                 <aligny>center</aligny>
                 <label>$INFO[Player.Time] / $INFO[Player.Duration]</label>
-                <font>font12</font>
+                <font>nflgamepass_font12</font>
                 <textcolor>FFEEEEEE</textcolor>
             </control>
         </control>
 
         <control type="list" id="110">
             <description>Play list container</description>
-            <left>1590</left>
+            <left>1329</left>
             <top>0</top>
-            <width>320</width>
+            <width>580</width>
             <height>1080</height>
             <viewtype label="list">list</viewtype>
             <orientation>vertical</orientation>
@@ -85,36 +85,36 @@
             <onleft>90</onleft>
             <onright>60</onright>
             <visible>![Player.HasMedia + Control.IsVisible(101)]</visible>
-            <itemlayout width="320" height="60">
+            <itemlayout width="580" height="60">
                 <control type="image">
-                    <width>320</width>
+                    <width>580</width>
                     <height>60</height>
                     <texture>GamePass/week_bg.png</texture>
                 </control>
                 <control type="label">
                     <description>Clip description, not focused</description>
                     <left>5</left>
-                    <width>310</width>
+                    <width>570</width>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>font12</font>
+                    <font>nflgamepass_font12</font>
                     <textcolor>FF111111</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
                 </control>
             </itemlayout>
-            <focusedlayout width="320" height="60">
+            <focusedlayout width="580" height="60">
                 <control type="image">
-                    <width>320</width>
+                    <width>580</width>
                     <height>60</height>
                     <texture>GamePass/week_focus.png</texture>
                     <visible>Control.HasFocus(110)</visible>
                 </control>
                 <control type="image">
-                    <width>320</width>
+                    <width>580</width>
                     <height>60</height>
                     <texture>GamePass/week_focus2.png</texture>
                     <visible>!Control.HasFocus(110)</visible>
@@ -122,12 +122,12 @@
                 <control type="label">
                     <description>Clip description, focused</description>
                     <left>5</left>
-                    <width>310</width>
+                    <width>570</width>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>font12</font>
+                    <font>nflgamepass_font12</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -137,12 +137,12 @@
                 <control type="label">
                     <description>Clip description, not focused</description>
                     <left>5</left>
-                    <width>310</width>
+                    <width>570</width>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>font12</font>
+                    <font>nflgamepass_font12</font>
                     <textcolor>FF111111</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -152,7 +152,7 @@
             </focusedlayout>
         </control>
         <control type="scrollbar" id="60">
-            <left>1911</left>
+            <left>1910</left>
             <top>0</top>
             <width>10</width>
             <height>720</height>
