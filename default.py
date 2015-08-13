@@ -480,6 +480,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 coachesItems.append(item)
 
                             self.list_refill = True
+                            xbmc.executebuiltin("Dialog.Close(busydialog)")
                             coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
                             coachGui.doModal()
                             del coachGui
