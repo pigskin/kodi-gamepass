@@ -463,7 +463,7 @@
                 <control type="label">
                     <description>Game competitors text</description>
                     <left>115</left>
-                    <top>8</top>
+                    <top>2</top>
                     <width>550</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -479,7 +479,7 @@
                 <control type="label">
                     <description>Game description text</description>
                     <left>115</left>
-                    <top>40</top>
+                    <top>36</top>
                     <width>550</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -493,16 +493,16 @@
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="label">
-                    <description>Upcoming game</description>
+                    <description>Upcoming Game</description>
                     <left>115</left>
-                    <top>70</top>
+                    <top>64</top>
                     <width>550</width>
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
-                    <label>[B]Upcoming game[/B]</label>
-                    <font>nflgamepass_font10</font>
+                    <label>» Upcoming Game «</label>
+                    <font>nflgamepass_font12</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -594,7 +594,7 @@
                 <control type="label">
                     <description>Game competitors text</description>
                     <left>115</left>
-                    <top>8</top>
+                    <top>2</top>
                     <width>550</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -610,7 +610,7 @@
                 <control type="label">
                     <description>Game description text</description>
                     <left>115</left>
-                    <top>40</top>
+                    <top>36</top>
                     <width>550</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -624,16 +624,16 @@
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="label">
-                    <description>Upcoming game</description>
+                    <description>Upcoming Game</description>
                     <left>115</left>
-                    <top>70</top>
+                    <top>64</top>
                     <width>550</width>
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
-                    <label>[B]Upcoming game[/B]</label>
-                    <font>nflgamepass_font10</font>
+                    <label>» Upcoming Game «</label>
+                    <font>nflgamepass_font12</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>

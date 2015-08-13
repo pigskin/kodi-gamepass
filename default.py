@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 A Kodi addon/skin for NFL Game Pass and Game Rewind.
 """
@@ -197,7 +198,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     game_info = 'Final'
             else:
                 if 'isLive' in game:
-                    game_info = 'Live'
+                    game_info = '» Live «'
 
                 try:
                     if addon.getSetting('local_tz') == '1':  # Localize and use 12-hour clock
