@@ -364,13 +364,10 @@ class pigskin(object):
         """Blindly authenticate to Game Pass/Rewind. Use
         check_for_subscription() to determine success.
         """
-        url = 'https://id.s.nfl.com/login'
+        url = self.base_url + '/secure/nfllogin'
         post_data = {
             'username': username,
-            'password': password,
-            'vendor_id': 'nflptnrnln',
-            'error_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule',
-            'success_url': self.base_url + '/secure/login?redirect=loginform&redirectnosub=packages&redirectsub=schedule'
+            'password': password
         }
         self.make_request(url=url, method='post', payload=post_data)
 
