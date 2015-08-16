@@ -16,7 +16,7 @@ import xmltodict
 
 
 class pigskin(object):
-    def __init__(self, subscription, proxy_config, cookiefile, debug=False):
+    def __init__(self, subscription, proxy_config, cookie_file, debug=False):
         self.subscription = subscription
         self.debug = debug
         self.non_seasonal_shows = {'Super Bowl Archives': '117'}
@@ -55,7 +55,7 @@ class pigskin(object):
                     'http': proxy_url,
                     'https': proxy_url,
                 }
-        self.cookie_jar = cookielib.LWPCookieJar(cookiefile)
+        self.cookie_jar = cookielib.LWPCookieJar(cookie_file)
         try:
             self.cookie_jar.load(ignore_discard=True, ignore_expires=True)
         except IOError:

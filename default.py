@@ -24,20 +24,20 @@ from resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
-addon_path = xbmc.translatePath(addon.getAddonInfo('path'))
-addon_profile = xbmc.translatePath(addon.getAddonInfo('profile'))
-logging_prefix = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
+ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
+ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
+LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
-if not xbmcvfs.exists(addon_profile):
-    xbmcvfs.mkdir(addon_profile)
+if not xbmcvfs.exists(ADDON_PROFILE):
+    xbmcvfs.mkdir(ADDON_PROFILE)
 
 if addon.getSetting('subscription') == '0':  # Game Pass
-    cookie_file = os.path.join(addon_profile, 'gp_cookie_file')
+    cookie_file = os.path.join(ADDON_PROFILE, 'gp_cookie_file')
     username = addon.getSetting('email')
     password = addon.getSetting('password')
     sub_name = 'gamepass'
 else:  # Game Rewind
-    cookie_file = os.path.join(addon_profile, 'gr_cookie_file')
+    cookie_file = os.path.join(ADDON_PROFILE, 'gr_cookie_file')
     username = addon.getSetting('gr_email')
     password = addon.getSetting('gr_password')
     sub_name = 'gamerewind'
@@ -60,12 +60,12 @@ if addon.getSetting('proxy_enabled') == 'true':
     if proxy_config['auth']['username'] == '' and proxy_config['auth']['password'] == '':
         proxy_config['auth'] = None
 
-gpr = pigskin(sub_name, proxy_config, cookiefile=cookie_file, debug=debug)
+gpr = pigskin(sub_name, proxy_config, cookie_file=cookie_file, debug=debug)
 
 
 def addon_log(string):
     if debug:
-        xbmc.log("%s: %s" % (logging_prefix, string))
+        xbmc.log("%s: %s" % (LOGGING_PREFIX, string))
 
 
 class GamepassGUI(xbmcgui.WindowXML):
@@ -92,7 +92,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         xbmcgui.WindowXML.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
-    def onInit(self):
+    def onInit(self):  # pylint: disable=invalid-name
         self.window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
         self.season_list = self.window.getControl(210)
         self.weeks_list = self.window.getControl(220)
@@ -284,7 +284,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 addon_log('Directory name: %s' % i['name'])
         self.games_list.addItems(self.games_items)
 
-    def playUrl(self, url):
+    def play_url(self, url):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         self.list_refill = True
         xbmc.Player().play(url)
@@ -384,12 +384,12 @@ class GamepassGUI(xbmcgui.WindowXML):
 
         return game_version
 
-    def onFocus(self, controlId):
+    def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
         if controlId in [210, 220, 230, 240]:
             self.focusId = controlId
 
-    def onClick(self, controlId):
+    def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
             xbmc.executebuiltin("ActivateWindow(busydialog)")
             if controlId in [110, 120, 130]:
@@ -481,14 +481,14 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                             self.list_refill = True
                             xbmc.executebuiltin("Dialog.Close(busydialog)")
-                            coachGui = CoachesFilmGUI('script-gamepass-coach.xml', addon_path, plays=coachesItems)
+                            coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
                             coachGui.doModal()
                             del coachGui
                         else:
                             game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
                             bitrate = self.select_bitrate(game_streams.keys())
                             game_url = game_streams[bitrate]
-                            self.playUrl(game_url)
+                            self.play_url(game_url)
 
             elif self.main_selection == 'NFL Network':
                 if controlId == 210:  # season is clicked
@@ -508,19 +508,19 @@ class GamepassGUI(xbmcgui.WindowXML):
                     addon_log('Video-Streams: %s' % video_streams)
                     bitrate = self.select_bitrate(video_streams.keys())
                     video_url = video_streams[bitrate]
-                    self.playUrl(video_url)
+                    self.play_url(video_url)
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
                         rz_live_streams = gpr.get_publishpoint_streams('redzone')
                         bitrate = self.select_bitrate(rz_live_streams.keys())
                         rz_live_url = rz_live_streams[bitrate]
-                        self.playUrl(rz_live_url)
+                        self.play_url(rz_live_url)
                     elif show_name == 'NFL Network - Live':
                         nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
                         bitrate = self.select_bitrate(nw_live_streams.keys())
                         nw_live_url = nw_live_streams[bitrate]
-                        self.playUrl(nw_live_url)
+                        self.play_url(nw_live_url)
             xbmc.executebuiltin("Dialog.Close(busydialog)")
         except Exception:  # catch anything that might fail
             xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -531,14 +531,14 @@ class GamepassGUI(xbmcgui.WindowXML):
 
 
 class CoachesFilmGUI(xbmcgui.WindowXML):
-    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin="Default", defaultRes="720p"):
+    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin="Default", defaultRes="720p"):  # pylint: disable=invalid-name
         self.playsList = None
         self.playsItems = plays
 
         xbmcgui.WindowXML.__init__(self, xmlFilename, scriptPath, defaultSkin, defaultRes)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
 
-    def onInit(self):
+    def onInit(self):  # pylint: disable=invalid-name
         self.window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
         if addon.getSetting('coach_lite') == 'true':
             self.window.setProperty('coach_lite', 'true')
@@ -551,7 +551,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
 
-    def onClick(self, controlId):
+    def onClick(self, controlId):  # pylint: disable=invalid-name
         if controlId == 110:
             url = self.playsList.getSelectedItem().getProperty('url')
             xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
@@ -596,7 +596,7 @@ if __name__ == "__main__":
                   language(30024))
         sys.exit(0)
 
-    gui = GamepassGUI('script-gamepass.xml', addon_path)
+    gui = GamepassGUI('script-gamepass.xml', ADDON_PATH)
     gui.doModal()
     del gui
 

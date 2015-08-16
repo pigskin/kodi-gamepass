@@ -1,4 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Though the id says this is a plugin, it's actually a script (see extension
+     point). The addon started as a plugin, but became a script when it was
+     converted to a skinned addon. It is left unchanged so that users aren't
+     marooned on an old version. -->
 <addon id="plugin.video.nfl.gamepass"
        name="NFL Game Pass"
        version="0.7.3"
