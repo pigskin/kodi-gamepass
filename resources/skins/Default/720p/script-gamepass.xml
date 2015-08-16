@@ -138,7 +138,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -170,7 +170,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -187,7 +187,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -227,7 +227,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -259,7 +259,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -276,7 +276,7 @@
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -331,12 +331,11 @@
                     <left>5</left>
                     <top>0</top>
                     <width>270</width>
-                    <height>40</height>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF111111</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -387,12 +386,11 @@
                     <description>Week/Show text</description>
                     <left>5</left>
                     <width>270</width>
-                    <height>40</height>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -403,12 +401,11 @@
                     <description>Week/Show text</description>
                     <left>5</left>
                     <width>270</width>
-                    <height>40</height>
                     <align>center</align>
                     <aligny>center</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF111111</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -473,7 +470,7 @@
                     <aligny>top</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -489,7 +486,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -505,7 +502,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <label>» Upcoming Game «</label>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -521,7 +518,7 @@
                     <aligny>top</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -537,7 +534,7 @@
                     <aligny>top</aligny>
                     <scroll>false</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>nflgamepass_font10</font>
+                    <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>0</scrollspeed>
@@ -604,7 +601,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Label2</info>
-                    <font>nflgamepass_font13</font>
+                    <font>font13</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -620,7 +617,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -636,7 +633,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <label>» Upcoming Game «</label>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -652,7 +649,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Label</info>
-                    <font>nflgamepass_font12</font>
+                    <font>font12</font>
                     <textcolor>FF222222</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>50</scrollspeed>
@@ -668,7 +665,7 @@
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>nflgamepass_font10</font>
+                    <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
