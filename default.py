@@ -18,7 +18,7 @@ import xbmcvfs
 Imports for font management
 """
 from resources.lib.skinutils.skinutils import reload_skin
-from resources.lib.skinutils.fonts import FontXmlError, FontManager
+from resources.lib.skinutils.fonts import FontManager
 
 from resources.lib.pigskin import pigskin
 
@@ -569,7 +569,7 @@ if __name__ == "__main__":
         fm.install_file(xml_path, font_dir)
 
         reload_skin()
-    except FontXmlError:
+    except:
         addon_log(format_exc())
         dialog = xbmcgui.Dialog()
         dialog.ok('Epic Failure',
