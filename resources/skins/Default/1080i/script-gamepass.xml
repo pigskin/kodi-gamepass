@@ -31,15 +31,28 @@
               <height>45</height>
               <defaultcontrol>110</defaultcontrol>
               <control type="button" id="110">
-                  <description>Gamepass button</description>
+                  <description>International Gamepass button</description>
+                  <visible>IsEmpty(Window.Property(domestic))</visible>
                   <left>0</left>
                   <width>562</width>
                   <height>84</height>
                   <ondown>210</ondown>
                   <onleft>90</onleft>
                   <onright>130</onright>
-                  <texturefocus>GamePass/gamepass_focus.png</texturefocus>
-                  <texturenofocus>GamePass/gamepass_bg.png</texturenofocus>
+                  <texturefocus>GamePass/gp_int_focus.png</texturefocus>
+                  <texturenofocus>GamePass/gp_int_normal.png</texturenofocus>
+            </control>
+            <control type="button" id="110">
+                  <description>Domestic Gamepass button</description>
+                  <visible>!IsEmpty(Window.Property(domestic))</visible>
+                  <left>0</left>
+                  <width>562</width>
+                  <height>84</height>
+                  <ondown>210</ondown>
+                  <onleft>90</onleft>
+                  <onright>130</onright>
+                  <texturefocus>GamePass/gp_dom_focus.png</texturefocus>
+                  <texturenofocus>GamePass/gp_dom_normal.png</texturenofocus>
             </control>
             <control type="button" id="130">
                   <description>Network button</description>
@@ -55,12 +68,23 @@
         </control>
 
         <control type="image">
-            <description>Gamepass active overlay</description>
+            <description>International Gamepass active overlay</description>
+            <visible>IsEmpty(Window.Property(domestic))</visible>
             <left>210</left>
             <width>562</width>
             <height>84</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/gamepass_focus2.png</texture>
+            <texture>GamePass/gp_int_selected.png</texture>
+            <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
+        </control>
+        <control type="image">
+            <description>Domestic Gamepass active overlay</description>
+            <visible>!IsEmpty(Window.Property(domestic))</visible>
+            <left>210</left>
+            <width>562</width>
+            <height>84</height>
+            <aspectratio>stretch</aspectratio>
+            <texture>GamePass/gp_dom_selected.png</texture>
             <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
         </control>
         <control type="image">
