@@ -99,8 +99,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list = self.window.getControl(230)
         self.live_list = self.window.getControl(240)
 
-        if gpr.subscription == 'gamepass':
-            self.window.setProperty('gamepass', 'true')
+        if gpr.subscription == 'domestic':
+            self.window.setProperty('domestic', 'true')
 
         if self.list_refill:
             self.season_list.reset()
