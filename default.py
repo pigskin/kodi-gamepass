@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-A Kodi addon/skin for NFL Game Pass and Game Rewind.
+A Kodi addon/skin for NFL Game Pass
 """
 import calendar
 from datetime import datetime

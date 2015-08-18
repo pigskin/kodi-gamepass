@@ -1,5 +1,5 @@
 """
-A Kodi-agnostic library for NFL Game Pass and Game Rewind support.
+A Kodi-agnostic library for NFL Game Pass
 """
 import codecs
 import cookielib
