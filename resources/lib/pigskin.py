@@ -19,31 +19,31 @@ class pigskin(object):
     def __init__(self, subscription, proxy_config, cookie_file, debug=False):
         self.subscription = subscription
         self.debug = debug
+        self.base_url = 'https://gamepass.nfl.com/nflgp'
+        self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
         self.non_seasonal_shows = {'Super Bowl Archives': '117'}
         self.seasonal_shows = {
+            'A Football Life': {'2015': '249', '2014': '218', '2013': '186', '2012': '154'},
             'NFL Gameday': {'2015': '252', '2014': '212', '2013': '179', '2012': '146'},
+            'Hard Knocks': {'2015': '251', '2014': '220', '2013': '223'},
+            'Sound FX': {'2015': '256', '2014': '215', '2013': '183', '2012': '150'},
             'Top 100 Players': {'2015': '257', '2014': '217', '2013': '185', '2012': '153'}
         }
         self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
 
-        if subscription == 'gamepass':
-            self.base_url = 'https://gamepass.nfl.com/nflgp'
-            self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
+        if subscription == 'international':
             self.seasonal_shows.update({
                 'Playbook': {'2015': '255', '2014': '213', '2013': '180', '2012': '147'},
                 'NFL Total Access': {'2015': '254', '2014': '214', '2013': '181', '2012': '148'},
                 'NFL RedZone Archives': {'2015': '248', '2014': '221', '2013': '182', '2012': '149'},
-                'Sound FX': {'2015': '256', '2014': '215', '2013': '183', '2012': '150'},
                 'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
-                'A Football Life': {'2015': '249', '2014': '218', '2013': '186', '2012': '154'},
                 'NFL Films Presents': {'2014': '219', '2013': '187'},
-                'Hard Knocks': {'2015': '251', '2014': '220', '2013': '223'},
                 'Hall of Fame': {'2015': '253', '2014': '222'}
             })
-        elif subscription == 'gamerewind':
-            self.base_url = 'https://gamerewind.nfl.com/nflgr'
-            self.servlets_url = 'http://gamerewind.nfl.com/nflgr/servlets'
-
+        elif subscription == 'domestic':
+            self.seasonal_shows.update({
+                'America\'s Game': {}
+            })
         else:
             raise ValueError('"%s" is not a supported subscription.' % subscription)
 
@@ -337,10 +337,9 @@ class pigskin(object):
 
         return games
 
-    # Handles necessary steps and checks to login to Game Pass/Rewind
     def login(self, username=None, password=None):
-        """Complete login process for Game Pass/Rewind. Errors (auth issues,
-        blackout, etc) are raised as LoginFailure.
+        """Complete login process for Game Pass. Errors (auth issues, blackout,
+        etc) are raised as LoginFailure.
         """
         if self.check_for_subscription():
             self.log('Already logged into %s' % self.subscription)
@@ -350,8 +349,8 @@ class pigskin(object):
                 self.login_to_account(username, password)
                 if not self.check_for_subscription():
                     raise self.LoginFailure('%s login failed' % self.subscription)
-                elif self.subscription == 'gamerewind' and self.service_blackout():
-                    raise self.LoginFailure('Game Rewind Blackout')
+                elif self.subscription == 'domestic' and self.service_blackout():
+                    raise self.LoginFailure('Game Pass Domestic Blackout')
             else:
                 # might need sans-login check here for Game Pass, though as of
                 # 2014, there /may/ no longer be any sans-login regions.
@@ -359,8 +358,8 @@ class pigskin(object):
                 raise self.LoginFailure('No username and password supplied.')
 
     def login_to_account(self, username, password):
-        """Blindly authenticate to Game Pass/Rewind. Use
-        check_for_subscription() to determine success.
+        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        determine success.
         """
         url = self.base_url + '/secure/nfllogin'
         post_data = {
@@ -423,9 +422,9 @@ class pigskin(object):
             return False
 
     def service_blackout(self):
-        """Return whether Game Rewind is blacked out."""
+        """Return whether Game Pass is blacked out."""
         url = self.base_url + '/secure/schedule'
-        blackout_message = ('Due to broadcast restrictions, the NFL Game Rewind service is currently unavailable.'
+        blackout_message = ('Due to broadcast restrictions, NFL Game Pass Domestic is currently unavailable.'
                             ' Please check back later.')
         service_data = self.make_request(url=url, method='get')
 
