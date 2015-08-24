@@ -6,6 +6,7 @@ import cookielib
 import hashlib
 import random
 import m3u8
+import sys
 import urllib
 from traceback import format_exc
 from uuid import getnode as get_mac
@@ -61,6 +62,10 @@ class pigskin(object):
         except IOError:
             pass
         self.http_session.cookies = self.cookie_jar
+
+        if self.debug:
+            self.log('Debugging enabled.')
+            self.log('Python Version: %s' % sys.version)
 
     class LoginFailure(Exception):
         def __init__(self, value):
@@ -144,18 +149,18 @@ class pigskin(object):
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         if '</userName>' not in sc_data:
-            self.log('No user name detected.')
+            self.log('No user name detected in Game Pass response.')
             return False
         elif '</subscription>' not in sc_data:
-            self.log('No subscription detected.')
+            self.log('No subscription detected in Game Pass response.')
             return False
         else:
-            self.log('Subscription and user name detected.')
+            self.log('Subscription and user name detected in Game Pass response.')
             return True
 
     def gen_plid(self):
         """Return a "unique" MD5 hash. Getting the video path requires a plid,
-        which looks like an and always changes. Reusing a plid does not work,
+        which looks like MD5 and always changes. Reusing a plid does not work,
         so our guess is that it's a id for each instance of the player.
         """
         rand = random.getrandbits(10)
@@ -342,7 +347,7 @@ class pigskin(object):
         etc) are raised as LoginFailure.
         """
         if self.check_for_subscription():
-            self.log('Already logged into %s' % self.subscription)
+            self.log('Already logged into Game Pass %s' % self.subscription)
         else:
             if username and password:
                 self.log('Not (yet) logged into %s' % self.subscription)
