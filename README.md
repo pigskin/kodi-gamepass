@@ -1,5 +1,5 @@
 # NFL Game Pass Kodi Plugin #
-**version 0.7.4 — Pete Carroll Edition**
+**version 0.8.0 — Julius Peppers Edition**
 
 Before reading any further, please understand that while this addon does work,
 not all features are supported (or fully tested) and it should be forever
