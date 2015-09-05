@@ -43,7 +43,7 @@ else:
 proxy_config = None
 if addon.getSetting('proxy_enabled') == 'true':
     proxy_config = {
-        'scheme': addon.getSetting('proxy_scheme'),
+        'scheme': 'https' if addon.getSetting('proxy_scheme') == '1' else 'http',
         'host': addon.getSetting('proxy_host'),
         'port': addon.getSetting('proxy_port'),
         'auth': {
