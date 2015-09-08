@@ -15,7 +15,7 @@
   </category>
   <category label="30033">
     <setting id="proxy_enabled" type="bool" label="30034" default="false"/>
-    <setting id="proxy_scheme" type="select" label="30035" lvalues="30040|30041" default="http" enable="eq(-1,true)"/>
+    <setting id="proxy_scheme" type="labelenum" label="30035" values="http|https" default="http" enable="eq(-1,true)"/>
     <setting id="proxy_host" type="text" label="30036" default="" enable="eq(-2,true)"/>
     <setting id="proxy_port" type="number" label="30037" default="" enable="eq(-3,true)"/>
     <setting type="lsep" label="30042"/>
