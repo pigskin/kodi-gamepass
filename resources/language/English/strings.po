@@ -150,7 +150,7 @@ msgid "Use an HTTP proxy to access Game Pass"
 msgstr ""
 
 msgctxt "#30035"
-msgid "Type"
+msgid "Protocol"
 msgstr ""
 
 msgctxt "#30036"
@@ -170,5 +170,5 @@ msgid "Password"
 msgstr ""
 
 msgctxt "#30042"
-msgid "Only the following authentication schemes are supported: None and Basic"
+msgid "Enable 'Basic' Authentication"
 msgstr ""

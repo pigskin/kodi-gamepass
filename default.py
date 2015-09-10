@@ -51,7 +51,7 @@ if addon.getSetting('proxy_enabled') == 'true':
             'password': addon.getSetting('proxy_password'),
         },
     }
-    if proxy_config['auth']['username'] == '' and proxy_config['auth']['password'] == '':
+    if addon.getSetting('proxy_auth') == 'false':
         proxy_config['auth'] = None
 
 gpr = pigskin(sub_name, proxy_config, cookie_file=cookie_file, debug=debug)
