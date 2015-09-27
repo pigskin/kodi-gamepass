@@ -420,7 +420,7 @@ class pigskin(object):
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         sc_dict = xmltodict.parse(sc_data)['result']
-        if sc_dict['rzPhase'] == 'in':
+        if sc_dict['rzPhase'] in ('pre', 'in'):
             self.log('RedZone is on air.')
             return True
         else:
