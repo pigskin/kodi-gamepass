@@ -1,3 +1,6 @@
+2015.12.02 v0.9.0 -- Charles Woodson Edition
++ Add support for Jarvis; drop Helix and Isengard
+
 2015.12.02 v0.8.1 -- Brett Favre Edition
 + Add NFL Honors and some old seasons (2010-2011) of other shows
 + Dropped non-fuctioning old (< 2014) NFL Total Access seasons

@@ -1,5 +1,5 @@
 # NFL Game Pass Kodi Plugin #
-**version 0.8.1 — Brett Favre Edition**
+**version 0.9.0 — Charles Woodson Edition**
 
 Before reading any further, please understand that while this addon does work,
 not all features are supported (or fully tested) and it should be forever
