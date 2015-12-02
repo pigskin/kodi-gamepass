@@ -214,7 +214,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     else:  # don't localize
                         game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                    if datetime.utcnow() < datetime(*(time.strptime(game['gameTimeGMT'], date_time_format)[0:6])):
+                    if not 'hasProgram' in game:
                         isPlayable = 'false'
                         game_name_full = self.coloring(game_name_full, "disabled")
                         game_name_shrt = self.coloring(game_name_shrt, "disabled")

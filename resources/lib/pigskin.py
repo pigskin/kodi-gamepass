@@ -35,7 +35,7 @@ class pigskin(object):
         if subscription == 'international':
             self.seasonal_shows.update({
                 'Playbook': {'2015': '255', '2014': '213', '2013': '180', '2012': '147', '2011': '114', '2010': '86'},
-                'NFL Total Access': {'2015': '254', '2014': '214', '2013': '181', '2012': '148', '2011': '115', '2010': '87'},
+                'NFL Total Access': {'2015': '254', '2014': '214'},
                 'NFL RedZone Archives': {'2015': '248', '2014': '221', '2013': '182', '2012': '149'},
                 'Coaches Show': {'2014': '216', '2013': '184', '2012': '151'},
                 'NFL Films Presents': {'2014': '219', '2013': '187'},
@@ -420,7 +420,7 @@ class pigskin(object):
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
         sc_dict = xmltodict.parse(sc_data)['result']
-        if sc_dict['rzPhase'] == 'in':
+        if sc_dict['rzPhase'] in ('pre', 'in'):
             self.log('RedZone is on air.')
             return True
         else:
