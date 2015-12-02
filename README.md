@@ -11,14 +11,14 @@ request. Patches and (constructive) input are always welcome.
 
 ## Any Dependencies? ##
 
-This addon requires Kodi Helix or later. XBMC Gotham and earlier are no longer
-supported due to upstream changes in the skinning system.
+This addon requires Kodi Jarvis or later. XBMC Helix and Isengard will be
+supported for awhile in the the "Isengard" branch.
 
 This addon is part of the official Kodi repository, thus all dependencies are
 installed automatically. However, if you're installing straight from source,
 make sure the following two dependencies are installed:
  * xmltodict (http://mirrors.kodi.tv/addons/gotham/script.module.xmltodict/)
- * Requests 2.x (http://mirrors.kodi.tv/addons/gotham/script.module.requests/)
+ * Requests 2.x (http://mirrors.kodi.tv/addons/jarvis/script.module.requests/)
 
 ## What is NFL Game Pass? ##
 
@@ -33,11 +33,8 @@ fix.
 NFL Game Pass Domestic is the USA version of Game Pass, but the service is
 blacked out during live games. Previously it lacked other features, but with the
 recent revamping (mid-2015) of their service, we have yet to find a side-by-side
-comparison of the two services. Information from Game Pass Domestic users would
-be most appreciated.
-
-As of mid-August 2015, we do not yet have complete support for Game Pass
-Domestic, but work in ongoing and should be stabilizing soon.
+comparison of the two services. Testing, bug reports, and patches from Game Pass
+Domestic users would be most appreciated.
 
 ## Why write a plugin for Kodi? ##
 
@@ -83,3 +80,4 @@ A rough roadmap follows:
 
 * Continue work towards feature completeness
 * Stabilize Game Pass Domestic support
+* Code cleanup
