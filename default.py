@@ -217,6 +217,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if game['blocked'] == 'true':
                         isPlayable = 'false'
                         isBlackedOut = 'true'
+                        game_name_full = self.coloring(game_name_full, "disabled")
+                        game_name_shrt = self.coloring(game_name_shrt, "disabled")
+                        game_info = self.coloring(game_info, "disabled-info")
 
                 except:
                     game_datetime = game['date'].split('T')
