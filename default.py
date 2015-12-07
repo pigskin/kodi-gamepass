@@ -164,6 +164,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             game_id = game['id']
             game_versions = []
             isPlayable = 'true'
+            isBlackedOut = 'false'
             home_team = game['homeTeam']
             away_team = game['awayTeam']
 
@@ -219,6 +220,14 @@ class GamepassGUI(xbmcgui.WindowXML):
                         game_name_full = self.coloring(game_name_full, "disabled")
                         game_name_shrt = self.coloring(game_name_shrt, "disabled")
                         game_info = self.coloring(game_info, "disabled-info")
+                    if game['blocked'] == 'true':
+                        isPlayable = 'false'
+                        isBlackedOut = 'true'
+                        game_info =  '» Blacked Out «'
+                        game_name_full = self.coloring(game_name_full, "disabled")
+                        game_name_shrt = self.coloring(game_name_shrt, "disabled")
+                        game_info = self.coloring(game_info, "disabled-info")
+
                 except:
                     game_datetime = game['date'].split('T')
                     game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
@@ -230,6 +239,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             listitem.setProperty('is_game', 'true')
             listitem.setProperty('is_show', 'false')
             listitem.setProperty('isPlayable', isPlayable)
+            listitem.setProperty('isBlackedOut', isBlackedOut)
             listitem.setProperty('game_id', game_id)
             listitem.setProperty('game_date', game['date'].split('T')[0])
             listitem.setProperty('game_versions', ' '.join(game_versions))
