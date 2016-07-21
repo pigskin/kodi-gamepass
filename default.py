@@ -418,8 +418,11 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.selected_season = cur_s_w.keys()[0]
                     self.selected_week = cur_s_w.values()[0]
 
-                    self.display_seasons_weeks()
-                    self.display_weeks_games()
+                    try:
+                       self.display_seasons_weeks()
+                       self.display_weeks_games()
+                    except:
+                       addon_log('Error while reading seasons weeks and games')
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
