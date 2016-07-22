@@ -134,6 +134,15 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.season_items.append(listitem)
         self.season_list.addItems(self.season_items)
 
+    def display_nfln_seasons(self):
+        """List seasons"""
+        self.season_items = []
+        for season in sorted(gpr.nflnSeasons, reverse=True):
+            listitem = xbmcgui.ListItem(season)
+
+            self.season_items.append(listitem)
+        self.season_list.addItems(self.season_items)
+
     def display_nfl_network_archive(self):
         """List shows for a given season"""
         self.weeks_items = []
@@ -417,6 +426,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     cur_s_w = gpr.get_current_season_and_week()
                     self.selected_season = cur_s_w.keys()[0]
                     self.selected_week = cur_s_w.values()[0]
+                    self.display_seasons()
 
                     try:
                        self.display_seasons_weeks()
@@ -435,8 +445,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                             self.live_items.append(listitem)
 
                     self.live_list.addItems(self.live_items)
+                    self.display_nfln_seasons()
 
-                self.display_seasons()
                 xbmc.executebuiltin("Dialog.Close(busydialog)")
                 return
 
