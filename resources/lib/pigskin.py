@@ -299,7 +299,7 @@ class pigskin(object):
         seasons_and_weeks = {}
 
         try:
-            url = 'http://smb.cdnak.neulion.com/fs/nfl/nfl/mobile/weeks_v2.xml'
+            url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/mobile/weeks_v2.xml'
             s_w_data = self.make_request(url=url, method='get')
             s_w_data_dict = xmltodict.parse(s_w_data)
         except:
