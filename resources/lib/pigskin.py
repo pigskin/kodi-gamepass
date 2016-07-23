@@ -22,6 +22,7 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
+        self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
         self.non_seasonal_shows = {}
         self.seasonal_shows = {}
         self.nflnSeasons = []
