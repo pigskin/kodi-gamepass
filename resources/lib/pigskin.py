@@ -23,9 +23,9 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
-        self.image_path=''
-        self.locEDLBaseUrl=''
         self.boxscore_url=''
+        self.image_url=''
+        self.locEDLBaseUrl=''
         self.non_seasonal_shows = {}
         self.seasonal_shows = {}
         self.nflnSeasons = []
@@ -45,30 +45,22 @@ class pigskin(object):
             pass
         self.http_session.cookies = self.cookie_jar
 
-        #Parse Urls dynamically from simpleconsole xml output
+        # get needed URLs from simpleconsole
+        # no auth needed, so we can get this info without invoking a login
         url = self.servlets_url + '/simpleconsole'
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
         try:
             url_dict = xmltodict.parse(sc_data)
-            if url_dict['result']['config']['locProgramImage'] != '':
-                self.log('locProgramImage: %s' % url_dict['result']['config']['locProgramImage'])
-                self.image_path=url_dict['result']['config']['locProgramImage']
-            else:
-                self.log("locProgramImage not found")
-            if url_dict['result']['config']['locEDL'] != '':
-                self.log('locEDLBaseUrl: %s' % url_dict['result']['config']['locEDL'].replace('edl/nflgp/', ''))
-                self.locEDLBaseUrl=url_dict['result']['config']['locEDL'].replace('/edl/nflgp/', '')
-            else:
-                self.log("locEDLBaseUrl not found")
-            if url_dict['result']['pbpFeedPrefix'] != '':
-                self.log('pbpFeedPrefix(boxscore url): %s' % url_dict['result']['pbpFeedPrefix'])
-                self.boxscore_url=url_dict['result']['pbpFeedPrefix']
-            else:
-                self.log("pbpFeedPrefix(boxscore url) not found")
+            self.boxscore_url  = url_dict['result']['pbpFeedPrefix']
+            self.image_url     = url_dict['result']['config']['locProgramImage']
+            self.locEDLBaseUrl = url_dict['result']['config']['locEDL'].replace('/edl/nflgp/', '')
+
+            self.log('boxscore url: %s' % self.boxscore_url)
+            self.log('image url: %s' % self.image_url)
+            self.log('locEDLBaseUrl: %s' % self.locEDLBaseUrl)
         except xmltodict.expat.ExpatError:
             return False
-        #Parsing completed or exception raised
 
         if self.debug:
             self.log('Debugging enabled.')
