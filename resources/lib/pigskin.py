@@ -23,6 +23,7 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
+        self.simpleconsole_url = self.servlets_url + '/simpleconsole'
         self.boxscore_url=''
         self.image_url=''
         self.locEDLBaseUrl=''
@@ -47,7 +48,7 @@ class pigskin(object):
 
         # get needed URLs from simpleconsole
         # no auth needed, so we can get this info without invoking a login
-        url = self.servlets_url + '/simpleconsole'
+        url = self.simpleconsole_url
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
         try:
@@ -143,7 +144,7 @@ class pigskin(object):
     def check_for_subscription(self):
         """Return whether a subscription and user name are detected. Determines
         whether a login was successful."""
-        url = self.servlets_url + '/simpleconsole'
+        url = self.simpleconsole_url
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
@@ -201,7 +202,7 @@ class pigskin(object):
 
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
-        url = self.servlets_url + '/simpleconsole'
+        url = self.simpleconsole_url
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
@@ -448,7 +449,7 @@ class pigskin(object):
 
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""
-        url = self.servlets_url + '/simpleconsole'
+        url = self.simpleconsole_url
         post_data = {'isFlex': 'true'}
         sc_data = self.make_request(url=url, method='post', payload=post_data)
 
