@@ -18,7 +18,7 @@ supported for awhile in the "Isengard" branch.
 This addon is part of the official Kodi repository, thus all dependencies are
 installed automatically. However, if you're installing straight from source,
 make sure the following two dependencies are installed:
- * xmltodict (http://mirrors.kodi.tv/addons/gotham/script.module.xmltodict/)
+ * xmltodict (http://mirrors.kodi.tv/addons/jarvis/script.module.xmltodict/)
  * Requests 2.x (http://mirrors.kodi.tv/addons/jarvis/script.module.requests/)
 
 ## What is NFL Game Pass? ##
