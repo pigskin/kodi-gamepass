@@ -280,12 +280,11 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_items = []
         items = gpr.get_shows_episodes(show_name, season)
 
-        image_path = 'http://smb.cdn.neulion.com/u/nfl/nfl/thumbs/'
         for i in items:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
                 listitem.setProperty('game_info', i['name'])
-                listitem.setProperty('away_thumb', image_path + i['image'])
+                listitem.setProperty('away_thumb', gpr.image_path + i['image'])
                 listitem.setProperty('url', i['publishPoint'])
                 listitem.setProperty('id', i['id'])
                 listitem.setProperty('type', i['type'])
