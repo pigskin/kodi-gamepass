@@ -23,7 +23,9 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
-        self.boxscore_url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/edl/nflgr'
+        self.image_path=''
+        self.locEDLBaseUrl=''
+        self.boxscore_url=''
         self.non_seasonal_shows = {}
         self.seasonal_shows = {}
         self.nflnSeasons = []
@@ -42,6 +44,31 @@ class pigskin(object):
         except IOError:
             pass
         self.http_session.cookies = self.cookie_jar
+
+        #Parse Urls dynamically from simpleconsole xml output
+        url = self.servlets_url + '/simpleconsole'
+        post_data = {'isFlex': 'true'}
+        sc_data = self.make_request(url=url, method='post', payload=post_data)
+        try:
+            url_dict = xmltodict.parse(sc_data)
+            if url_dict['result']['config']['locProgramImage'] != '':
+                self.log('locProgramImage: %s' % url_dict['result']['config']['locProgramImage'])
+                self.image_path=url_dict['result']['config']['locProgramImage']
+            else:
+                self.log("locProgramImage not found")
+            if url_dict['result']['config']['locEDL'] != '':
+                self.log('locEDLBaseUrl: %s' % url_dict['result']['config']['locEDL'].replace('edl/nflgp/', ''))
+                self.locEDLBaseUrl=url_dict['result']['config']['locEDL'].replace('/edl/nflgp/', '')
+            else:
+                self.log("locEDLBaseUrl not found")
+            if url_dict['result']['pbpFeedPrefix'] != '':
+                self.log('pbpFeedPrefix(boxscore url): %s' % url_dict['result']['pbpFeedPrefix'])
+                self.boxscore_url=url_dict['result']['pbpFeedPrefix']
+            else:
+                self.log("pbpFeedPrefix(boxscore url) not found")
+        except xmltodict.expat.ExpatError:
+            return False
+        #Parsing completed or exception raised
 
         if self.debug:
             self.log('Debugging enabled.')
@@ -312,7 +339,7 @@ class pigskin(object):
         seasons_and_weeks = {}
 
         try:
-            url = 'http://neulionms-a.akamaihd.net/fs/nfl/nfl/mobile/weeks_v2.xml'
+            url = self.locEDLBaseUrl + '/mobile/weeks_v2.xml'
             s_w_data = self.make_request(url=url, method='get')
             s_w_data_dict = xmltodict.parse(s_w_data)
         except:
