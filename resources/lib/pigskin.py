@@ -6,6 +6,7 @@ import cookielib
 import hashlib
 import random
 import m3u8
+import re
 import sys
 import urllib
 from traceback import format_exc
@@ -190,7 +191,7 @@ class pigskin(object):
         return current_s_w
 
     def parse_shows(self, sc_dict):
-        """Parse return from /simpleconsole request and get shows dynamically"""
+        """Parse return from /simpleconsole request to build shows list dynamically"""
         try:
             show_dict = {}
             for show in sc_dict['nflnShows']['show']:
@@ -204,23 +205,19 @@ class pigskin(object):
                     else:
                         season_id    = show['seasons']['season']['@catId']
                         season_name  = show['seasons']['season']['#text']
-                    
-                    words = season_name.split()
-                    if len(words) > 1:
-                        season_name = words[1]
-                    else:
-                        # a little trick to get non numeric season names at to the end of the list
-                        season_name = " " +  season_name
-                        
-                    season_dict[season_name] = season_id
-                    
-                    # try to find the season name in the seasons list, if not found error is raised
-                    # if error is raised add the season name to the list
+
+                    # Trim season name to just the year if year is present
+                    # Common season names: '2014', 'Season 2014', and 'Archives'
                     try:
-                        self.nflnSeasons.index(season_name)
-                    except:
+                        season_name = re.findall(r"\d{4}(?!\d)",season_name)[0]
+                    except IndexError:
+                        pass
+
+                    season_dict[season_name] = season_id
+
+                    if season_name not in self.nflnSeasons:
                         self.nflnSeasons.append(season_name)
-                    
+
                 show_dict[name] = season_dict
 
             self.seasonal_shows.update(show_dict)

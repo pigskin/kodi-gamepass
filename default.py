@@ -130,17 +130,18 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.season_items = []
         for season in sorted(self.seasons_and_weeks.keys(), reverse=True):
             listitem = xbmcgui.ListItem(season)
-
             self.season_items.append(listitem)
+
         self.season_list.addItems(self.season_items)
 
     def display_nfln_seasons(self):
         """List seasons"""
         self.season_items = []
-        for season in sorted(gpr.nflnSeasons, reverse=True):
+        # sort so that years are first (descending) followed by text
+        for season in sorted(gpr.nflnSeasons, key=lambda x: (x[0].isdigit(), x), reverse=True):
             listitem = xbmcgui.ListItem(season)
-
             self.season_items.append(listitem)
+
         self.season_list.addItems(self.season_items)
 
     def display_nfl_network_archive(self):
