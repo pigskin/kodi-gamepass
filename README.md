@@ -1,5 +1,5 @@
 # NFL Game Pass Kodi Plugin #
-**version 0.9.0 — Charles Woodson Edition**
+**version 0.9.1 — Bart Starr Edition**
 
 Before reading any further, please understand that this addon is unofficial and
 is not endorsed or supported by the NFL in any way. Thus, not all features are
