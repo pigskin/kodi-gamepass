@@ -280,7 +280,7 @@ class pigskin(object):
                 bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
                 streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
         else:
-            streams['only available'] = m3u8_url
+            streams['sole available'] = m3u8_url
 
         return streams
 
@@ -473,7 +473,7 @@ class pigskin(object):
     def service_blackout(self):
         """Return whether Game Pass is blacked out."""
         url = self.base_url + '/secure/schedule'
-        blackout_message = ('Due to broadcast restrictions, NFL Game Pass Domestic is currently unavailable.'
+        blackout_message = ('Due to broadcast restrictions, NFL Game Pass is currently unavailable.'
                             ' Please check back later.')
         service_data = self.make_request(url=url, method='get')
 
