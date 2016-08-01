@@ -219,7 +219,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     else:  # don't localize
                         game_datetime = datetime(*(time.strptime(game['date'], date_time_format)[0:6]))
                         game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                    if not 'hasProgram' in game:
+                    if 'hasProgram' not in game:
                         isPlayable = 'false'
                         game_name_full = self.coloring(game_name_full, "disabled")
                         game_name_shrt = self.coloring(game_name_shrt, "disabled")
@@ -227,7 +227,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if game['blocked'] == 'true':
                         isPlayable = 'false'
                         isBlackedOut = 'true'
-                        game_info =  '» Blacked Out «'
+                        game_info = '» Blacked Out «'
                         game_name_full = self.coloring(game_name_full, "disabled")
                         game_name_shrt = self.coloring(game_name_shrt, "disabled")
                         game_info = self.coloring(game_info, "disabled-info")
@@ -429,10 +429,10 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.display_seasons()
 
                     try:
-                       self.display_seasons_weeks()
-                       self.display_weeks_games()
+                        self.display_seasons_weeks()
+                        self.display_weeks_games()
                     except:
-                       addon_log('Error while reading seasons weeks and games')
+                        addon_log('Error while reading seasons weeks and games')
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')

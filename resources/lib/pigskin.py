@@ -24,9 +24,9 @@ class pigskin(object):
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
         self.simpleconsole_url = self.servlets_url + '/simpleconsole'
-        self.boxscore_url=''
-        self.image_url=''
-        self.locEDLBaseUrl=''
+        self.boxscore_url = ''
+        self.image_url = ''
+        self.locEDLBaseUrl = ''
         self.non_seasonal_shows = {}
         self.seasonal_shows = {}
         self.nflnSeasons = []
@@ -229,7 +229,7 @@ class pigskin(object):
                     # Trim season name to just the year if year is present
                     # Common season names: '2014', 'Season 2014', and 'Archives'
                     try:
-                        season_name = re.findall(r"\d{4}(?!\d)",season_name)[0]
+                        season_name = re.findall(r"\d{4}(?!\d)", season_name)[0]
                     except IndexError:
                         pass
 
@@ -267,8 +267,12 @@ class pigskin(object):
 
         m3u8_url = m3u8_dict['path'].replace('_ipad', '')
         m3u8_param = m3u8_url.split('?', 1)[-1]
-        # I hate lying with User-Agent. Points to anyone who can make this work without lying.
-        m3u8_header = {'Cookie': 'nlqptid=' + m3u8_param, 'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57', 'Accept-encoding': 'identity, gzip, deflate', 'Connection': 'keep-alive'}
+        # I /hate/ lying with User-Agent.
+        # Huge points for making this work without lying.
+        m3u8_header = {'Cookie': 'nlqptid=' + m3u8_param,
+                       'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57',
+                       'Accept-encoding': 'identity, gzip, deflate',
+                       'Connection': 'keep-alive'}
 
         m3u8_obj = m3u8.load(m3u8_url)
         if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
