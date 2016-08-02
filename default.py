@@ -218,12 +218,17 @@ class GamepassGUI(xbmcgui.WindowXML):
                             game_info = time.strftime('%A, %b %d - %I:%M %p', game_local)
                         else:  # localize and use 24-hour clock
                             game_info = time.strftime('%A, %b %d - %H:%M', game_local)
+                except:  # all else fails, just use their raw date value
+                    game_datetime = game['date'].split('T')
+                    game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
 
-                    if 'hasProgram' not in game:
-                        isPlayable = 'false'
-                        game_name_full = self.coloring(game_name_full, "disabled")
-                        game_name_shrt = self.coloring(game_name_shrt, "disabled")
-                        game_info = self.coloring(game_info, "disabled-info")
+                if 'hasProgram' not in game:  # if subscription doesn't allow
+                    isPlayable = 'false'
+                    game_name_full = self.coloring(game_name_full, "disabled")
+                    game_name_shrt = self.coloring(game_name_shrt, "disabled")
+                    game_info = self.coloring(game_info, "disabled-info")
+
+                try:
                     if game['blocked'] == 'true':
                         isPlayable = 'false'
                         isBlackedOut = 'true'
@@ -231,10 +236,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                         game_name_full = self.coloring(game_name_full, "disabled")
                         game_name_shrt = self.coloring(game_name_shrt, "disabled")
                         game_info = self.coloring(game_info, "disabled-info")
-
-                except:
-                    game_datetime = game['date'].split('T')
-                    game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
+                except KeyError:
+                    pass
 
             listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
             listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/6.11/img/logos/teams-matte-80x53/%s.png' % away_team['id'])
