@@ -425,8 +425,15 @@ class pigskin(object):
             self.log('Response: %s' % req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             return req.content
+        except requests.exceptions.ProxyError:
+            self.log('Error connecting to proxy server')
+            raise
+        except requests.exceptions.ConnectionError as error:
+            self.log('Connection Error: - %s' % error.message)
+            raise
         except requests.exceptions.RequestException as error:
             self.log('Error: - %s' % error.value)
+            raise
 
     def parse_manifest(self, manifest):
         """Return a dict of the supplied XML manifest. Builds and adds
