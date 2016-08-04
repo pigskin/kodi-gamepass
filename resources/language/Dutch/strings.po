@@ -172,3 +172,11 @@ msgstr ""
 msgctxt "#30042"
 msgid "Enable 'Basic' Authentication"
 msgstr ""
+
+msgctxt "#30043"
+msgid "There was a problem playing that stream"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
+msgstr ""

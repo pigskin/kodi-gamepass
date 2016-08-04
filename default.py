@@ -545,9 +545,14 @@ class GamepassGUI(xbmcgui.WindowXML):
         except Exception:  # catch anything that might fail
             xbmc.executebuiltin("Dialog.Close(busydialog)")
             addon_log(format_exc())
+
             dialog = xbmcgui.Dialog()
-            dialog.ok(language(30021),
-                      language(30024))
+            if self.main_selection == 'NFL Network' and controlId == 230:  # episode
+                # inform that not all shows will work
+                dialog.ok(language(30043), language(30044))
+            else:
+                # generic oops
+                dialog.ok(language(30021), language(30024))
 
 
 class CoachesFilmGUI(xbmcgui.WindowXML):
