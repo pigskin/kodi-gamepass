@@ -395,8 +395,6 @@ class pigskin(object):
                 elif self.subscription == 'domestic' and self.service_blackout():
                     raise self.LoginFailure('Game Pass Domestic Blackout')
             else:
-                # might need sans-login check here for Game Pass, though as of
-                # 2014, there /may/ no longer be any sans-login regions.
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
 

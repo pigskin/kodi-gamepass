@@ -5,7 +5,6 @@
     <setting id="password" type="text" label="30002" default="" option="hidden" visible="eq(-2,0)" enable="eq(-2,0)"/>
     <setting id="gr_email" type="text" label="30001" default="" visible="eq(-3,1)" enable="eq(-3,1)"/>
     <setting id="gr_password" type="text" label="30002" default="" option="hidden" visible="eq(-4,1)" enable="eq(-4,1)"/>
-    <setting id="sans_login" type="bool" label="Sans-Login Region" default="false" visible="eq(-6,0)" enable="eq(-6,0)"/>
   </category>
   <category label="30030">
     <setting id="preferred_bitrate" type="select" label="30003" lvalues="30004|30005|30006|30007|30008|30009|30010|30011|30012" default="8"/>
