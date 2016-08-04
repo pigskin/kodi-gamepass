@@ -63,9 +63,8 @@ class pigskin(object):
         except xmltodict.expat.ExpatError:
             return False
 
-        if self.debug:
-            self.log('Debugging enabled.')
-            self.log('Python Version: %s' % sys.version)
+        self.log('Debugging enabled.')
+        self.log('Python Version: %s' % sys.version)
 
     class LoginFailure(Exception):
         def __init__(self, value):
