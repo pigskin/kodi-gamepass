@@ -273,13 +273,19 @@ class pigskin(object):
                        'Accept-encoding': 'identity, gzip, deflate',
                        'Connection': 'keep-alive'}
 
-        m3u8_obj = m3u8.load(m3u8_url)
-        if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
-            for playlist in m3u8_obj.playlists:
-                bitrate = int(playlist.stream_info.bandwidth) / 1000
-                streams[str(bitrate)] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
-        else:
-            streams['sole available'] = m3u8_url
+        try:
+            m3u8_manifest = self.make_request(url=m3u8_url, method='get')
+        except:
+            m3u8_manifest = False
+
+        if m3u8_manifest:
+            m3u8_obj = m3u8.loads(m3u8_manifest)
+            if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
+                for playlist in m3u8_obj.playlists:
+                    bitrate = int(playlist.stream_info.bandwidth) / 1000
+                    streams[str(bitrate)] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+            else:
+                streams['sole available'] = m3u8_url
 
         return streams
 
@@ -419,10 +425,14 @@ class pigskin(object):
                 req = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
             else:  # post
                 req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
+            req.raise_for_status()
             self.log('Response code: %s' % req.status_code)
             self.log('Response: %s' % req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             return req.content
+        except requests.exceptions.HTTPError as error:
+            self.log('An HTTP error occurred: %s' % error)
+            raise
         except requests.exceptions.ProxyError:
             self.log('Error connecting to proxy server')
             raise
