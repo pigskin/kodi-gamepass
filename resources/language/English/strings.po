@@ -180,3 +180,7 @@ msgstr ""
 msgctxt "#30044"
 msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
 msgstr ""
+
+msgctxt "#30045"
+msgid "No valid stream URL was found."
+msgstr ""

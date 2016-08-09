@@ -272,16 +272,22 @@ class pigskin(object):
                        'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57',
                        'Accept-encoding': 'identity, gzip, deflate',
                        'Connection': 'keep-alive'}
+                       
+        try:
+            m3u8_manifest = self.make_request(url=m3u8_url, method='get')
+        except:
+            m3u8_manifest = False
+            
+        if m3u8_manifest:
+            m3u8_obj = m3u8.loads(m3u8_manifest)
+            if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
+                for playlist in m3u8_obj.playlists:
+                    bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
+                    streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+            else:
+                streams['sole available'] = m3u8_url
 
-        m3u8_obj = m3u8.load(m3u8_url)
-        if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
-            for playlist in m3u8_obj.playlists:
-                bitrate = str(int(playlist.stream_info.bandwidth[:playlist.stream_info.bandwidth.find(' ')])/100)
-                streams[bitrate] = m3u8_url[:m3u8_url.rfind('/') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
-        else:
-            streams['sole available'] = m3u8_url
-
-        return streams
+            return streams
 
     def get_shows(self, season):
         """Return a list of all shows for a season."""
@@ -419,10 +425,14 @@ class pigskin(object):
                 req = self.http_session.get(url, params=payload, headers=headers, allow_redirects=False)
             else:  # post
                 req = self.http_session.post(url, data=payload, headers=headers, allow_redirects=False)
+            req.raise_for_status()
             self.log('Response code: %s' % req.status_code)
             self.log('Response: %s' % req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             return req.content
+        except requests.exceptions.HTTPError as error:
+            self.log('An HTTP error occurred: %s' % error)
+            raise
         except requests.exceptions.ProxyError:
             self.log('Error connecting to proxy server')
             raise
