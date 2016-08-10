@@ -9,8 +9,9 @@
        provider-name="Alexqw,divingmule,BaumSchorle,eriksoderblom">
   <requires>
     <import addon="xbmc.python" version="2.19.0"/>
-    <import addon="script.module.xmltodict" version="0.9.0"/>
+    <import addon="script.module.m3u8" version="0.2.2"/>
     <import addon="script.module.requests" version="2.7.0"/>
+    <import addon="script.module.xmltodict" version="0.9.0"/>
     <import addon="xbmc.gui" version="5.10.0"/>
   </requires>
   <extension point="xbmc.python.script" library="default.py">
