@@ -525,22 +525,34 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
                     video_streams = gpr.get_publishpoint_streams(video_id, 'video')
-                    addon_log('Video-Streams: %s' % video_streams)
-                    bitrate = self.select_bitrate(video_streams.keys())
-                    video_url = video_streams[bitrate]
-                    self.play_url(video_url)
+                    if video_streams:
+                        addon_log('Video-Streams: %s' % video_streams)
+                        bitrate = self.select_bitrate(video_streams.keys())
+                        video_url = video_streams[bitrate]
+                        self.play_url(video_url)
+                    else:
+                        dialog = xbmcgui.Dialog()
+                        dialog.ok(language(30043), language(30045))
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
                         rz_live_streams = gpr.get_publishpoint_streams('redzone')
-                        bitrate = self.select_bitrate(rz_live_streams.keys())
-                        rz_live_url = rz_live_streams[bitrate]
-                        self.play_url(rz_live_url)
+                        if rz_live_streams:
+                            bitrate = self.select_bitrate(rz_live_streams.keys())
+                            rz_live_url = rz_live_streams[bitrate]
+                            self.play_url(rz_live_url)
+                        else:
+                            dialog = xbmcgui.Dialog()
+                            dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
                         nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
-                        bitrate = self.select_bitrate(nw_live_streams.keys())
-                        nw_live_url = nw_live_streams[bitrate]
-                        self.play_url(nw_live_url)
+                        if nw_live_streams:
+                            bitrate = self.select_bitrate(nw_live_streams.keys())
+                            nw_live_url = nw_live_streams[bitrate]
+                            self.play_url(nw_live_url)
+                        else:
+                            dialog = xbmcgui.Dialog()
+                            dialog.ok(language(30043), language(30045))
             xbmc.executebuiltin("Dialog.Close(busydialog)")
         except Exception:  # catch anything that might fail
             xbmc.executebuiltin("Dialog.Close(busydialog)")
