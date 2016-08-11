@@ -240,8 +240,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                     pass
 
             listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
-            listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/6.11/img/logos/teams-matte-80x53/%s.png' % away_team['id'])
-            listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/6.11/img/logos/teams-matte-80x53/%s.png' % home_team['id'])
+            listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-80x53/%s.png' % away_team['id'])
+            listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-80x53/%s.png' % home_team['id'])
             listitem.setProperty('game_info', game_info)
             listitem.setProperty('is_game', 'true')
             listitem.setProperty('is_show', 'false')
