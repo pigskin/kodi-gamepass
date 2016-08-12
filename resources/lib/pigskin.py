@@ -18,9 +18,9 @@ import xmltodict
 
 
 class pigskin(object):
-    def __init__(self, subscription, proxy_config, cookie_file, debug=False):
-        self.subscription = subscription
+    def __init__(self, proxy_config, cookie_file, debug=False):
         self.debug = debug
+        self.subscription = ''
         self.base_url = 'https://gamepass.nfl.com/nflgp'
         self.servlets_url = 'http://gamepass.nfl.com/nflgp/servlets'
         self.simpleconsole_url = self.servlets_url + '/simpleconsole'
@@ -62,7 +62,15 @@ class pigskin(object):
             self.log('locEDLBaseUrl: %s' % self.locEDLBaseUrl)
         except xmltodict.expat.ExpatError:
             return False
-
+            
+        # get subscription type
+        if '<isGPDomestic>' in sc_data:
+            self.subscription = 'domestic'
+            self.log('NFL Game Pass Domestic detected.')
+        else:
+            self.subscription = 'international'
+            self.log('NFL Game Pass International detected.')
+            
         self.log('Debugging enabled.')
         self.log('Python Version: %s' % sys.version)
 
@@ -495,3 +503,21 @@ class pigskin(object):
             return True
         else:
             return False
+
+    def get_subscription_type(self):
+        """Return whether the user is eligible for Game Pass Domestic/International."""
+        if self.subscription:
+            return self.subscription
+        else:
+            url = self.simpleconsole_url
+            post_data = {'isFlex': 'true'}
+            sc_data = self.make_request(url=url, method='post', payload=post_data)
+            
+            if '<isGPDomestic>' in sc_data:
+                subscription = 'domestic'
+                self.log('NFL Game Pass Domestic detected.')
+            else:
+                subscription = 'international'
+                self.log('NFL Game Pass International detected.')
+                
+            return subscription
