@@ -1,3 +1,58 @@
+2016.07.29 v0.9.1 -- Bart Starr Edition
++ Shows are now acquired dynamically (BaumSchorle)
++  This means new shows will be available immediately. However, Game Pass has
++  many ways of providing shows, so new shows may not always /work/ right away.
++ Game Pass Resource URLs (most of them) are now acquired dynamically (kaileu)
++  This means the addon should be more resilient to Game Pass service changes.
++ UI Fix: Blacked-Out games are now marked as non-playable (BaumSchorle)
++ Bug Fix: an empty season crashes the add-on (BaumSchorle)
++ Assorted small improvements (Alexqw)
+
+2015.12.02 v0.9.0 -- Charles Woodson Edition
++ Add support for Jarvis; drop Helix and Isengard
+
+2015.12.02 v0.8.1 -- Brett Favre Edition
++ Add NFL Honors and some old seasons (2010-2011) of other shows
++ Dropped non-fuctioning old (< 2014) NFL Total Access seasons
++ Make RedZone button show even when in "pre" mode
++ Fix proxy protocol selection (thanks to maguire for reporting)
++ Cleanup method to detect running games (kaileu)
++ Assorted small improvements
+
+2015.08.27 v0.8.0 -- Julius Peppers Edition
++ Fix regression; can now watch streams for more than ~20 minutes on all platforms
++ Replace Game Rewind with Game Pass Domestic
++   Preliminary Support (please report any bugs)
++ Renamed Game Pass to Game Pass International
++ New Logos for Game Pass Domestic and International (eriksoderblom)
++ Bug fix: Games after 2015 preseason Week 1 wouldn't play (kaileu)
++ Bump required version of Requests to 2.7.0
++ Small improvements to debugging
++ Code cleanup
+
+2015.08.17 v0.7.4 -- Pete Carroll Edition
++ Revert skinutils font hack
++ New GamePass-only icon (eriksoderblom)
++   The NFL replaced Game Rewind with the "Game Pass Domestic" service
++ Correctly identify as a script now instead of a plugin (BaumSchorle)
++   Fixes an issue with not being able to exit the addon when using a shortcut
++ Code Cleanup (Alexqw)
+
+2015.08.13 v0.7.3 -- (Unreleased)
++ Add 2015 Season for Shows (kaileu)
++ 1080i skin (eriksoderblom)
++ Assorted bug fixes and tweaks (mostly for previous release's features)
+
+2015.08.11 v0.7.2 -- (Unreleased)
++ All streams now use same method (publishpoint) to play (kaileu)
++   fixes RedZone, TotalAccess, and likely a few other shows
++ Fix (mostly) font issues in non-Confluence skins (BaumSchorle)
++ Language Fixes/Clarifications (dmaiorino and Alexqw)
++ Translation: Update Dutch Translation (Vulpecula)
++ Bug fix: Coaches Tape XML now handles both UTF and ASCII (kaileu)
++ Bug fix: Close any open busy-dialogs before launching addon (Alexqw)
++ Code cleanup (Alexqw)
+
 2015.01.23 v0.7.1 -- Brian Urlacher Edition
 + Bug fix: Support Pro Bowl (kaileu)
 
