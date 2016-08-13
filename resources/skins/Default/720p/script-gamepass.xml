@@ -29,30 +29,30 @@
               <left>140</left>
               <width>1000</width>
               <height>30</height>
+              <defaultcontrol condition="IsEmpty(Window.Property(gamepass))">120</defaultcontrol>
               <defaultcontrol>110</defaultcontrol>
               <control type="button" id="110">
-                  <description>International Gamepass button</description>
-                  <visible>IsEmpty(Window.Property(domestic))</visible>
+                  <description>Gamepass button</description>
                   <left>0</left>
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
                   <onleft>90</onleft>
-                  <onright>130</onright>
-                  <texturefocus>GamePass/gp_int_focus.png</texturefocus>
-                  <texturenofocus>GamePass/gp_int_normal.png</texturenofocus>
+                  <onright>120</onright>
+                  <texturefocus>GamePass/gamepass_focus.png</texturefocus>
+                  <texturenofocus>GamePass/gamepass_bg.png</texturenofocus>
+                  <visible>!IsEmpty(Window.Property(gamepass))</visible>
             </control>
-            <control type="button" id="110">
-                  <description>Domestic Gamepass button</description>
-                  <visible>!IsEmpty(Window.Property(domestic))</visible>
-                  <left>0</left>
+            <control type="button" id="120">
+                  <description>Rewind button</description>
                   <width>375</width>
                   <height>56</height>
                   <ondown>210</ondown>
-                  <onleft>90</onleft>
+                  <onleft>110</onleft>
                   <onright>130</onright>
-                  <texturefocus>GamePass/gp_dom_focus.png</texturefocus>
-                  <texturenofocus>GamePass/gp_dom_normal.png</texturenofocus>
+                  <texturefocus>GamePass/rewind_focus.png</texturefocus>
+                  <texturenofocus>GamePass/rewind_bg.png</texturenofocus>
+                  <visible>IsEmpty(Window.Property(gamepass))</visible>
             </control>
             <control type="button" id="130">
                   <description>Network button</description>
@@ -60,7 +60,7 @@
                   <width>375</width>
                   <height>56</height>
                   <ondown>240</ondown>
-                  <onleft>110</onleft>
+                  <onleft>120</onleft>
                   <onright>90</onright>
                   <texturefocus>GamePass/network_focus.png</texturefocus>
                   <texturenofocus>GamePass/network_bg.png</texturenofocus>
@@ -68,24 +68,22 @@
         </control>
 
         <control type="image">
-            <description>International Gamepass active overlay</description>
-            <visible>IsEmpty(Window.Property(domestic))</visible>
+            <description>Gamepass active overlay</description>
             <left>140</left>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/gp_int_selected.png</texture>
+            <texture>GamePass/gamepass_focus2.png</texture>
             <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
         </control>
         <control type="image">
-            <description>Domestic Gamepass active overlay</description>
-            <visible>!IsEmpty(Window.Property(domestic))</visible>
+            <description>GameRewind active overlay</description>
             <left>140</left>
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/gp_dom_selected.png</texture>
-            <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
+            <texture>GamePass/rewind_focus2.png</texture>
+            <visible>!Control.HasFocus(120) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(120)</visible>
         </control>
         <control type="image">
             <description>NFL Network active overlay</description>
@@ -104,6 +102,7 @@
             <height>56</height>
             <ondown>210</ondown>
             <onleft>130</onleft>
+            <onright condition="IsEmpty(Window.Property(gamepass))">120</onright>
             <onright>110</onright>
             <texturefocus>GamePass/settings_focus.png</texturefocus>
             <texturenofocus>GamePass/settings.png</texturenofocus>
@@ -114,16 +113,16 @@
             <description>Season list container</description>
             <left>10</left>
             <top>56</top>
-            <width>700</width>
+            <width>500</width>
             <height>50</height>
             <onup>100</onup>
             <ondown>220</ondown>
             <onright>240</onright>
             <viewtype label="list">list</viewtype>
             <orientation>horizontal</orientation>
-            <itemlayout width="100" height="36">
+            <itemlayout width="110" height="36">
                 <control type="image">
-                    <width>100</width>
+                    <width>110</width>
                     <height>36</height>
                     <aspectratio>stretch</aspectratio>
                     <texture>GamePass/submenubar_focus2.png</texture>
@@ -131,7 +130,7 @@
                 </control>
                 <control type="label">
                     <description>Season text</description>
-                    <left>5</left>
+                    <left>10</left>
                     <top>3</top>
                     <width>90</width>
                     <height>30</height>
@@ -146,16 +145,16 @@
                     <scrollsuffix> - </scrollsuffix>
                 </control>
             </itemlayout>
-            <focusedlayout width="100" height="36">
+            <focusedlayout width="110" height="36">
                 <control type="image">
-                        <width>100</width>
+                        <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
                         <texture>GamePass/submenubar_focus2.png</texture>
                         <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="image">
-                        <width>100</width>
+                        <width>110</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
                         <texture>GamePass/submenubar_focus.png</texture>
@@ -163,7 +162,7 @@
                 </control>
                 <control type="label">
                     <description>Season text</description>
-                    <left>5</left>
+                    <left>10</left>
                     <top>3</top>
                     <width>90</width>
                     <height>30</height>
@@ -180,7 +179,7 @@
                 </control>
                 <control type="label">
                     <description>Season text</description>
-                    <left>5</left>
+                    <left>10</left>
                     <top>3</top>
                     <width>90</width>
                     <height>30</height>
@@ -447,16 +446,16 @@
                 <control type="image">
                         <left>22</left>
                         <top>12</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
                         <top>12</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <colordiffuse>66FFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable)</visible>
@@ -464,7 +463,7 @@
                 <control type="label">
                     <description>Game competitors text</description>
                     <left>110</left>
-                    <top>5</top>
+                    <top>8</top>
                     <width>240</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -480,30 +479,30 @@
                 <control type="label">
                     <description>Game description text</description>
                     <left>110</left>
-                    <top>30</top>
+                    <top>35</top>
                     <width>240</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>font12</font>
+                    <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="label">
-                    <description>Upcoming Game</description>
+                    <description>Upcoming game</description>
                     <left>110</left>
-                    <top>50</top>
+                    <top>55</top>
                     <width>240</width>
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
-                    <label>» Upcoming Game «</label>
-                    <font>font12</font>
+                    <label>[B]Upcoming game[/B]</label>
+                    <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -512,7 +511,7 @@
                 <control type="label">
                     <description>Show Name</description>
                     <left>110</left>
-                    <top>15</top>
+                    <top>8</top>
                     <width>320</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
@@ -528,7 +527,7 @@
                 <control type="label">
                     <description>Show description text</description>
                     <left>110</left>
-                    <top>40</top>
+                    <top>30</top>
                     <width>320</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
@@ -544,16 +543,16 @@
                 <control type="image">
                         <left>360</left>
                         <top>13</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
                         <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
                 <control type="image">
                         <left>360</left>
                         <top>13</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
                         <colordiffuse>66FFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
@@ -578,16 +577,16 @@
                 <control type="image">
                         <left>22</left>
                         <top>12</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>22</left>
                         <top>12</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(away_thumb)</info>
                         <colordiffuse>99FFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable)</visible>
@@ -595,7 +594,7 @@
                 <control type="label">
                     <description>Game competitors text</description>
                     <left>110</left>
-                    <top>5</top>
+                    <top>8</top>
                     <width>240</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
@@ -611,30 +610,30 @@
                 <control type="label">
                     <description>Game description text</description>
                     <left>110</left>
-                    <top>30</top>
+                    <top>35</top>
                     <width>240</width>
                     <visible>ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
                     <info>ListItem.Property(game_info)</info>
-                    <font>font12</font>
+                    <font>font10</font>
                     <textcolor>FF333333</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
                     <scrollsuffix> - </scrollsuffix>
                 </control>
                 <control type="label">
-                    <description>Upcoming Game</description>
+                    <description>Upcoming game</description>
                     <left>110</left>
-                    <top>50</top>
+                    <top>55</top>
                     <width>240</width>
                     <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                     <align>center</align>
                     <aligny>top</aligny>
                     <scroll>true</scroll>
-                    <label>» Upcoming Game «</label>
-                    <font>font12</font>
+                    <label>[B]Upcoming game[/B]</label>
+                    <font>font10</font>
                     <textcolor>FF000000</textcolor>
                     <wrapmultiline>false</wrapmultiline>
                     <scrollspeed>25</scrollspeed>
@@ -643,7 +642,7 @@
                 <control type="label">
                     <description>Show Name</description>
                     <left>110</left>
-                    <top>15</top>
+                    <top>8</top>
                     <width>320</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
@@ -659,7 +658,7 @@
                 <control type="label">
                     <description>Show description text</description>
                     <left>110</left>
-                    <top>40</top>
+                    <top>30</top>
                     <width>320</width>
                     <visible>ListItem.Property(is_show)</visible>
                     <align>left</align>
@@ -675,16 +674,16 @@
                 <control type="image">
                         <left>360</left>
                         <top>13</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
                         <visible>ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>
                 </control>
                 <control type="image">
                         <left>360</left>
                         <top>13</top>
-                        <width>82</width>
-                        <height>55</height>
+                        <width>80</width>
+                        <height>53</height>
                         <info>ListItem.Property(home_thumb)</info>
                         <colordiffuse>99FFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable) + ListItem.Property(is_game)</visible>

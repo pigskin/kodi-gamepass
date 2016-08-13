@@ -77,6 +77,18 @@ msgctxt "#30016"
 msgid "Choose a game version"
 msgstr "Wähle eine Spiel Version"
 
+msgctxt "#30017"
+msgid "Game Pass"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Game Rewind"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Choose Subscription"
+msgstr "Abonnement wählen"
+
 msgctxt "#30020"
 msgid "Date/time in local time"
 msgstr "Uhrzeit in lokaler Zeitzone"
@@ -86,15 +98,15 @@ msgid "Error"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Due to broadcast restrictions, NFL Game Pass Domestic is currently unavailable. Please try again later."
+msgid "Due to broadcast restrictions, NFL Game Rewind is currently unavailable. Please try again later."
 msgstr ""
 
 msgctxt "#30023"
-msgid "Logging into NFL Game Pass failed. Make sure that your account information is correct and your subscription is valid."
+msgid "Logging into NFL Game Pass/Rewind failed. Make sure that your account information is correct and your subscription is valid."
 msgstr ""
 
 msgctxt "#30024"
-msgid "Unexpected error ='(. Please enable debuging for both the addon and Kodi, and submit a bug report."
+msgid "Some bad jujumagumbo just went down. Please enable debuging, and submit a bug report."
 msgstr ""
 
 msgctxt "#30025"
@@ -127,44 +139,4 @@ msgstr ""
 
 msgctxt "#30032"
 msgid "Coaches Film"
-msgstr ""
-
-msgctxt "#30033"
-msgid "Proxy Settings"
-msgstr ""
-
-msgctxt "#30034"
-msgid "Use an HTTP proxy to access Game Pass"
-msgstr ""
-
-msgctxt "#30035"
-msgid "Protocol"
-msgstr ""
-
-msgctxt "#30036"
-msgid "Server"
-msgstr ""
-
-msgctxt "#30037"
-msgid "Port"
-msgstr ""
-
-msgctxt "#30038"
-msgid "Username"
-msgstr ""
-
-msgctxt "#30039"
-msgid "Password"
-msgstr ""
-
-msgctxt "#30042"
-msgid "Enable 'Basic' Authentication"
-msgstr ""
-
-msgctxt "#30043"
-msgid "There was a problem playing that stream"
-msgstr ""
-
-msgctxt "#30044"
-msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
 msgstr ""
