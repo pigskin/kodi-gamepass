@@ -49,9 +49,11 @@ if addon.getSetting('proxy_enabled') == 'true':
 
 gpr = pigskin(proxy_config, cookie_file=cookie_file, debug=debug)
 
+
 def addon_log(string):
     if debug:
         xbmc.log("%s: %s" % (LOGGING_PREFIX, string))
+
 
 class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
