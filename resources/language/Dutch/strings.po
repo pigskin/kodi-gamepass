@@ -77,18 +77,6 @@ msgctxt "#30016"
 msgid "Choose a game version"
 msgstr "Kies een wedstrijd versie"
 
-msgctxt "#30017"
-msgid "Game Pass International"
-msgstr "Game Pass Internationaal"
-
-msgctxt "#30018"
-msgid "Game Pass Domestic"
-msgstr "Game Pass Domestic"
-
-msgctxt "#30019"
-msgid "Subscription Type"
-msgstr "Kies abonnement"
-
 msgctxt "#30020"
 msgid "Date/time in local time"
 msgstr "Datum/tijd in lokale tijd"

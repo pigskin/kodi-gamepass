@@ -25,16 +25,9 @@ LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('vers
 if not xbmcvfs.exists(ADDON_PROFILE):
     xbmcvfs.mkdir(ADDON_PROFILE)
 
-if addon.getSetting('subscription') == '0':  # Game Pass International
-    cookie_file = os.path.join(ADDON_PROFILE, 'gp_cookie_file')
-    username = addon.getSetting('email')
-    password = addon.getSetting('password')
-    sub_name = 'international'
-else:  # Game Pass Domestic
-    cookie_file = os.path.join(ADDON_PROFILE, 'gr_cookie_file')
-    username = addon.getSetting('gr_email')
-    password = addon.getSetting('gr_password')
-    sub_name = 'domestic'
+cookie_file = os.path.join(ADDON_PROFILE, 'cookie_file')
+username = addon.getSetting('email')
+password = addon.getSetting('password')
 if addon.getSetting('debug') == 'false':
     debug = False
 else:
@@ -54,7 +47,7 @@ if addon.getSetting('proxy_enabled') == 'true':
     if addon.getSetting('proxy_auth') == 'false':
         proxy_config['auth'] = None
 
-gpr = pigskin(sub_name, proxy_config, cookie_file=cookie_file, debug=debug)
+gpr = pigskin(proxy_config, cookie_file=cookie_file, debug=debug)
 
 
 def addon_log(string):
