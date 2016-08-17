@@ -337,7 +337,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         dialog = xbmcgui.Dialog()
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         ret = dialog.select(language(30003), options)
-        return bitrates[ret]
+        if ret > -1:
+            return bitrates[ret]
 
     def select_bitrate(self, manifest_bitrates=None):
         """Returns a bitrate, while honoring the user's /preference/."""
@@ -390,8 +391,8 @@ class GamepassGUI(xbmcgui.WindowXML):
             game_version = 'coach'
         else:
             game_version = 'archive'
-
-        return game_version
+        if preferred_version > -1:
+            return game_version
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
@@ -467,8 +468,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
                                 game_version = self.select_version(game_versions)
-                                if game_version == 'archive':
-                                    game_version = 'dvr'
+                                if game_version:
+                                    if game_version == 'archive':
+                                        game_version = 'dvr'
                             else:
                                 game_version = 'live'
                         else:
@@ -477,31 +479,32 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 game_versions = game_versions + ' Coach'
 
                             game_version = self.select_version(game_versions)
+                        if game_version:
+                            if game_version == 'coach':
+                                xbmc.executebuiltin("ActivateWindow(busydialog)")
+                                coachesItems = []
+                                game_date = selectedGame.getProperty('game_date').replace('-', '/')
+                                self.playBackStop = False
 
-                        if game_version == 'coach':
-                            xbmc.executebuiltin("ActivateWindow(busydialog)")
-                            coachesItems = []
-                            game_date = selectedGame.getProperty('game_date').replace('-', '/')
-                            self.playBackStop = False
+                                play_stream = gpr.get_coaches_url(game_id, game_date, 'dummy')
+                                plays = gpr.get_coaches_playIDs(game_id, self.selected_season)
+                                for playID in sorted(plays, key=int):
+                                    cf_url = str(play_stream).replace('dummy', playID)
+                                    item = xbmcgui.ListItem(plays[playID])
+                                    item.setProperty('url', cf_url)
+                                    coachesItems.append(item)
 
-                            play_stream = gpr.get_coaches_url(game_id, game_date, 'dummy')
-                            plays = gpr.get_coaches_playIDs(game_id, self.selected_season)
-                            for playID in sorted(plays, key=int):
-                                cf_url = str(play_stream).replace('dummy', playID)
-                                item = xbmcgui.ListItem(plays[playID])
-                                item.setProperty('url', cf_url)
-                                coachesItems.append(item)
-
-                            self.list_refill = True
-                            xbmc.executebuiltin("Dialog.Close(busydialog)")
-                            coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
-                            coachGui.doModal()
-                            del coachGui
-                        else:
-                            game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
-                            bitrate = self.select_bitrate(game_streams.keys())
-                            game_url = game_streams[bitrate]
-                            self.play_url(game_url)
+                                self.list_refill = True
+                                xbmc.executebuiltin("Dialog.Close(busydialog)")
+                                coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
+                                coachGui.doModal()
+                                del coachGui
+                            else:
+                                game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
+                                bitrate = self.select_bitrate(game_streams.keys())
+                                if bitrate:
+                                    game_url = game_streams[bitrate]
+                                    self.play_url(game_url)
 
             elif self.main_selection == 'NFL Network':
                 if controlId == 210:  # season is clicked
@@ -521,8 +524,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
                         bitrate = self.select_bitrate(video_streams.keys())
-                        video_url = video_streams[bitrate]
-                        self.play_url(video_url)
+                        if bitrate:
+                            video_url = video_streams[bitrate]
+                            self.play_url(video_url)
                     else:
                         dialog = xbmcgui.Dialog()
                         dialog.ok(language(30043), language(30045))
@@ -532,8 +536,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         rz_live_streams = gpr.get_publishpoint_streams('redzone')
                         if rz_live_streams:
                             bitrate = self.select_bitrate(rz_live_streams.keys())
-                            rz_live_url = rz_live_streams[bitrate]
-                            self.play_url(rz_live_url)
+                            if bitrate:
+                                rz_live_url = rz_live_streams[bitrate]
+                                self.play_url(rz_live_url)
                         else:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
@@ -541,8 +546,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
                         if nw_live_streams:
                             bitrate = self.select_bitrate(nw_live_streams.keys())
-                            nw_live_url = nw_live_streams[bitrate]
-                            self.play_url(nw_live_url)
+                            if bitrate:
+                                nw_live_url = nw_live_streams[bitrate]
+                                self.play_url(nw_live_url)
                         else:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
