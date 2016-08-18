@@ -346,27 +346,28 @@ class GamepassGUI(xbmcgui.WindowXML):
         """Returns a bitrate, while honoring the user's /preference/."""
         bitrate_setting = int(addon.getSetting('preferred_bitrate'))
         bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
-        if bitrate_setting == 0:
-            preferred_bitrate = 'highest'
-        elif bitrate_setting < 7:  # specific bitrate
+
+        highest = False
+        preferred_bitrate = None
+        if bitrate_setting == 0:  # 0 === "highest"
+            highest = True
+        elif 0 < bitrate_setting and bitrate_setting < 8:  # a specific bitrate. '8' === "ask"
             preferred_bitrate = bitrate_values[bitrate_setting - 1]
-        else:
-            preferred_bitrate = 'ask'
 
         if manifest_bitrates:
             manifest_bitrates.sort(key=int, reverse=True)
-            if preferred_bitrate == 'highest':
+            if highest:
                 return manifest_bitrates[0]
-            elif preferred_bitrate in manifest_bitrates:
+            elif preferred_bitrate and preferred_bitrate in manifest_bitrates:
                 return preferred_bitrate
-            else:
+            else:  # ask user
                 return self.ask_bitrate(manifest_bitrates)
         else:
-            if preferred_bitrate == 'highest':
+            if highest:
                 return bitrate_values[0]
-            elif preferred_bitrate != 'ask':
+            elif preferred_bitrate:
                 return preferred_bitrate
-            else:
+            else:  # ask user
                 return self.ask_bitrate(bitrate_values)
 
     def select_version(self, game_versions):
