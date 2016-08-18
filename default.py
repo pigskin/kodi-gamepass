@@ -339,6 +339,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         ret = dialog.select(language(30003), options)
         if ret > -1:
             return bitrates[ret]
+        else:
+            return None
 
     def select_bitrate(self, manifest_bitrates=None):
         """Returns a bitrate, while honoring the user's /preference/."""
@@ -391,8 +393,11 @@ class GamepassGUI(xbmcgui.WindowXML):
             game_version = 'coach'
         else:
             game_version = 'archive'
+
         if preferred_version > -1:
             return game_version
+        else:
+            return None
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
@@ -468,9 +473,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                         if 'Live' in game_versions:
                             if 'Final' in selectedGame.getProperty('game_info'):
                                 game_version = self.select_version(game_versions)
-                                if game_version:
-                                    if game_version == 'archive':
-                                        game_version = 'dvr'
+                                if game_version == 'archive':
+                                    game_version = 'dvr'
                             else:
                                 game_version = 'live'
                         else:
