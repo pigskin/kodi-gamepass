@@ -13,7 +13,7 @@
 
 2015.12.02 v0.8.1 -- Brett Favre Edition
 + Add NFL Honors and some old seasons (2010-2011) of other shows
-+ Dropped non-fuctioning old (< 2014) NFL Total Access seasons
++ Dropped non-functioning old (< 2014) NFL Total Access seasons
 + Make RedZone button show even when in "pre" mode
 + Fix proxy protocol selection (thanks to maguire for reporting)
 + Cleanup method to detect running games (kaileu)
@@ -157,7 +157,8 @@ Credit goes to divingmule for most of the features added below.
 + New Feature: A Football Life
 + New Translation: Dutch (thanks to Vulpecula-nl!)
 + New fanart (thanks to dahlSTROM!)
-+ Modified Setting: 'Always use best bitrate" is now "Preferred Stream Quality," which lists possible stream values.
++ Modified Setting: 'Always use best bitrate" is now "Preferred Stream Quality,"
++   which lists possible stream values.
 + Untested Features: Superbowl Archives, Top 100 Players, Coaches Show
 + Future games now have date and time listed
 + Live games are noted as such in the interface

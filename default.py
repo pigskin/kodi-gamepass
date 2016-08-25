@@ -372,8 +372,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def select_version(self, game_versions):
         """Returns a game version, while honoring the user's /preference/.
-        Note: the full version is always be available, but not always the
-        condensed.
+        Note: the full version is always available but not always the condensed.
         """
         preferred_version = int(addon.getSetting('preferred_game_version'))
 
