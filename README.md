@@ -2,7 +2,7 @@
 **version 0.9.2 — Jimmy Johnson Edition**
 
 Before reading any further, please understand that this addon is unofficial and
-is not endorsed or supported by the NFL in any way. Thus, not all features are
+is not endorsed or supported by the NFL in any way. Not all features are
 supported (see below) and it should be forever regarded as a beta release. It
 may crash, spay your puppy, and/or cause your oven to not heat to 400°F
 properly.
@@ -15,12 +15,12 @@ request. Patches and (constructive) input are always welcome.
 This addon requires Kodi Jarvis or later. XBMC Helix and Isengard will be
 supported for awhile in the "Isengard" branch.
 
-This addon is part of the official Kodi repository, thus all dependencies are
-installed automatically. However, if you're installing directly from the source,
-make sure the following dependencies are installed:
+This addon is in the official Kodi repository, and when installed from there,
+all dependencies are installed automatically. However, if you're installing
+directly from the source, make sure the following dependencies are installed:
  * xmltodict (http://mirrors.kodi.tv/addons/jarvis/script.module.xmltodict/)
  * Requests 2.x (http://mirrors.kodi.tv/addons/jarvis/script.module.requests/)
- * m3u8 (http://mirrors.kodi.tv/addons/jarvis/script.module.m3u8/)
+ * m3u8 >= 0.2.10 (http://mirrors.kodi.tv/addons/jarvis/script.module.m3u8/)
    * which needs iso8601 (http://mirrors.kodi.tv/addons/jarvis/script.module.iso8601/)
 
 ## What is NFL Game Pass? ##
