@@ -439,12 +439,13 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
                     self.window.setProperty('GP_clicked', 'false')
-                    if gpr.subscription == 'international':
-                        listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
+
+                    listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
+                    self.live_items.append(listitem)
+
+                    if gpr.redzone_on_air():
+                        listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
                         self.live_items.append(listitem)
-                        if gpr.redzone_on_air():
-                            listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
-                            self.live_items.append(listitem)
 
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
