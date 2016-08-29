@@ -220,6 +220,7 @@ class pigskin(object):
     def parse_shows(self, sc_dict):
         """Parse return from /simpleconsole request to build shows list dynamically"""
         try:
+            # All (nearly) NFL Network Shows
             show_dict = {}
             for show in sc_dict['nflnShows']['show']:
                 name = show['name']
@@ -246,6 +247,16 @@ class pigskin(object):
                         self.nflnSeasons.append(season_name)
 
                 show_dict[name] = season_dict
+
+            # RedZone is "special" and is returned separately in the XML
+            rz_dict = {}
+            for season in sc_dict['redZoneCats']['cat']:
+                rz_dict[season['@season']] = season['@id']
+
+                if season['@season'] not in self.nflnSeasons:
+                    self.nflnSeasons.append(season['@season'])
+
+            show_dict['RedZone Archives'] = rz_dict
 
             self.seasonal_shows.update(show_dict)
         except KeyError:
