@@ -47,7 +47,7 @@ if addon.getSetting('proxy_enabled') == 'true':
     if addon.getSetting('proxy_auth') == 'false':
         proxy_config['auth'] = None
 
-gpr = pigskin(proxy_config, cookie_file=cookie_file, debug=debug)
+gp = pigskin(proxy_config, cookie_file=cookie_file, debug=debug)
 
 
 def addon_log(string):
@@ -74,7 +74,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.player = None
         self.list_refill = False
         self.focusId = 100
-        self.seasons_and_weeks = gpr.get_seasons_and_weeks()
+        self.seasons_and_weeks = gp.get_seasons_and_weeks()
 
         xbmcgui.WindowXML.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
@@ -86,7 +86,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list = self.window.getControl(230)
         self.live_list = self.window.getControl(240)
 
-        if gpr.subscription == 'domestic':
+        if gp.subscription == 'domestic':
             self.window.setProperty('domestic', 'true')
 
         if self.list_refill:
@@ -131,7 +131,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         """List seasons"""
         self.season_items = []
         # sort so that years are first (descending) followed by text
-        for season in sorted(gpr.nflnSeasons, key=lambda x: (x[0].isdigit(), x), reverse=True):
+        for season in sorted(gp.nflnSeasons, key=lambda x: (x[0].isdigit(), x), reverse=True):
             listitem = xbmcgui.ListItem(season)
             self.season_items.append(listitem)
 
@@ -140,7 +140,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_nfl_network_archive(self):
         """List shows for a given season"""
         self.weeks_items = []
-        shows = gpr.get_shows(self.selected_season)
+        shows = gp.get_shows(self.selected_season)
         for show_name in shows:
             listitem = xbmcgui.ListItem(show_name)
             self.weeks_items.append(listitem)
@@ -150,7 +150,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_weeks_games(self):
         """Show games for a given season/week"""
         self.games_items = []
-        games = gpr.get_weeks_games(self.selected_season, self.selected_week)
+        games = gp.get_weeks_games(self.selected_season, self.selected_week)
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
         for game in games:
@@ -274,13 +274,13 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_shows_episodes(self, show_name, season):
         """Show episodes for a given season/show"""
         self.games_items = []
-        items = gpr.get_shows_episodes(show_name, season)
+        items = gp.get_shows_episodes(show_name, season)
 
         for i in items:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
                 listitem.setProperty('game_info', i['name'])
-                listitem.setProperty('away_thumb', gpr.image_url + i['image'])
+                listitem.setProperty('away_thumb', gp.image_url + i['image'])
                 listitem.setProperty('url', i['publishPoint'])
                 listitem.setProperty('id', i['id'])
                 listitem.setProperty('type', i['type'])
@@ -425,7 +425,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.window.setProperty('GP_clicked', 'true')
 
                     # display games of current week for usability purposes
-                    cur_s_w = gpr.get_current_season_and_week()
+                    cur_s_w = gp.get_current_season_and_week()
                     self.selected_season = cur_s_w.keys()[0]
                     self.selected_week = cur_s_w.values()[0]
                     self.display_seasons()
@@ -443,7 +443,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
 
-                    if gpr.redzone_on_air():
+                    if gp.redzone_on_air():
                         listitem = xbmcgui.ListItem('NFL RedZone - Live', 'NFL RedZone - Live')
                         self.live_items.append(listitem)
 
@@ -480,7 +480,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 game_version = 'live'
                         else:
                             # Check for coaches film availability
-                            if gpr.check_for_coachestape(game_id, self.selected_season):
+                            if gp.check_for_coachestape(game_id, self.selected_season):
                                 game_versions = game_versions + ' Coach'
 
                             game_version = self.select_version(game_versions)
@@ -491,8 +491,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 game_date = selectedGame.getProperty('game_date').replace('-', '/')
                                 self.playBackStop = False
 
-                                play_stream = gpr.get_coaches_url(game_id, game_date, 'dummy')
-                                plays = gpr.get_coaches_playIDs(game_id, self.selected_season)
+                                play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
+                                plays = gp.get_coaches_playIDs(game_id, self.selected_season)
                                 for playID in sorted(plays, key=int):
                                     cf_url = str(play_stream).replace('dummy', playID)
                                     item = xbmcgui.ListItem(plays[playID])
@@ -505,7 +505,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 coachGui.doModal()
                                 del coachGui
                             else:
-                                game_streams = gpr.get_publishpoint_streams(game_id, 'game', game_version)
+                                game_streams = gp.get_publishpoint_streams(game_id, 'game', game_version)
                                 bitrate = self.select_bitrate(game_streams.keys())
                                 if bitrate:
                                     game_url = game_streams[bitrate]
@@ -525,7 +525,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gpr.get_publishpoint_streams(video_id, 'video')
+                    video_streams = gp.get_publishpoint_streams(video_id, 'video')
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
                         bitrate = self.select_bitrate(video_streams.keys())
@@ -538,7 +538,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_live_streams = gpr.get_publishpoint_streams('redzone')
+                        rz_live_streams = gp.get_publishpoint_streams('redzone')
                         if rz_live_streams:
                             bitrate = self.select_bitrate(rz_live_streams.keys())
                             if bitrate:
@@ -548,7 +548,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
-                        nw_live_streams = gpr.get_publishpoint_streams('nfl_network')
+                        nw_live_streams = gp.get_publishpoint_streams('nfl_network')
                         if nw_live_streams:
                             bitrate = self.select_bitrate(nw_live_streams.keys())
                             if bitrate:
@@ -602,8 +602,8 @@ if __name__ == "__main__":
     xbmc.executebuiltin("Dialog.Close(busydialog)")
 
     try:
-        gpr.login(username, password)
-    except gpr.LoginFailure as error:
+        gp.login(username, password)
+    except gp.LoginFailure as error:
         dialog = xbmcgui.Dialog()
         if error.value == 'Game Pass Domestic Blackout':
             addon_log('Game Pass Domestic is in blackout.')
