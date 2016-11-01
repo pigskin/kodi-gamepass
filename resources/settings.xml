@@ -18,7 +18,4 @@
     <setting id="proxy_username" type="text" label="30038" default="" enable="eq(-1,true)"/>
     <setting id="proxy_password" type="text" label="30039" default="" option="hidden" enable="eq(-2,true)"/>
   </category>
-  <category label="30031">
-    <setting id="debug" type="bool" label="Add-on debugging" default="false"/>
-  </category>
 </settings>

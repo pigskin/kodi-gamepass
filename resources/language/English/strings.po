@@ -121,10 +121,6 @@ msgctxt "#30030"
 msgid "Display/Video"
 msgstr ""
 
-msgctxt "#30031"
-msgid "Advanced"
-msgstr ""
-
 msgctxt "#30032"
 msgid "Coaches Film"
 msgstr ""
