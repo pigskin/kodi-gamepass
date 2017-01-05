@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 import sys
 import time
-import json
 from traceback import format_exc
 
 import xbmc
@@ -29,14 +28,6 @@ if not xbmcvfs.exists(ADDON_PROFILE):
 cookie_file = os.path.join(ADDON_PROFILE, 'cookie_file')
 username = addon.getSetting('email')
 password = addon.getSetting('password')
-debug_cmd = {  # determine if debug logging is activated in kodi
-    'jsonrpc': '2.0',
-    'method': 'Settings.GetSettingValue',
-    'params': {'setting': 'debug.showloginfo'},
-    'id': '1'
-    }
-debug_dict = json.loads(xbmc.executeJSONRPC(json.dumps(debug_cmd)))
-debug = debug_dict['result']['value']
 
 proxy_config = None
 if addon.getSetting('proxy_enabled') == 'true':
@@ -52,13 +43,12 @@ if addon.getSetting('proxy_enabled') == 'true':
     if addon.getSetting('proxy_auth') == 'false':
         proxy_config['auth'] = None
 
-gp = pigskin(proxy_config, cookie_file=cookie_file, debug=debug)
+gp = pigskin(proxy_config, cookie_file=cookie_file, debug=True)
 
 
 def addon_log(string):
-    if debug:
-        msg = '%s: %s' % (logging_prefix, string)
-        xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
+    msg = '%s: %s' % (LOGGING_PREFIX, string)
+    xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
 
 
 class GamepassGUI(xbmcgui.WindowXML):
