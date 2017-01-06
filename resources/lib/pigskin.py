@@ -398,12 +398,15 @@ class pigskin(object):
 
         game_data = self.make_request(url=url, method='post', payload=post_data)
         game_data_dict = xmltodict.parse(game_data)['result']
-        games = game_data_dict['games']['game']
-        # if only one game is returned, we explicitly put it into a list
-        if isinstance(games, dict):
-            games = [games]
+        if game_data_dict['games']:
+            games = game_data_dict['games']['game']
+            # if only one game is returned, we explicitly put it into a list
+            if isinstance(games, dict):
+                games = [games]
 
-        return games
+            return games
+        else:
+            return None
 
     def login(self, username=None, password=None):
         """Complete login process for Game Pass. Errors (auth issues, blackout,
