@@ -168,3 +168,7 @@ msgstr ""
 msgctxt "#30045"
 msgid "No valid stream URL was found."
 msgstr ""
+
+msgctxt "#30046"
+msgid "There is currently no data available for this week."
+msgstr ""
