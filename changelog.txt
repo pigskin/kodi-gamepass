@@ -1,3 +1,12 @@
+2017.01.09 v0.10.0 -- Barry Sanders Edition
++ Update for Krypton
++ Update logging for Krypton (emilsvennesson)
++ Nicely inform user when week info isn't available yet
++ New Translations: Russian and Ukrainian (Igor Davydenko)
++ Domestic users can now access NFL Network
++ RedZone content is now acquired dynamically, like all other resources
++ Assorted cleanup
+
 2016.08.25 v0.9.2 -- Jimmy Johnson Edition
 + New Translation: Japanese (David Maiorino)
 + UI Fix: "Upcoming" game text overlapped with the game time (aqw)
