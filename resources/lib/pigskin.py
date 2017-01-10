@@ -61,7 +61,9 @@ class pigskin(object):
             self.log('image url: %s' % self.image_url)
             self.log('locEDLBaseUrl: %s' % self.locEDLBaseUrl)
         except xmltodict.expat.ExpatError:
-            return False
+            self.log('Failed to parse contents of the "simpleconsole".')
+            self.log('pigskin __init__-ing failed. Time to debug!')
+            return None
 
         # get subscription type
         if '<isGPDomestic>' in sc_data:
