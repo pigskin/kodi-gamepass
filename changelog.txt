@@ -1,3 +1,6 @@
+2017.01.10 v0.10.1 -- Barry Sanders Edition
++ Bug fix caught by Kodi's Pull Request code checks. :-)
+
 2017.01.09 v0.10.0 -- Barry Sanders Edition
 + Update for Krypton
 + Update logging for Krypton (emilsvennesson)

@@ -1,5 +1,5 @@
 # NFL Game Pass Kodi Plugin #
-**version 0.10.0 — Barry Sanders Edition**
+**version 0.10.1 — Barry Sanders Edition**
 
 Before reading any further, please understand that this addon is unofficial and
 is not endorsed or supported by the NFL in any way. Not all features are
