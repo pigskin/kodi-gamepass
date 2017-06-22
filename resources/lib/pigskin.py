@@ -160,3 +160,37 @@ class pigskin(object):
         self.access_token = result["access_token"]
         self.refresh_token = result["refresh_token"]
         print result
+
+    def get_seasons_and_weeks(self):
+        """Return a multidimensional array of all seasons and weeks."""
+        seasons_and_weeks = {}
+
+        try:
+            url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
+            request = urllib2.urlopen(url)
+            seasons = json.loads(request.read())
+        except:
+            self.log('Acquiring season and week data failed.')
+            raise
+
+        try:
+            for season in seasons['modules']['mainMenu']['seasonStructureList']:
+                year = season['season']
+                print year
+                season_dict = {}
+
+                for season_week_types in season['seasonTypes']:
+                    if season_week_types['seasonType'] == "pre":  # preseason
+                        print season_week_types['weeks']
+                            #week_code = '1' + week['number'].zfill(2)
+                        #season_dict[week_code] = week
+                    #else:  # regular season and post season
+                     #   week_code = '2' + week['@value'].zfill(2)
+                      #  season_dict[week_code] = week
+
+                #seasons_and_weeks[year] = season_dict
+        except KeyError:
+            self.log('Parsing season and week data failed.')
+            raise
+
+        return seasons_and_weeks
