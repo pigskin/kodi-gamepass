@@ -25,7 +25,6 @@ LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('vers
 if not xbmcvfs.exists(ADDON_PROFILE):
     xbmcvfs.mkdir(ADDON_PROFILE)
 
-cookie_file = os.path.join(ADDON_PROFILE, 'cookie_file')
 username = addon.getSetting('email')
 password = addon.getSetting('password')
 
@@ -43,7 +42,7 @@ if addon.getSetting('proxy_enabled') == 'true':
     if addon.getSetting('proxy_auth') == 'false':
         proxy_config['auth'] = None
 
-gp = pigskin(proxy_config, cookie_file=cookie_file, debug=True)
+gp = pigskin(proxy_config, debug=True)
 
 
 def addon_log(string):
