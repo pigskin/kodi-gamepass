@@ -175,22 +175,87 @@ class pigskin(object):
 
         try:
             for season in seasons['modules']['mainMenu']['seasonStructureList']:
-                year = season['season']
-                print year
+                year = str(season['season'])
                 season_dict = {}
 
                 for season_week_types in season['seasonTypes']:
                     if season_week_types['seasonType'] == "pre":  # preseason
-                        print season_week_types['weeks']
-                            #week_code = '1' + week['number'].zfill(2)
-                        #season_dict[week_code] = week
-                    #else:  # regular season and post season
-                     #   week_code = '2' + week['@value'].zfill(2)
-                      #  season_dict[week_code] = week
+                        for week in season_week_types['weeks']:
+                            week_code = '1' + str(week['number']).zfill(2)
+                            if week['weekNameAbbr'] == 'hof':
+                                season_dict[week_code] = 'Hall of Fame'
+                            else:
+                                season_dict[week_code] = 'Week ' + str(week['number'])
+                    if season_week_types['seasonType'] == "reg":
+                        for week in season_week_types['weeks']:    
+                            week_code = '2' + str(week['number']).zfill(2)
+                            season_dict[week_code] = 'Week ' + str(week['number']+4)
+                    else:  # regular season and post season
+                        for week in season_week_types['weeks']:
+                            week_code = '3' + str(week['number']).zfill(2)
+                            if week['weekNameAbbr'] == 'wc':
+                                season_dict[week_code] = 'WILD CARD ROUND'
+                            if week['weekNameAbbr'] == 'div':
+                                season_dict[week_code] = 'DIVISIONAL ROUND'
+                            if week['weekNameAbbr'] == 'conf':
+                                season_dict[week_code] = 'CHAMPIONSHIP ROUND'
+                            if week['weekNameAbbr'] == 'pro':
+                                season_dict[week_code] = 'PRO BOWL'
+                            if week['weekNameAbbr'] == 'sb':
+                                season_dict[week_code] = 'SUPER BOWL'
 
-                #seasons_and_weeks[year] = season_dict
+
+                seasons_and_weeks[year] = season_dict
         except KeyError:
             self.log('Parsing season and week data failed.')
             raise
 
         return seasons_and_weeks
+    
+    def get_current_season_and_week(self):
+        """Return the current season and week_code (e.g. 210) in a dict."""
+        try:
+            url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
+            request = urllib2.urlopen(url)
+            seasons = json.loads(request.read())
+        except:
+            self.log('Acquiring season and week data failed.')
+            raise
+
+        if seasons['modules']['meta']['currentContext']['currentSeasonType'] == 'pre':
+            current_s_w = {seasons['modules']['meta']['currentContext']['currentSeason']: '1' + str(seasons['modules']['meta']['currentContext']['currentWeek']).zfill(2)}
+        if seasons['modules']['meta']['currentContext']['currentSeasonType'] == 'reg':
+            current_s_w = {seasons['modules']['meta']['currentContext']['currentSeason']: '2' + str(seasons['modules']['meta']['currentContext']['currentWeek']).zfill(2)}
+        if seasons['modules']['meta']['currentContext']['currentSeasonType'] == 'post':
+            current_s_w = {seasons['modules']['meta']['currentContext']['currentSeason']: '3' + str(seasons['modules']['meta']['currentContext']['currentWeek']).zfill(2)}
+        
+        return current_s_w
+
+    def get_weeks_games(self, season, week_code):
+        if week_code[:1] == '1':
+            week_code = week_code[1:].lstrip('0')
+            if week_code == '':
+                week_code = '0'
+            type = 'pre'
+        if week_code[:1] == '2':
+            week_code = week_code[1:].lstrip('0')
+            type = 'reg'
+        if week_code[:1] == '3':
+            week_code = week_code[1:].lstrip('0')
+            type = 'post'
+        try:
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
+            print url
+            url = url.replace(':seasonType', type).replace(':season', season).replace(':week', week_code)
+            
+            print type
+            print week_code
+            print season
+            print url
+        
+            request = urllib2.urlopen(url)
+            games = json.loads(request.read())
+        except:
+            self.log('Acquiring games data failed.')
+            raise
+        return games
