@@ -292,7 +292,21 @@ class pigskin(object):
             return False
         else:
             print 'Coaches Tape available'
-            return True
+            return coachfilmVideo['videoId'] 
+    
+    def check_for_condensedGame(self, game_id, season):
+        """Return whether coaches tape is available for a given game."""
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
+        url = url.replace(':season', season).replace(':gameslug', game_id)
+        request = requests.get(url, verify=False)
+        response = request.json()
+        condensedVideo = response['modules']['singlegame']['content'][0]['condensedVideo']
+        if condensedVideo is None:
+            print 'No condensed Game available'
+            return False
+        else:
+            print 'Condensed Game available'
+            return condensedVideo['videoId']
 
     def gen_plid(self):
         """Return a "unique" MD5 hash. Getting the video path requires a plid,

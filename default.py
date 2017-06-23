@@ -476,34 +476,45 @@ class GamepassGUI(xbmcgui.WindowXML):
                             # Check for coaches film availability
                             if gp.check_for_coachestape(game_id, self.selected_season):
                                 game_versions = game_versions + ' Coach'
+                                couch_id = gp.check_for_coachestape(game_id, self.selected_season)
+                            # Check for condensed film availability
+                            if gp.check_for_condensedGame(game_id, self.selected_season):
+                                game_versions = game_versions + ' Condensed'
+                                condensed_id = gp.check_for_condensedGame(game_id, self.selected_season)
 
                             game_version = self.select_version(game_versions)
                         if game_version:
-                            if game_version == 'coach':
-                                xbmc.executebuiltin("ActivateWindow(busydialog)")
-                                coachesItems = []
-                                game_date = selectedGame.getProperty('game_date').replace('-', '/')
-                                self.playBackStop = False
+                            #if game_version == 'coach':
+                            #    xbmc.executebuiltin("ActivateWindow(busydialog)")
+                            #    coachesItems = []
+                            #    game_date = selectedGame.getProperty('game_date').replace('-', '/')
+                            #    self.playBackStop = False
 
-                                play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
-                                plays = gp.get_coaches_playIDs(game_id, self.selected_season)
-                                for playID in sorted(plays, key=int):
-                                    cf_url = str(play_stream).replace('dummy', playID)
-                                    item = xbmcgui.ListItem(plays[playID])
-                                    item.setProperty('url', cf_url)
-                                    coachesItems.append(item)
+                                #play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
+                                #play_stream = gp.get_publishpoint_streams(couch_id, 'game', game_version, username)
+                                #plays = gp.get_coaches_playIDs(game_id, self.selected_season)
+                                #for playID in sorted(plays, key=int):
+                                #    cf_url = str(play_stream).replace('dummy', playID)
+                                #    item = xbmcgui.ListItem(plays[playID])
+                                #    item.setProperty('url', cf_url)
+                                #    coachesItems.append(item)
 
-                                self.list_refill = True
-                                xbmc.executebuiltin("Dialog.Close(busydialog)")
-                                coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
-                                coachGui.doModal()
-                                del coachGui
+                                #self.list_refill = True
+                                #xbmc.executebuiltin("Dialog.Close(busydialog)")
+                                #coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
+                                #coachGui.doModal()
+                                #del coachGui
+                            if game_version == 'condensed':
+                                game_streams = gp.get_publishpoint_streams(condensed_id, 'game', game_version, username)
                             else:
-                                game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
-                                bitrate = self.select_bitrate(game_streams.keys())
-                                if bitrate:
-                                    game_url = game_streams[bitrate]
-                                    self.play_url(game_url)
+                                if game_version == 'coach':
+                                    game_streams = gp.get_publishpoint_streams(couch_id, 'game', game_version, username)
+                                else:
+                                    game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
+                            bitrate = self.select_bitrate(game_streams.keys())
+                            if bitrate:
+                                game_url = game_streams[bitrate]
+                                self.play_url(game_url)
 
             elif self.main_selection == 'NFL Network':
                 if controlId == 210:  # season is clicked
