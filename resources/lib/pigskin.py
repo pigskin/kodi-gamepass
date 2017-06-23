@@ -7,9 +7,8 @@ import random
 import m3u8
 import re
 import sys
-import urllib
-import urllib2
 import json
+import urllib2
 from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
@@ -27,8 +26,8 @@ class pigskin(object):
         self.refresh_token = ''
         #################
         url = self.base_url + '/api/en/content/v1/web/config'
-        jsonconfig = urllib2.urlopen(url)
-        self.config = json.loads(jsonconfig.read())
+        jsonconfig = requests.get(url, verify=False)
+        self.config = jsonconfig.json()
         self.client_id = self.config["modules"]["API"]["CLIENT_ID"]
         #self.config["modules"]["API"]["LOGIN"]
 
@@ -117,16 +116,13 @@ class pigskin(object):
         whether a login was successful."""
         url = self.config["modules"]["API"]["USER_PROFILE"]
         BearerHeaders = {"Authorization":"Bearer " + self.access_token}
-        request=urllib2.Request(url, headers=BearerHeaders)
-        try:
-            response = urllib2.urlopen(request)
-        except urllib2.HTTPError as e:
-            if e.code==401:
-                self.log('Subscription not detected in Game Pass response.')
-                return False
-            else:
-                self.log('Subscription detected.')
-        return True
+        request=requests.get(url, headers=BearerHeaders, verify=False)
+        if request.status_code == 401:
+            self.log('Subscription not detected in Game Pass response.')
+            return False
+        else:
+            self.log('Subscription detected.')
+            return True
 
     def login(self, username=None, password=None):
         """Complete login process for Game Pass. Errors (auth issues, blackout,
@@ -155,11 +151,14 @@ class pigskin(object):
             'client_id': self.client_id,
             'grant_type': 'password'
         }
-        request = urllib2.urlopen(url, urllib.urlencode(post_data))
-        result = json.loads(request.read())
-        self.access_token = result["access_token"]
-        self.refresh_token = result["refresh_token"]
-        print result
+        request = requests.post(url, data=post_data, verify=False)
+        if request.status_code == 200:
+            result = request.json()
+            self.access_token = result["access_token"]
+            self.refresh_token = result["refresh_token"]
+            print result
+            return True
+        return False
 
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
@@ -167,8 +166,8 @@ class pigskin(object):
 
         try:
             url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
-            request = urllib2.urlopen(url)
-            seasons = json.loads(request.read())
+            request = requests.get(url, verify=False)
+            seasons = request.json()
         except:
             self.log('Acquiring season and week data failed.')
             raise
@@ -216,8 +215,8 @@ class pigskin(object):
         """Return the current season and week_code (e.g. 210) in a dict."""
         try:
             url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
-            request = urllib2.urlopen(url)
-            seasons = json.loads(request.read())
+            request = requests.get(url, verify=False)
+            seasons = request.json()
         except:
             self.log('Acquiring season and week data failed.')
             raise
@@ -253,8 +252,8 @@ class pigskin(object):
             print season
             print url
         
-            request = urllib2.urlopen(url)
-            games = json.loads(request.read())
+            request = requests.get(url, verify=False)
+            games = request.json()
         except:
             self.log('Acquiring games data failed.')
             raise
