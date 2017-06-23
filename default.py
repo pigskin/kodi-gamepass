@@ -177,6 +177,65 @@ class GamepassGUI(xbmcgui.WindowXML):
                 #listitem.setProperty('game_date', game['date'].split('T')[0])
                 #listitem.setProperty('game_versions', ' '.join(game_versions))
                 self.games_items.append(listitem)
+            for game in games['modules']['weekScheduledGames']['content']:
+                game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
+                isPlayable = 'false'
+                isBlackedOut = 'false'
+                home_team = game['homeTeamAbbr']
+                away_team = game['visitorTeamAbbr']
+                #game_info = ''
+                #game_id = game['id']
+                #game_versions = []
+                #isPlayable = 'true'
+                #isBlackedOut = 'false'
+                #home_team = game['homeTeam']
+                #away_team = game['awayTeam']               
+                #print game['gameid']
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
+                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
+                listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+                #listitem.setProperty('game_info', game_info)
+                listitem.setProperty('is_game', 'true')
+                listitem.setProperty('is_show', 'false')
+                listitem.setProperty('isPlayable', isPlayable)
+                listitem.setProperty('isBlackedOut', isBlackedOut)
+                listitem.setProperty('game_id', game_id)
+                listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
+                listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
+                #listitem.setProperty('game_date', game['date'].split('T')[0])
+                #listitem.setProperty('game_versions', ' '.join(game_versions))
+                self.games_items.append(listitem)
+            for game in games['modules']['weekLiveGames']['content']:
+                game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
+                if game['video']['videoId']:
+                    video_id = str(game['video']['videoId'])
+                    isPlayable = 'true'
+                    isBlackedOut = 'false'
+                home_team = game['homeTeamAbbr']
+                away_team = game['visitorTeamAbbr']
+                #game_info = ''
+                #game_id = game['id']
+                #game_versions = []
+                #isPlayable = 'true'
+                #isBlackedOut = 'false'
+                #home_team = game['homeTeam']
+                #away_team = game['awayTeam']               
+                #print game['gameid']
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
+                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
+                listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+                #listitem.setProperty('game_info', game_info)
+                listitem.setProperty('is_game', 'true')
+                listitem.setProperty('is_show', 'false')
+                listitem.setProperty('isPlayable', isPlayable)
+                listitem.setProperty('isBlackedOut', isBlackedOut)
+                listitem.setProperty('game_id', game_id)
+                listitem.setProperty('video_id', video_id)
+                listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
+                listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
+                #listitem.setProperty('game_date', game['date'].split('T')[0])
+                #listitem.setProperty('game_versions', ' '.join(game_versions))
+                self.games_items.append(listitem)
 
             self.games_list.addItems(self.games_items)
         
