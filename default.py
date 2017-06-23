@@ -147,13 +147,13 @@ class GamepassGUI(xbmcgui.WindowXML):
         date_time_format = '%Y-%m-%dT%H:%M:%S.000'
         if games:
             for game in games['modules']['weekCompletedGames']['content']:
-                game_id = str(game['gameId'])
+                game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
                 if game['video']['videoId']:
                     video_id = str(game['video']['videoId'])
                     isPlayable = 'true'
                     isBlackedOut = 'false'
                 home_team = game['homeTeamAbbr']
-                away_team = game['visitorNickName']
+                away_team = game['visitorTeamAbbr']
                 #game_info = ''
                 #game_id = game['id']
                 #game_versions = []
@@ -162,7 +162,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 #home_team = game['homeTeam']
                 #away_team = game['awayTeam']               
                 #print game['gameid']
-                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (away_team, game['homeNickName'])
+                game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
                 game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
                 listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
                 #listitem.setProperty('game_info', game_info)
@@ -172,6 +172,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                 listitem.setProperty('isBlackedOut', isBlackedOut)
                 listitem.setProperty('game_id', game_id)
                 listitem.setProperty('video_id', video_id)
+                listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
+                listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
                 #listitem.setProperty('game_date', game['date'].split('T')[0])
                 #listitem.setProperty('game_versions', ' '.join(game_versions))
                 self.games_items.append(listitem)
@@ -264,7 +266,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         """
         options = []
         for bitrate in bitrates:
-            options.append(bitrate + ' Kbps')
+            print bitrate
+            options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         ret = dialog.select(language(30003), options)
@@ -276,7 +279,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def select_bitrate(self, manifest_bitrates=None):
         """Returns a bitrate, while honoring the user's /preference/."""
         bitrate_setting = int(addon.getSetting('preferred_bitrate'))
-        bitrate_values = ['4500', '3000', '2400', '1600', '1200', '800', '400']
+        bitrate_values = ['3671533', '2394274', '1577316', '1117771', '760027', '555799', '402512']
 
         highest = False
         preferred_bitrate = None
@@ -400,6 +403,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if selectedGame.getProperty('isPlayable') == 'true':
                         self.init('game/episode')
                         game_id = selectedGame.getProperty('game_id')
+                        video_id = selectedGame.getProperty('video_id')
                         game_versions = selectedGame.getProperty('game_versions')
 
                         if 'Live' in game_versions:
@@ -436,7 +440,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 coachGui.doModal()
                                 del coachGui
                             else:
-                                game_streams = gp.get_publishpoint_streams(game_id, 'game', game_version)
+                                game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
                                 bitrate = self.select_bitrate(game_streams.keys())
                                 if bitrate:
                                     game_url = game_streams[bitrate]
@@ -456,7 +460,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gp.get_publishpoint_streams(video_id, 'video')
+                    video_streams = gp.get_publishpoint_streams(video_id, 'video', username)
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
                         bitrate = self.select_bitrate(video_streams.keys())
@@ -469,7 +473,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_live_streams = gp.get_publishpoint_streams('redzone')
+                        rz_live_streams = gp.get_publishpoint_streams('redzone', username)
                         if rz_live_streams:
                             bitrate = self.select_bitrate(rz_live_streams.keys())
                             if bitrate:
@@ -479,7 +483,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
-                        nw_live_streams = gp.get_publishpoint_streams('nfl_network')
+                        nw_live_streams = gp.get_publishpoint_streams('nfl_network', username)
                         if nw_live_streams:
                             bitrate = self.select_bitrate(nw_live_streams.keys())
                             if bitrate:

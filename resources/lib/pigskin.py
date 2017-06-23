@@ -8,7 +8,7 @@ import m3u8
 import re
 import sys
 import json
-import urllib2
+import urllib
 from traceback import format_exc
 from uuid import getnode as get_mac
 from urlparse import urlsplit
@@ -92,7 +92,7 @@ class pigskin(object):
                 password = config['auth']['password']
                 if username == '' or password == '':
                     return ''
-                proxy_url += '%s:%s@' % (urllib2.quote(username), urllib2.quote(password))
+                proxy_url += '%s:%s@' % (urllib.quote(username), urllib.quote(password))
             except KeyError:
                 return ''
 
@@ -159,7 +159,26 @@ class pigskin(object):
             print result
             return True
         return False
-
+    
+    def get_refresh_token(self, refresh_token):
+        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        determine success.
+        """
+        url = self.config["modules"]["API"]["LOGIN"]
+        post_data = {
+            'refresh_token': refresh_token,
+            'client_id': self.client_id,
+            'grant_type': 'refresh_token'
+        }
+        request = requests.post(url, data=post_data, verify=False)
+        if request.status_code == 200:
+            result = request.json()
+            self.access_token = result["access_token"]
+            self.refresh_token = result["refresh_token"]
+            print result
+            return True
+        return False
+        
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
         seasons_and_weeks = {}
@@ -235,19 +254,21 @@ class pigskin(object):
             week_code = week_code[1:].lstrip('0')
             if week_code == '':
                 week_code = '0'
-            type = 'pre'
-        if week_code[:1] == '2':
-            week_code = week_code[1:].lstrip('0')
-            type = 'reg'
-        if week_code[:1] == '3':
-            week_code = week_code[1:].lstrip('0')
-            type = 'post'
+            seasonType = 'pre'
+        else:
+            if week_code[:1] == '2':
+                week_code = week_code[1:].lstrip('0')
+                seasonType = 'reg'
+            else:
+                if week_code[:1] == '3':
+                    week_code = week_code[1:].lstrip('0')
+                    seasonType = 'post'
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
             print url
-            url = url.replace(':seasonType', type).replace(':season', season).replace(':week', week_code)
+            url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
             
-            print type
+            print seasonType
             print week_code
             print season
             print url
@@ -258,3 +279,88 @@ class pigskin(object):
             self.log('Acquiring games data failed.')
             raise
         return games
+        
+    def check_for_coachestape(self, game_id, season):
+        """Return whether coaches tape is available for a given game."""
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
+        url = url.replace(':season', season).replace(':gameslug', game_id)
+        request = requests.get(url, verify=False)
+        response = request.json()
+        coachfilmVideo = response['modules']['singlegame']['content'][0]['coachfilmVideo']
+        if coachfilmVideo is None:
+            print 'No coaches Tape available'
+            return False
+        else:
+            print 'Coaches Tape available'
+            return True
+
+    def gen_plid(self):
+        """Return a "unique" MD5 hash. Getting the video path requires a plid,
+        which looks like MD5 and always changes. Reusing a plid does not work,
+        so our guess is that it's a id for each instance of the player.
+        """
+        rand = random.getrandbits(10)
+        mac_address = str(get_mac())
+        md5 = hashlib.md5(str(rand) + mac_address)
+        return md5.hexdigest()
+        
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None):
+        """Return the URL for a stream."""
+        streams = {}
+        self.get_current_season_and_week()  # set cookies
+        divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
+        url = divaconfig.replace('device', 'html5')
+        request = requests.get(url, verify=False)
+        divaconfig = xmltodict.parse(request.text)
+        for parameter in divaconfig['settings']['videoData']['parameter']:
+            if parameter['@name']== 'videoDataPath':
+                videoDataPath = parameter['@value'].replace('{V.ID}',video_id)
+        for parameter in divaconfig['settings']['entitlementCheck']['parameter']:
+            if parameter['@name']== 'processingUrlCallPath':
+                processingUrlCallPath = parameter['@value']
+        request = requests.get(videoDataPath, verify=False)
+        akamai_url = xmltodict.parse(request.text)
+        for videoSource in akamai_url['video']['videoSources']['videoSource']:
+            print videoSource
+            if videoSource['@format']== 'HLS':
+                m3u8_url = videoSource['uri']
+        print m3u8_url
+        self.get_refresh_token(self.refresh_token)
+        
+        
+        
+        
+        post_data = {
+            'Type': '1',
+            'User': '',
+            'VideoId': video_id,
+            'VideoSource': m3u8_url,
+            'VideoKind': 'Video',
+            'AssetState': '3',
+            'PlayerType': 'HTML5',
+            'other': self.gen_plid() + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
+        }
+        
+        request = requests.post(processingUrlCallPath, json=post_data, verify=False)
+        response = request.json()
+        m3u8_url = response['ContentUrl']
+        
+        m3u8_request = requests.get(m3u8_url, verify=False)
+        m3u8_manifest = m3u8_request.text
+        
+        m3u8_header = {'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57',
+                       'Accept-encoding': 'identity, gzip, deflate',
+                       'Connection': 'keep-alive'}
+
+        if m3u8_manifest:
+            m3u8_obj = m3u8.loads(m3u8_manifest)
+            if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
+                for playlist in m3u8_obj.playlists:
+                    bitrate = int(playlist.stream_info.bandwidth)
+                    print bitrate
+                    streams[bitrate] = m3u8_url[:m3u8_url.rfind('/manifest') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+            else:
+                streams['sole available'] = m3u8_url
+
+        return streams
+    
