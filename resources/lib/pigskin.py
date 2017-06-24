@@ -383,3 +383,24 @@ class pigskin(object):
 
         return streams
     
+    def get_team_games(self, team):
+        try:
+            #team = 'Seattle Seahawks' Team Full Name will be converted to the seoname Team Name
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
+            teams = requests.get(url, verify=False)
+            teams = teams.json()
+            for conference in teams['modules']:
+                for teamname in teams['modules'][conference]['content']:
+                    print team
+                    if team == teamname['fullName']:
+                        team = teamname['seoname']
+                    
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
+            url = url.replace(':team', team)
+            team_detail = requests.get(url, verify=False)
+            team_detail = team_detail.json()
+            
+        except:
+            self.log('Acquiring games data failed.')
+            raise
+        return team_detail
