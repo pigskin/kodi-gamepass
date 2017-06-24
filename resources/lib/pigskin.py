@@ -263,6 +263,7 @@ class pigskin(object):
                     seasonType = 'post'
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
+            print url
             url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
             request = requests.get(url, verify=False)
             games = request.json()
@@ -313,7 +314,20 @@ class pigskin(object):
         """Return the URL for a stream."""
         streams = {}
         self.get_current_season_and_week()  # set cookies
-        divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
+        
+        if video_id == 'nfl_network':
+            divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
+            request = requests.get(url, verify=False)
+            response = request.json()
+            video_id = response['modules']['networkLiveVideo']['content'][0]['videoId']
+        else:
+            if game_type == 'live':
+                divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['LiveNoData']
+            else:
+                divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
+        
+
         url = divaconfig.replace('device', 'html5')
         request = requests.get(url, verify=False)
         divaconfig = xmltodict.parse(request.text)
@@ -326,8 +340,10 @@ class pigskin(object):
         request = requests.get(videoDataPath, verify=False)
         akamai_url = xmltodict.parse(request.text)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
+            print videoSource
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
+        print m3u8_url
         self.get_refresh_token(self.refresh_token)
         
         

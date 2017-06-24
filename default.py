@@ -310,6 +310,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         """
         options = []
         for bitrate in bitrates:
+            print bitrate
             options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
         xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -527,7 +528,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_live_streams = gp.get_publishpoint_streams('redzone', username)
+                        rz_live_streams = gp.get_publishpoint_streams('redzone', '', '', username)
                         if rz_live_streams:
                             bitrate = self.select_bitrate(rz_live_streams.keys())
                             if bitrate:
@@ -537,7 +538,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
-                        nw_live_streams = gp.get_publishpoint_streams('nfl_network', username)
+                        nw_live_streams = gp.get_publishpoint_streams('nfl_network', '', '', username)
                         if nw_live_streams:
                             bitrate = self.select_bitrate(nw_live_streams.keys())
                             if bitrate:
