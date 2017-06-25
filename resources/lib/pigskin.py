@@ -259,27 +259,30 @@ class pigskin(object):
             raise
         return games
     
-    def get_team_games(self, season, team):
+    def get_team_games(self, season, team=None):
         try:
-            team = 'Seattle Seahawks'
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
             teams = requests.get(url, verify=False)
             teams = teams.json()
-            for conference in teams['modules']:
-                for teamname in teams['modules'][conference]['content']:
-                    print team
-                    if team == teamname['fullName']:
-                        team = teamname['seoname']
+            if team is None:
+                return teams
+            else:
+                for conference in teams['modules']:
+                    for teamname in teams['modules'][conference]['content']:
+                        print team
+                        if team == teamname['fullName']:
+                            team = teamname['seoname']
                     
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
-            url = url.replace(':team', team)
-            team_detail = requests.get(url, verify=False)
-            team_detail = team_detail.json()
+                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
+                url = url.replace(':team', team)
+                team_detail = requests.get(url, verify=False)
+                team_detail = team_detail.json()
+                return team_detail
             
         except:
             self.log('Acquiring games data failed.')
             raise
-        return team_detail
+        return False
         
     def check_for_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
