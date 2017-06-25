@@ -252,22 +252,21 @@ class GamepassGUI(xbmcgui.WindowXML):
         """Show episodes for a given season/show"""
         self.games_items = []
         items = gp.get_shows_episodes(show_name, season)
-
-        for i in items:
+        
+        for i in items['modules']['archive']['content']:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
-                listitem.setProperty('game_info', i['name'])
-                listitem.setProperty('away_thumb', gp.image_url + i['image'])
-                listitem.setProperty('url', i['publishPoint'])
-                listitem.setProperty('id', i['id'])
-                listitem.setProperty('type', i['type'])
+                listitem.setProperty('game_info', i['title'])
+                #listitem.setProperty('away_thumb', gp.image_url + i['image'])
+                #listitem.setProperty('url', i['publishPoint'])
+                listitem.setProperty('id', i['videoId'])
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
                 self.games_items.append(listitem)
             except:
                 addon_log('Exception adding archive directory: %s' % format_exc())
-                addon_log('Directory name: %s' % i['name'])
+                addon_log('Directory name: %s' % i['title'])
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
@@ -515,7 +514,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gp.get_publishpoint_streams(video_id, 'video', username)
+                    video_streams = gp.get_publishpoint_streams(video_id, 'video', '', username)
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
                         bitrate = self.select_bitrate(video_streams.keys())

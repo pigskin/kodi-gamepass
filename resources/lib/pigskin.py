@@ -24,24 +24,11 @@ class pigskin(object):
         self.http_session = requests.Session()
         self.access_token = ''
         self.refresh_token = ''
-        #################
         url = self.base_url + '/api/en/content/v1/web/config'
         jsonconfig = requests.get(url, verify=False)
         self.config = jsonconfig.json()
         self.client_id = self.config["modules"]["API"]["CLIENT_ID"]
-        #self.config["modules"]["API"]["LOGIN"]
-
-        #################
-        
-        
-        
-        self.servlets_url = 'http://gamepass.nfl.leutner.ch/nflgp/servlets'
-        self.simpleconsole_url = self.servlets_url + '/simpleconsole'
-        self.boxscore_url = ''
-        self.image_url = ''
-        self.locEDLBaseUrl = ''
-        self.non_seasonal_shows = {}
-        self.seasonal_shows = {}
+        self.nflnShows = {}
         self.nflnSeasons = []       
 
 
@@ -271,6 +258,28 @@ class pigskin(object):
             self.log('Acquiring games data failed.')
             raise
         return games
+    
+    def get_team_games(self, season, team):
+        try:
+            team = 'Seattle Seahawks'
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
+            teams = requests.get(url, verify=False)
+            teams = teams.json()
+            for conference in teams['modules']:
+                for teamname in teams['modules'][conference]['content']:
+                    print team
+                    if team == teamname['fullName']:
+                        team = teamname['seoname']
+                    
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
+            url = url.replace(':team', team)
+            team_detail = requests.get(url, verify=False)
+            team_detail = team_detail.json()
+            
+        except:
+            self.log('Acquiring games data failed.')
+            raise
+        return team_detail
         
     def check_for_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
@@ -383,24 +392,78 @@ class pigskin(object):
 
         return streams
     
-    def get_team_games(self, team):
-        try:
-            #team = 'Seattle Seahawks' Team Full Name will be converted to the seoname Team Name
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
-            teams = requests.get(url, verify=False)
-            teams = teams.json()
-            for conference in teams['modules']:
-                for teamname in teams['modules'][conference]['content']:
-                    print team
-                    if team == teamname['fullName']:
-                        team = teamname['seoname']
-                    
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
-            url = url.replace(':team', team)
-            team_detail = requests.get(url, verify=False)
-            team_detail = team_detail.json()
-            
-        except:
-            self.log('Acquiring games data failed.')
-            raise
-        return team_detail
+    def redzone_on_air(self):
+        """Return whether RedZone Live is currently broadcasting."""
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
+        request = requests.get(url, verify=False)
+        response = request.json()
+        # Dynamically parse NFL-Network shows
+        self.parse_shows()
+
+        # Check if RedZone is Live
+        #if sc_dict['rzPhase'] in ('pre', 'in'):
+        #    self.log('RedZone is on air.')
+        #    return True
+        #else:
+        #    self.log('RedZone is not on air.')
+        #    return False
+        if not response['modules']['redZoneLive']['content']:
+            return False
+        else:
+            return True
+        
+    def parse_shows(self):
+        url = self.config['modules']['API']['NETWORK_PROGRAMS']
+        request = requests.get(url, verify=False)
+        response = request.json()
+        show_dict = {}
+        
+        for show in response['modules']['programs']:
+            name = show['title']
+            slug = show['slug']
+            season_dict = {}
+            for season in show['seasons']:
+                slug_dict = {}
+                season_name = season['value']
+                season_id = season['slug']
+                season_dict[season_name] = season_id
+                if season_name not in self.nflnSeasons:
+                        self.nflnSeasons.append(season_name)
+            show_dict[name] = season_dict
+        self.nflnShows.update(show_dict)
+    
+    def get_shows(self, season):
+        """Return a list of all shows for a season."""
+        #seasons_shows = self.nflnShows.keys()
+        seasons_shows = []
+        
+        for show_name, show_codes in self.nflnShows.items():
+            if season in show_codes:
+                seasons_shows.append(show_name)
+
+        return sorted(seasons_shows)
+
+    def get_shows_episodes(self, show_name, season=None):
+        """Return a list of episodes for a show. Return empty list if none are
+        found or if an error occurs.
+        """
+        url = self.config['modules']['API']['NETWORK_PROGRAMS']
+        request = requests.get(url, verify=False)
+        response = request.json()
+        season_id = ''
+        slug = ''
+        for show in response['modules']['programs']:
+            name = show['title']
+            if show_name == name:
+                slug = show['slug']
+                for seasons in show['seasons']:
+                    season_name = seasons['value']
+                    if season == season_name:
+                        season_id = seasons['slug']
+        url = self.config['modules']['API']['NETWORK_EPISODES']
+        url = url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
+        request = requests.get(url, verify=False)
+        response = request.json()
+        
+        
+        return response
