@@ -143,92 +143,171 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_weeks_games(self):
         """Show games for a given season/week"""
         self.games_items = []
-        games = gp.get_weeks_games(self.selected_season, self.selected_week)
-
         date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        if games:
-            #for game in games['modules']['weekCompletedGames']['content']:
-            for weekSet in games['modules']:
-                for game in games['modules'][weekSet]['content']:
-                    game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
-                    home_team = game['homeTeamAbbr']
-                    away_team = game['visitorTeamAbbr']
-                    #game_info = ''
-                    game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
-                    game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
-                    listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+        team_name = addon.getSetting('preferred_team')
+        if addon.getSetting('team_view') == 'true' and self.selected_week == '444':
+            if (31002+int(team_name))== 31034:
+                options = []
+                for i in range (31002, 31033):
+                    options.append(language(i))
+                dialog = xbmcgui.Dialog()
+                xbmc.executebuiltin("Dialog.Close(busydialog)")
+                ret = dialog.select(language(31001), options)
 
-                    listitem.setProperty('is_game', 'true')
-                    listitem.setProperty('is_show', 'false')
- 
-                    if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
-                    # Show game duration only if user wants to see it
-                        if addon.getSetting('hide_game_length') == 'false':
-                            try:
-                                game_info = 'Final [CR] Duration: %s' % str(datetime.timedelta(seconds=int(float(game['video']['videoDuration']))))
-                            except:
-                                addon_log(format_exc())
-                                if 'result' in game:
-                                    game_info = game['phase']
-                        else:
-                            game_info = 'FINAL'
-                        listitem.setProperty('game_info', game_info)
-                    else:
-                        if 'isLive' in game:
-                            game_info = '» Live «'
-                        
-                        try:
-                            if addon.getSetting('local_tz') == '0':  # don't localize
-                                game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
-                                game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                if ret > -1:
+                    print 'Team ist : %s' % language(31002+ret)
+                    games = gp.get_team_games(self.selected_season, language(31002+ret))
+                else:
+                    return None
+            else:
+                games = gp.get_team_games(self.selected_season, language(31002+int(team_name)))
+            if games:
+                slug = 'videos'+self.selected_season
+                #for game in games['modules']['weekCompletedGames']['content']:
+                for game in games['modules'][slug]['content']:
+                    if game['gameId']:
+                        game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
+                        home_team = game['homeTeamAbbr']
+                        away_team = game['visitorTeamAbbr']
+                        #game_info = ''
+                        game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
+                        game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
+                        listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+                        listitem.setProperty('is_game', 'true')
+                        listitem.setProperty('is_show', 'false')
+                        isPlayable = 'true'
+                        if game['videoStatus'] == 'SCHEDULED':
+                            isPlayable = 'false'
+                        listitem.setProperty('isPlayable', isPlayable)
+                        listitem.setProperty('game_id', game_id)
+                        listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
+                        listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
+                        if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
+                        # Show game duration only if user wants to see it
+                            if addon.getSetting('hide_game_length') == 'false':
+                                try:
+                                    game_info = 'Final [CR] Duration: %s' % str(datetime.timedelta(seconds=int(float(game['video']['videoDuration']))))
+                                except:
+                                    addon_log(format_exc())
+                                    if 'result' in game:
+                                        game_info = game['phase']
                             else:
-                                from_zone = tz.tzutc()
-                                to_zone = tz.tzlocal()
-                                game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
-                                game_datetime = game_datetime.replace(tzinfo=from_zone)
-                                local_time = game_datetime.astimezone(to_zone)
-                                if addon.getSetting('local_tz') == '1':  # localize and use 12-hour clock
-                                    game_info = local_time.strftime('%A, %b %d - %I:%M %p')
-                                else:  # localize and use 24-hour clock
-                                    game_info = local_time.strftime('%A, %b %d - %H:%M')
-                        except:  # all else fails, just use their raw date value
-                            game_datetime = game['gameDateTimeUtc'].split('T')
-                            game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
-                        listitem.setProperty('game_info', game_info)
-                    
-                    if weekSet == 'weekScheduledGames':
-                        isPlayable = 'false'
-                        isBlackedOut = 'false'
-                    else:
-                        if weekSet == 'weekLiveGames':
-                            if game['video']['videoId']:
-                                video_id = str(game['video']['videoId'])
-                                isPlayable = 'true'
-                                isBlackedOut = 'false'
-                                listitem.setProperty('video_id', video_id)
-                                listitem.setProperty('game_versions', 'Live')
+                                game_info = 'FINAL'
+                            listitem.setProperty('game_info', game_info)
                         else:
-                            if weekSet == 'weekCompletedGames':
+                            if 'isLive' in game:
+                                game_info = '» Live «'
+                        
+                            try:
+                                if addon.getSetting('local_tz') == '0':  # don't localize
+                                    game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
+                                    game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                                else:
+                                    from_zone = tz.tzutc()
+                                    to_zone = tz.tzlocal()
+                                    game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
+                                    game_datetime = game_datetime.replace(tzinfo=from_zone)
+                                    local_time = game_datetime.astimezone(to_zone)
+                                    if addon.getSetting('local_tz') == '1':  # localize and use 12-hour clock
+                                        game_info = local_time.strftime('%A, %b %d - %I:%M %p')
+                                    else:  # localize and use 24-hour clock
+                                        game_info = local_time.strftime('%A, %b %d - %H:%M')
+                            except:  # all else fails, just use their raw date value
+                                game_datetime = game['gameDateTimeUtc'].split('T')
+                                game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
+                            listitem.setProperty('game_info', game_info)
+                        self.games_items.append(listitem)
+        else:
+            games = gp.get_weeks_games(self.selected_season, self.selected_week)
+
+            
+            if games:
+                #for game in games['modules']['weekCompletedGames']['content']:
+                for weekSet in games['modules']:
+                    for game in games['modules'][weekSet]['content']:
+                        game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
+                        home_team = game['homeTeamAbbr']
+                        away_team = game['visitorTeamAbbr']
+                        #game_info = ''
+                        game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
+                        game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (game['visitorCityState'], game['visitorNickName'], game['homeCityState'], game['homeNickName'])
+                        listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
+
+                        listitem.setProperty('is_game', 'true')
+                        listitem.setProperty('is_show', 'false')
+ 
+                        if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
+                        # Show game duration only if user wants to see it
+                            if addon.getSetting('hide_game_length') == 'false':
+                                try:
+                                    game_info = 'Final [CR] Duration: %s' % str(datetime.timedelta(seconds=int(float(game['video']['videoDuration']))))
+                                except:
+                                    addon_log(format_exc())
+                                    if 'result' in game:
+                                        game_info = game['phase']
+                            else:
+                                game_info = 'FINAL'
+                            listitem.setProperty('game_info', game_info)
+                        else:
+                            if 'isLive' in game:
+                                game_info = '» Live «'
+                        
+                            try:
+                                if addon.getSetting('local_tz') == '0':  # don't localize
+                                    game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
+                                    game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
+                                else:
+                                    from_zone = tz.tzutc()
+                                    to_zone = tz.tzlocal()
+                                    game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
+                                    game_datetime = game_datetime.replace(tzinfo=from_zone)
+                                    local_time = game_datetime.astimezone(to_zone)
+                                    if addon.getSetting('local_tz') == '1':  # localize and use 12-hour clock
+                                        game_info = local_time.strftime('%A, %b %d - %I:%M %p')
+                                    else:  # localize and use 24-hour clock
+                                        game_info = local_time.strftime('%A, %b %d - %H:%M')
+                            except:  # all else fails, just use their raw date value
+                                game_datetime = game['gameDateTimeUtc'].split('T')
+                                game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
+                            listitem.setProperty('game_info', game_info)
+                        
+                        if weekSet == 'weekScheduledGames':
+                            isPlayable = 'false'
+                            isBlackedOut = 'false'
+                        else:
+                            if weekSet == 'weekLiveGames':
                                 if game['video']['videoId']:
                                     video_id = str(game['video']['videoId'])
                                     isPlayable = 'true'
                                     isBlackedOut = 'false'
                                     listitem.setProperty('video_id', video_id)
+                                    listitem.setProperty('game_versions', 'Live')
+                            else:
+                                if weekSet == 'weekCompletedGames':
+                                    if game['video']['videoId']:
+                                        video_id = str(game['video']['videoId'])
+                                        isPlayable = 'true'
+                                        isBlackedOut = 'false'
+                                        listitem.setProperty('video_id', video_id)
                                     
-                    listitem.setProperty('isPlayable', isPlayable)
-                    listitem.setProperty('isBlackedOut', isBlackedOut)
-                    listitem.setProperty('game_id', game_id)
-                    listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
-                    listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
-                    #listitem.setProperty('game_date', game['date'].split('T')[0])
-                    #listitem.setProperty('game_versions', ' '.join(game_versions))
-                    self.games_items.append(listitem)
-            self.games_list.addItems(self.games_items)
+                        listitem.setProperty('isPlayable', isPlayable)
+                        listitem.setProperty('isBlackedOut', isBlackedOut)
+                        listitem.setProperty('game_id', game_id)
+                        listitem.setProperty('away_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % away_team)
+                        listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % home_team)
+                        #listitem.setProperty('game_date', game['date'].split('T')[0])
+                        #listitem.setProperty('game_versions', ' '.join(game_versions))
+                        self.games_items.append(listitem)
+        self.games_list.addItems(self.games_items)
         
     def display_seasons_weeks(self):
         """List weeks for a given season"""
         weeks = self.seasons_and_weeks[self.selected_season]
-
+        if addon.getSetting('team_view') == 'true':
+            listitem = xbmcgui.ListItem('Teams')
+            listitem.setProperty('week_code', '444')
+            listitem.setProperty('future', 'false')
+            self.weeks_items.append(listitem)
         for week_code, week in sorted(weeks.iteritems()):
             future = 'false'
             #try:
@@ -439,7 +518,6 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 220:  # week is clicked
                     self.init('week/show')
                     self.selected_week = self.weeks_list.getSelectedItem().getProperty('week_code')
-
                     self.display_weeks_games()
                 elif controlId == 230:  # game is clicked
                     selectedGame = self.games_list.getSelectedItem()

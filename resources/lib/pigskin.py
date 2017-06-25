@@ -248,9 +248,9 @@ class pigskin(object):
                 if week_code[:1] == '3':
                     week_code = week_code[1:].lstrip('0')
                     seasonType = 'post'
+
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
-            print url
             url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
             request = requests.get(url, verify=False)
             games = request.json()
@@ -269,7 +269,6 @@ class pigskin(object):
             else:
                 for conference in teams['modules']:
                     for teamname in teams['modules'][conference]['content']:
-                        print team
                         if team == teamname['fullName']:
                             team = teamname['seoname']
                     
@@ -352,10 +351,8 @@ class pigskin(object):
         request = requests.get(videoDataPath, verify=False)
         akamai_url = xmltodict.parse(request.text)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
-            print videoSource
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
-        print m3u8_url
         self.get_refresh_token(self.refresh_token)
         
         
@@ -467,6 +464,4 @@ class pigskin(object):
         url = url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
         request = requests.get(url, verify=False)
         response = request.json()
-        
-        
         return response
