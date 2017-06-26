@@ -20,11 +20,9 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://www.nflgamepass.com'
         self.http_session = requests.Session()
-        self.access_token = ''
-        self.refresh_token = ''
-        url = self.base_url + '/api/en/content/v1/web/config'
-        jsonconfig = requests.get(url, verify=False)
-        self.config = jsonconfig.json()
+        self.access_token = None
+        self.refresh_token = None
+        self.config = self.make_request(self.base_url + '/api/en/content/v1/web/config', 'get')
         self.client_id = self.config["modules"]["API"]["CLIENT_ID"]
         self.nflnShows = {}
         self.nflnSeasons = []
@@ -40,7 +38,7 @@ class pigskin(object):
         self.log('Debugging enabled.')
         self.log('Python Version: %s' % sys.version)
 
-    class LoginFailure(Exception):
+    class GamePassError(Exception):
         def __init__(self, value):
             self.value = value
 
@@ -58,6 +56,43 @@ class pigskin(object):
                 print '[pigskin]: %s' % string.replace(bom, '')
             except:
                 pass
+
+    def make_request(self, url, method, params=None, payload=None, headers=None):
+        """Make an HTTP request. Return the response."""
+        self.log('Request URL: %s' % url)
+        self.log('Method: %s' % method)
+        if params:
+            self.log('Params: %s' % params)
+        if payload:
+            self.log('Payload: %s' % payload)
+        if headers:
+            self.log('Headers: %s' % headers)
+
+        if method == 'get':
+            req = self.http_session.get(url, params=params, headers=headers)
+        elif method == 'put':
+            req = self.http_session.put(url, params=params, data=payload, headers=headers)
+        else:  # post
+            req = self.http_session.post(url, params=params, data=payload, headers=headers)
+        self.log('Response code: %s' % req.status_code)
+        self.log('Response: %s' % req.content)
+
+        return self.parse_response(req)
+
+    def parse_response(self, req):
+        """Try to load JSON data into dict and raise potential errors."""
+        try:
+            response = json.loads(req.content)
+        except ValueError:  # if response is not json
+            response = req.content
+
+        if isinstance(response, dict):
+            for key in response.keys():
+                if key.lower() == 'message':
+                    if response[key]: # raise all messages as GamePassError if message is not empty
+                        raise self.GamePassError(response[key])
+
+        return response
 
     def build_proxy_url(self, config):
         proxy_url = ''
@@ -93,36 +128,7 @@ class pigskin(object):
 
         return proxy_url
 
-    def has_subscription(self):
-        """Return whether a subscription and user name are detected. Determines
-        whether a login was successful."""
-        url = self.config["modules"]["API"]["USER_PROFILE"]
-        BearerHeaders = {"Authorization":"Bearer " + self.access_token}
-        request=requests.get(url, headers=BearerHeaders, verify=False)
-        if request.status_code == 401:
-            self.log('Subscription not detected in Game Pass response.')
-            return False
-        else:
-            self.log('Subscription detected.')
-            return True
-
-    def login(self, username=None, password=None):
-        """Complete login process for Game Pass. Errors (auth issues, blackout,
-        etc) are raised as LoginFailure.
-        """
-        if self.has_subscription():
-            self.log('Already logged into Game Pass ')
-        else:
-            if username and password:
-                self.log('Not (yet) logged into ')
-                self.login_to_account(username, password)
-                if not self.has_subscription():
-                    raise self.LoginFailure('login failed')
-            else:
-                self.log('No username and password supplied.')
-                raise self.LoginFailure('No username and password supplied.')
-
-    def login_to_account(self, username, password):
+    def login(self, username, password):
         """Blindly authenticate to Game Pass. Use has_subscription() to
         determine success.
         """
@@ -133,31 +139,34 @@ class pigskin(object):
             'client_id': self.client_id,
             'grant_type': 'password'
         }
-        request = requests.post(url, data=post_data, verify=False)
-        if request.status_code == 200:
-            result = request.json()
-            self.access_token = result["access_token"]
-            self.refresh_token = result["refresh_token"]
-            return True
-        return False
+        data = self.make_request(url, 'post', payload=post_data)
+        self.access_token = data['access_token']
+        self.refresh_token = data['refresh_token']
+        self.check_for_subscription()
 
-    def get_refresh_token(self, refresh_token):
-        """Blindly authenticate to Game Pass. Use has_subscription() to
-        determine success.
-        """
+        return True
+
+    def check_for_subscription(self):
+        """Returns True if a subscription is detected. Raises error_unauthorised on failure."""
+        url = self.config["modules"]["API"]["USER_PROFILE"]
+        headers = {'Authorization': 'Bearer {0}'.format(self.access_token)}
+        self.make_request(url, 'get', headers=headers)
+
+        return True
+
+    def refresh_tokens(self):
+        """Refreshes authorization tokens."""
         url = self.config["modules"]["API"]["LOGIN"]
         post_data = {
-            'refresh_token': refresh_token,
+            'refresh_token': self.refresh_token,
             'client_id': self.client_id,
             'grant_type': 'refresh_token'
         }
-        request = requests.post(url, data=post_data, verify=False)
-        if request.status_code == 200:
-            result = request.json()
-            self.access_token = result["access_token"]
-            self.refresh_token = result["refresh_token"]
-            return True
-        return False
+        data = self.make_request(url, 'post', payload=post_data)
+        self.access_token = data['access_token']
+        self.refresh_token = data['refresh_token']
+
+        return True
 
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
@@ -165,8 +174,7 @@ class pigskin(object):
 
         try:
             url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
-            request = requests.get(url, verify=False)
-            seasons = request.json()
+            seasons = self.make_request(url, 'get')
         except:
             self.log('Acquiring season and week data failed.')
             raise
@@ -213,8 +221,7 @@ class pigskin(object):
         """Return the current season and week_code (e.g. 210) in a dict."""
         try:
             url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
-            request = requests.get(url, verify=False)
-            seasons = request.json()
+            seasons = self.make_request(url, 'get')
         except:
             self.log('Acquiring season and week data failed.')
             raise
@@ -243,20 +250,18 @@ class pigskin(object):
                     week_code = week_code[1:].lstrip('0')
                     seasonType = 'post'
         try:
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
-            url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
-            request = requests.get(url, verify=False)
-            games = request.json()
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail'].replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
+            games = self.make_request(url, 'get')
         except:
             self.log('Acquiring games data failed.')
             raise
+
         return games
 
     def get_team_games(self, season, team=None):
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
-            teams = requests.get(url, verify=False)
-            teams = teams.json()
+            teams = self.make_request(url, 'get')
             if team is None:
                 return teams
             else:
@@ -265,10 +270,9 @@ class pigskin(object):
                         if team == teamname['fullName']:
                             team = teamname['seoname']
 
-                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
-                url = url.replace(':team', team)
-                team_detail = requests.get(url, verify=False)
-                team_detail = team_detail.json()
+                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
+                team_detail = self.make_request(url, 'get')
+
                 return team_detail
 
         except:
@@ -278,10 +282,8 @@ class pigskin(object):
 
     def has_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
-        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
-        url = url.replace(':season', season).replace(':gameslug', game_id)
-        request = requests.get(url, verify=False)
-        response = request.json()
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
+        response = self.make_request(url, 'get')
         coachfilmVideo = response['modules']['singlegame']['content'][0]['coachfilmVideo']
         if coachfilmVideo is None:
             print 'No coaches Tape available'
@@ -292,10 +294,8 @@ class pigskin(object):
 
     def has_condensedGame(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
-        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
-        url = url.replace(':season', season).replace(':gameslug', game_id)
-        request = requests.get(url, verify=False)
-        response = request.json()
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
+        response = self.make_request(url, 'get')
         condensedVideo = response['modules']['singlegame']['content'][0]['condensedVideo']
         if condensedVideo is None:
             print 'No Condensed Game available'
@@ -312,8 +312,7 @@ class pigskin(object):
         if video_id == 'nfl_network':
             divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
-            request = requests.get(url, verify=False)
-            response = request.json()
+            response = self.make_request(url, 'get')
             video_id = response['modules']['networkLiveVideo']['content'][0]['videoId']
         else:
             if game_type == 'live':
@@ -322,20 +321,20 @@ class pigskin(object):
                 divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
 
         url = divaconfig.replace('device', 'html5')
-        request = requests.get(url, verify=False)
-        divaconfig = xmltodict.parse(request.text)
+        request = self.make_request(url, 'get')
+        divaconfig = xmltodict.parse(request)
         for parameter in divaconfig['settings']['videoData']['parameter']:
             if parameter['@name']== 'videoDataPath':
                 videoDataPath = parameter['@value'].replace('{V.ID}',video_id)
         for parameter in divaconfig['settings']['entitlementCheck']['parameter']:
             if parameter['@name']== 'processingUrlCallPath':
                 processingUrlCallPath = parameter['@value']
-        request = requests.get(videoDataPath, verify=False)
-        akamai_url = xmltodict.parse(request.text)
+        request = self.make_request(videoDataPath, 'get')
+        akamai_url = xmltodict.parse(request)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
-        self.get_refresh_token(self.refresh_token)
+        self.refresh_tokens()
 
         post_data = {
             'Type': '1',
@@ -348,12 +347,10 @@ class pigskin(object):
             'other': str(uuid.uuid4()) + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
         }
 
-        request = requests.post(processingUrlCallPath, json=post_data, verify=False)
-        response = request.json()
+        response = self.make_request(processingUrlCallPath, 'post', payload=json.dumps(post_data))
         m3u8_url = response['ContentUrl']
 
-        m3u8_request = requests.get(m3u8_url, verify=False)
-        m3u8_manifest = m3u8_request.text
+        m3u8_manifest = self.make_request(m3u8_url, 'get')
         if full:
             return m3u8_url
         m3u8_header = {'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57',
@@ -373,8 +370,7 @@ class pigskin(object):
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
-        request = requests.get(url, verify=False)
-        response = request.json()
+        response = self.make_request(url, 'get')
         # Dynamically parse NFL-Network shows
         self.parse_shows()
 
@@ -392,8 +388,7 @@ class pigskin(object):
 
     def parse_shows(self):
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
-        request = requests.get(url, verify=False)
-        response = request.json()
+        response = self.make_request(url, 'get')
         show_dict = {}
 
         for show in response['modules']['programs']:
@@ -426,8 +421,7 @@ class pigskin(object):
         found or if an error occurs.
         """
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
-        request = requests.get(url, verify=False)
-        response = request.json()
+        response = self.make_request(url, 'get')
         season_id = ''
         slug = ''
         for show in response['modules']['programs']:
@@ -440,7 +434,6 @@ class pigskin(object):
                         season_id = seasons['slug']
         url = self.config['modules']['API']['NETWORK_EPISODES']
         url = url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
-        request = requests.get(url, verify=False)
-        response = request.json()
+        response = self.make_request(url, 'get')
 
         return response
