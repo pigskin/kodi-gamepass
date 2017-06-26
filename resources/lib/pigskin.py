@@ -2,15 +2,13 @@
 A Kodi-agnostic library for NFL Game Pass
 """
 import codecs
-import hashlib
-import random
+import uuid
 import m3u8
 import re
 import sys
 import json
 import urllib
 from traceback import format_exc
-from uuid import getnode as get_mac
 from urlparse import urlsplit
 
 import requests
@@ -310,16 +308,6 @@ class pigskin(object):
             print 'Condensed Game available'
             return condensedVideo['videoId']
 
-    def gen_plid(self):
-        """Return a "unique" MD5 hash. Getting the video path requires a plid,
-        which looks like MD5 and always changes. Reusing a plid does not work,
-        so our guess is that it's a id for each instance of the player.
-        """
-        rand = random.getrandbits(10)
-        mac_address = str(get_mac())
-        md5 = hashlib.md5(str(rand) + mac_address)
-        return md5.hexdigest()
-
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None, full = None):
         """Return the URL for a stream."""
         streams = {}
@@ -361,7 +349,7 @@ class pigskin(object):
             'VideoKind': 'Video',
             'AssetState': '3',
             'PlayerType': 'HTML5',
-            'other': self.gen_plid() + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
+            'other': str(uuid.uuid4()) + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
         }
 
         request = requests.post(processingUrlCallPath, json=post_data, verify=False)
