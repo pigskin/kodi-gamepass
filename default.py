@@ -147,7 +147,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
         date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         if games:
-            #for game in games['modules']['weekCompletedGames']['content']:
             for weekSet in games['modules']:
                 for game in games['modules'][weekSet]['content']:
                     game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
@@ -162,7 +161,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     listitem.setProperty('is_show', 'false')
 
                     if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
-                    # Show game duration only if user wants to see it
+                        # show game duration only if user wants to see it
                         if addon.getSetting('hide_game_length') == 'false':
                             try:
                                 game_info = 'Final [CR] Duration: %s' % str(datetime.timedelta(seconds=int(float(game['video']['videoDuration']))))
@@ -309,7 +308,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         """
         options = []
         for bitrate in bitrates:
-            print bitrate
             options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
         xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -457,11 +455,11 @@ class GamepassGUI(xbmcgui.WindowXML):
                             else:
                                 game_version = 'live'
                         else:
-                            # Check for coaches film availability
+                            # check for coaches film availability
                             if gp.check_for_coachestape(game_id, self.selected_season):
                                 game_versions = game_versions + ' Coach'
-                                couch_id = gp.check_for_coachestape(game_id, self.selected_season)
-                            # Check for condensed film availability
+                                coach_id = gp.check_for_coachestape(game_id, self.selected_season)
+                            # check for condensed film availability
                             if gp.check_for_condensedGame(game_id, self.selected_season):
                                 game_versions = game_versions + ' Condensed'
                                 condensed_id = gp.check_for_condensedGame(game_id, self.selected_season)
@@ -475,7 +473,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             #    self.playBackStop = False
 
                                 #play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
-                                #play_stream = gp.get_publishpoint_streams(couch_id, 'game', game_version, username)
+                                #play_stream = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
                                 #plays = gp.get_coaches_playIDs(game_id, self.selected_season)
                                 #for playID in sorted(plays, key=int):
                                 #    cf_url = str(play_stream).replace('dummy', playID)
@@ -492,7 +490,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 game_streams = gp.get_publishpoint_streams(condensed_id, 'game', game_version, username)
                             else:
                                 if game_version == 'coach':
-                                    game_streams = gp.get_publishpoint_streams(couch_id, 'game', game_version, username)
+                                    game_streams = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
                                 else:
                                     game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
                             bitrate = self.select_bitrate(game_streams.keys())

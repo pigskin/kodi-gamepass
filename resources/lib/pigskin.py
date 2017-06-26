@@ -250,7 +250,6 @@ class pigskin(object):
                     seasonType = 'post'
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
-            print url
             url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
             request = requests.get(url, verify=False)
             games = request.json()
@@ -269,7 +268,6 @@ class pigskin(object):
             else:
                 for conference in teams['modules']:
                     for teamname in teams['modules'][conference]['content']:
-                        print team
                         if team == teamname['fullName']:
                             team = teamname['seoname']
 
@@ -306,7 +304,7 @@ class pigskin(object):
         response = request.json()
         condensedVideo = response['modules']['singlegame']['content'][0]['condensedVideo']
         if condensedVideo is None:
-            print 'No condensed Game available'
+            print 'No Condensed Game available'
             return False
         else:
             print 'Condensed Game available'
@@ -339,7 +337,6 @@ class pigskin(object):
             else:
                 divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
 
-
         url = divaconfig.replace('device', 'html5')
         request = requests.get(url, verify=False)
         divaconfig = xmltodict.parse(request.text)
@@ -352,14 +349,9 @@ class pigskin(object):
         request = requests.get(videoDataPath, verify=False)
         akamai_url = xmltodict.parse(request.text)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
-            print videoSource
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
-        print m3u8_url
         self.get_refresh_token(self.refresh_token)
-
-
-
 
         post_data = {
             'Type': '1',
@@ -388,7 +380,6 @@ class pigskin(object):
             if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
                 for playlist in m3u8_obj.playlists:
                     bitrate = int(playlist.stream_info.bandwidth)
-                    print bitrate
                     streams[bitrate] = m3u8_url[:m3u8_url.rfind('/manifest') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
             else:
                 streams['sole available'] = m3u8_url
