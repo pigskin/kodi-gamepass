@@ -456,13 +456,13 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 game_version = 'live'
                         else:
                             # check for coaches film availability
-                            if gp.check_for_coachestape(game_id, self.selected_season):
+                            if gp.has_coachestape(game_id, self.selected_season):
                                 game_versions = game_versions + ' Coach'
-                                coach_id = gp.check_for_coachestape(game_id, self.selected_season)
+                                coach_id = gp.has_coachestape(game_id, self.selected_season)
                             # check for condensed film availability
-                            if gp.check_for_condensedGame(game_id, self.selected_season):
+                            if gp.has_condensedGame(game_id, self.selected_season):
                                 game_versions = game_versions + ' Condensed'
-                                condensed_id = gp.check_for_condensedGame(game_id, self.selected_season)
+                                condensed_id = gp.has_condensedGame(game_id, self.selected_season)
 
                             game_version = self.select_version(game_versions)
                         if game_version:

@@ -98,7 +98,7 @@ class pigskin(object):
 
         return proxy_url
 
-    def check_for_subscription(self):
+    def has_subscription(self):
         """Return whether a subscription and user name are detected. Determines
         whether a login was successful."""
         url = self.config["modules"]["API"]["USER_PROFILE"]
@@ -115,20 +115,20 @@ class pigskin(object):
         """Complete login process for Game Pass. Errors (auth issues, blackout,
         etc) are raised as LoginFailure.
         """
-        if self.check_for_subscription():
+        if self.has_subscription():
             self.log('Already logged into Game Pass ')
         else:
             if username and password:
                 self.log('Not (yet) logged into ')
                 self.login_to_account(username, password)
-                if not self.check_for_subscription():
+                if not self.has_subscription():
                     raise self.LoginFailure('login failed')
             else:
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
 
     def login_to_account(self, username, password):
-        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        """Blindly authenticate to Game Pass. Use has_subscription() to
         determine success.
         """
         url = self.config["modules"]["API"]["LOGIN"]
@@ -147,7 +147,7 @@ class pigskin(object):
         return False
 
     def get_refresh_token(self, refresh_token):
-        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        """Blindly authenticate to Game Pass. Use has_subscription() to
         determine success.
         """
         url = self.config["modules"]["API"]["LOGIN"]
@@ -282,7 +282,7 @@ class pigskin(object):
             raise
         return False
 
-    def check_for_coachestape(self, game_id, season):
+    def has_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
         url = url.replace(':season', season).replace(':gameslug', game_id)
@@ -296,7 +296,7 @@ class pigskin(object):
             print 'Coaches Tape available'
             return coachfilmVideo['videoId']
 
-    def check_for_condensedGame(self, game_id, season):
+    def has_condensedGame(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
         url = url.replace(':season', season).replace(':gameslug', game_id)
