@@ -590,16 +590,12 @@ if __name__ == "__main__":
 
     try:
         gp.login(username, password)
-    except gp.LoginFailure as error:
+    except gp.GamePassError as error:
         dialog = xbmcgui.Dialog()
-        if error.value == 'Game Pass Domestic Blackout':
-            addon_log('Game Pass Domestic is in blackout.')
-            dialog.ok(language(30021),
-                      language(30022))
+        if error.value == 'error_unauthorised':
+            dialog.ok(language(30021), language(30023))
         else:
-            addon_log('login failed')
-            dialog.ok(language(30021),
-                      language(30023))
+            dialog.ok(language(30021), error.value)
         sys.exit(0)
     except:
         addon_log(format_exc())
