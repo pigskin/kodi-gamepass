@@ -1,5 +1,14 @@
+# NOTE #
+
+NFL Game Pass has just moved to a new streaming partner. We are updating
+everything to use the new service, but do expect bugs and bumps along the way.
+A lot has changed.
+
+Version 0.10.2 is the last version to support the old service, and will continue
+to work until 2017.07.31 when the old service is retired.
+
 # NFL Game Pass Kodi Plugin #
-**version 0.10.1 — Barry Sanders Edition**
+**version 0.11.0 — Jay Cutler Edition**
 
 Before reading any further, please understand that this addon is unofficial and
 is not endorsed or supported by the NFL in any way. Not all features are
@@ -12,8 +21,7 @@ request. Patches and (constructive) input are always welcome.
 
 ## Any Dependencies? ##
 
-This addon requires Kodi Krypton or later. The latest version supporting Jarvis
-was 0.9.2.
+This addon requires Kodi Krypton or later.
 
 This addon is available from the official Kodi repository, and when installed
 from there, all dependencies are installed automatically. However, if you're

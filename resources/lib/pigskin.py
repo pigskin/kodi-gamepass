@@ -2,15 +2,13 @@
 A Kodi-agnostic library for NFL Game Pass
 """
 import codecs
-import hashlib
-import random
+import uuid
 import m3u8
 import re
 import sys
 import json
 import urllib
 from traceback import format_exc
-from uuid import getnode as get_mac
 from urlparse import urlsplit
 
 import requests
@@ -29,8 +27,7 @@ class pigskin(object):
         self.config = jsonconfig.json()
         self.client_id = self.config["modules"]["API"]["CLIENT_ID"]
         self.nflnShows = {}
-        self.nflnSeasons = []       
-
+        self.nflnSeasons = []
 
         if proxy_config is not None:
             proxy_url = self.build_proxy_url(proxy_config)
@@ -40,8 +37,6 @@ class pigskin(object):
                     'https': proxy_url,
                 }
 
-
-        
         self.log('Debugging enabled.')
         self.log('Python Version: %s' % sys.version)
 
@@ -98,7 +93,7 @@ class pigskin(object):
 
         return proxy_url
 
-    def check_for_subscription(self):
+    def has_subscription(self):
         """Return whether a subscription and user name are detected. Determines
         whether a login was successful."""
         url = self.config["modules"]["API"]["USER_PROFILE"]
@@ -115,20 +110,20 @@ class pigskin(object):
         """Complete login process for Game Pass. Errors (auth issues, blackout,
         etc) are raised as LoginFailure.
         """
-        if self.check_for_subscription():
+        if self.has_subscription():
             self.log('Already logged into Game Pass ')
         else:
             if username and password:
                 self.log('Not (yet) logged into ')
                 self.login_to_account(username, password)
-                if not self.check_for_subscription():
+                if not self.has_subscription():
                     raise self.LoginFailure('login failed')
             else:
                 self.log('No username and password supplied.')
                 raise self.LoginFailure('No username and password supplied.')
 
     def login_to_account(self, username, password):
-        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        """Blindly authenticate to Game Pass. Use has_subscription() to
         determine success.
         """
         url = self.config["modules"]["API"]["LOGIN"]
@@ -145,9 +140,9 @@ class pigskin(object):
             self.refresh_token = result["refresh_token"]
             return True
         return False
-    
+
     def get_refresh_token(self, refresh_token):
-        """Blindly authenticate to Game Pass. Use check_for_subscription() to
+        """Blindly authenticate to Game Pass. Use has_subscription() to
         determine success.
         """
         url = self.config["modules"]["API"]["LOGIN"]
@@ -163,7 +158,7 @@ class pigskin(object):
             self.refresh_token = result["refresh_token"]
             return True
         return False
-        
+
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
         seasons_and_weeks = {}
@@ -190,7 +185,7 @@ class pigskin(object):
                             else:
                                 season_dict[week_code] = 'Week ' + str(week['number'])
                     if season_week_types['seasonType'] == "reg":
-                        for week in season_week_types['weeks']:    
+                        for week in season_week_types['weeks']:
                             week_code = '2' + str(week['number']).zfill(2)
                             season_dict[week_code] = 'Week ' + str(week['number']+4)
                     else:  # regular season and post season
@@ -207,14 +202,13 @@ class pigskin(object):
                             if week['weekNameAbbr'] == 'sb':
                                 season_dict[week_code] = 'SUPER BOWL'
 
-
                 seasons_and_weeks[year] = season_dict
         except KeyError:
             self.log('Parsing season and week data failed.')
             raise
 
         return seasons_and_weeks
-    
+
     def get_current_season_and_week(self):
         """Return the current season and week_code (e.g. 210) in a dict."""
         try:
@@ -231,7 +225,7 @@ class pigskin(object):
             current_s_w = {seasons['modules']['meta']['currentContext']['currentSeason']: '2' + str(seasons['modules']['meta']['currentContext']['currentWeek']).zfill(2)}
         if seasons['modules']['meta']['currentContext']['currentSeasonType'] == 'post':
             current_s_w = {seasons['modules']['meta']['currentContext']['currentSeason']: '3' + str(seasons['modules']['meta']['currentContext']['currentWeek']).zfill(2)}
-        
+
         return current_s_w
 
     def get_weeks_games(self, season, week_code):
@@ -248,7 +242,6 @@ class pigskin(object):
                 if week_code[:1] == '3':
                     week_code = week_code[1:].lstrip('0')
                     seasonType = 'post'
-
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
             url = url.replace(':seasonType', seasonType).replace(':season', season).replace(':week', week_code)
@@ -258,7 +251,7 @@ class pigskin(object):
             self.log('Acquiring games data failed.')
             raise
         return games
-    
+
     def get_team_games(self, season, team=None):
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
@@ -271,19 +264,19 @@ class pigskin(object):
                     for teamname in teams['modules'][conference]['content']:
                         if team == teamname['fullName']:
                             team = teamname['seoname']
-                    
+
                 url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
                 url = url.replace(':team', team)
                 team_detail = requests.get(url, verify=False)
                 team_detail = team_detail.json()
                 return team_detail
-            
+
         except:
             self.log('Acquiring games data failed.')
             raise
         return False
-        
-    def check_for_coachestape(self, game_id, season):
+
+    def has_coachestape(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
         url = url.replace(':season', season).replace(':gameslug', game_id)
@@ -295,9 +288,9 @@ class pigskin(object):
             return False
         else:
             print 'Coaches Tape available'
-            return coachfilmVideo['videoId'] 
-    
-    def check_for_condensedGame(self, game_id, season):
+            return coachfilmVideo['videoId']
+
+    def has_condensedGame(self, game_id, season):
         """Return whether coaches tape is available for a given game."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
         url = url.replace(':season', season).replace(':gameslug', game_id)
@@ -305,27 +298,17 @@ class pigskin(object):
         response = request.json()
         condensedVideo = response['modules']['singlegame']['content'][0]['condensedVideo']
         if condensedVideo is None:
-            print 'No condensed Game available'
+            print 'No Condensed Game available'
             return False
         else:
             print 'Condensed Game available'
             return condensedVideo['videoId']
 
-    def gen_plid(self):
-        """Return a "unique" MD5 hash. Getting the video path requires a plid,
-        which looks like MD5 and always changes. Reusing a plid does not work,
-        so our guess is that it's a id for each instance of the player.
-        """
-        rand = random.getrandbits(10)
-        mac_address = str(get_mac())
-        md5 = hashlib.md5(str(rand) + mac_address)
-        return md5.hexdigest()
-        
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None, full = None):
         """Return the URL for a stream."""
         streams = {}
         self.get_current_season_and_week()  # set cookies
-        
+
         if video_id == 'nfl_network':
             divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
@@ -337,7 +320,6 @@ class pigskin(object):
                 divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['LiveNoData']
             else:
                 divaconfig = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
-        
 
         url = divaconfig.replace('device', 'html5')
         request = requests.get(url, verify=False)
@@ -354,10 +336,7 @@ class pigskin(object):
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
         self.get_refresh_token(self.refresh_token)
-        
-        
-        
-        
+
         post_data = {
             'Type': '1',
             'User': '',
@@ -366,13 +345,13 @@ class pigskin(object):
             'VideoKind': 'Video',
             'AssetState': '3',
             'PlayerType': 'HTML5',
-            'other': self.gen_plid() + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
+            'other': str(uuid.uuid4()) + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
         }
-        
+
         request = requests.post(processingUrlCallPath, json=post_data, verify=False)
         response = request.json()
         m3u8_url = response['ContentUrl']
-        
+
         m3u8_request = requests.get(m3u8_url, verify=False)
         m3u8_manifest = m3u8_request.text
         if full:
@@ -385,13 +364,12 @@ class pigskin(object):
             if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
                 for playlist in m3u8_obj.playlists:
                     bitrate = int(playlist.stream_info.bandwidth)
-                    print bitrate
                     streams[bitrate] = m3u8_url[:m3u8_url.rfind('/manifest') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
             else:
                 streams['sole available'] = m3u8_url
 
         return streams
-    
+
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
@@ -411,13 +389,13 @@ class pigskin(object):
             return False
         else:
             return True
-        
+
     def parse_shows(self):
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
         request = requests.get(url, verify=False)
         response = request.json()
         show_dict = {}
-        
+
         for show in response['modules']['programs']:
             name = show['title']
             slug = show['slug']
@@ -431,12 +409,12 @@ class pigskin(object):
                         self.nflnSeasons.append(season_name)
             show_dict[name] = season_dict
         self.nflnShows.update(show_dict)
-    
+
     def get_shows(self, season):
         """Return a list of all shows for a season."""
         #seasons_shows = self.nflnShows.keys()
         seasons_shows = []
-        
+
         for show_name, show_codes in self.nflnShows.items():
             if season in show_codes:
                 seasons_shows.append(show_name)
@@ -464,4 +442,5 @@ class pigskin(object):
         url = url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
         request = requests.get(url, verify=False)
         response = request.json()
+
         return response
