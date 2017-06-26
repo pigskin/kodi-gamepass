@@ -69,11 +69,11 @@ class pigskin(object):
             self.log('Headers: %s' % headers)
 
         if method == 'get':
-            req = self.http_session.get(url, params=params, headers=headers, verify=False)
+            req = self.http_session.get(url, params=params, headers=headers)
         elif method == 'put':
-            req = self.http_session.put(url, params=params, data=payload, headers=headers, verify=False)
+            req = self.http_session.put(url, params=params, data=payload, headers=headers)
         else:  # post
-            req = self.http_session.post(url, params=params, data=payload, headers=headers, verify=False)
+            req = self.http_session.post(url, params=params, data=payload, headers=headers)
         self.log('Response code: %s' % req.status_code)
         self.log('Response: %s' % req.content)
 
