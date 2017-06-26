@@ -172,3 +172,143 @@ msgstr "Некоторые шоу могут не работать. Пожалу
 msgctxt "#30045"
 msgid "No valid stream URL was found."
 msgstr "Не возможно найти URL для потока."
+
+msgctxt "#31000"
+msgid "Enable Team View"
+msgstr ""
+
+msgctxt "#31001"
+msgid "Prefered Team"
+msgstr ""
+
+msgctxt "#31002"
+msgid "Buffalo Bills"
+msgstr ""
+
+msgctxt "#31003"
+msgid "Cincinnati Bengals"
+msgstr ""
+
+msgctxt "#31004"
+msgid "Cleveland Browns"
+msgstr ""
+
+msgctxt "#31005"
+msgid "Denver Broncos"
+msgstr ""
+
+msgctxt "#31006"
+msgid "Houston Texans"
+msgstr ""
+
+msgctxt "#31007"
+msgid "Indianapolis Colts"
+msgstr ""
+
+msgctxt "#31008"
+msgid "Jacksonville Jaguars"
+msgstr ""
+
+msgctxt "#31009"
+msgid "Kansas City Chiefs"
+msgstr ""
+
+msgctxt "#31010"
+msgid "Los Angeles Chargers"
+msgstr ""
+
+msgctxt "#31011"
+msgid "Miami Dolphins"
+msgstr ""
+
+msgctxt "#31012"
+msgid "New England Patriots"
+msgstr ""
+
+msgctxt "#31013"
+msgid "New York Jets"
+msgstr ""
+
+msgctxt "#31014"
+msgid "Oakland Raiders"
+msgstr ""
+
+msgctxt "#31015"
+msgid "Pittsburgh Steelers"
+msgstr ""
+
+msgctxt "#31016"
+msgid "Tennessee Titans"
+msgstr ""
+
+msgctxt "#31017"
+msgid "Arizona Cardinals"
+msgstr ""
+
+msgctxt "#31018"
+msgid "Atlanta Falcons"
+msgstr ""
+
+msgctxt "#31019"
+msgid "Carolina Panthers"
+msgstr ""
+
+msgctxt "#31020"
+msgid "Chicago Bears"
+msgstr ""
+
+msgctxt "#31021"
+msgid "Dallas Cowboys"
+msgstr ""
+
+msgctxt "#31022"
+msgid "Detroit Lions"
+msgstr ""
+
+msgctxt "#31023"
+msgid "Green Bay Packers"
+msgstr ""
+
+msgctxt "#31024"
+msgid "Los Angeles Rams"
+msgstr ""
+
+msgctxt "#31025"
+msgid "Minnesota Vikings"
+msgstr ""
+
+msgctxt "#31026"
+msgid "New Orleans Saints"
+msgstr ""
+
+msgctxt "#31027"
+msgid "New York Giants"
+msgstr ""
+
+msgctxt "#31028"
+msgid "Philadelphia Eagles"
+msgstr ""
+
+msgctxt "#31029"
+msgid "Seattle Seahawks"
+msgstr ""
+
+msgctxt "#31030"
+msgid "San Francisco 49ers"
+msgstr ""
+
+msgctxt "#31031"
+msgid "Tampa Bay Buccaneers"
+msgstr ""
+
+msgctxt "#31032"
+msgid "Washington Redskins"
+msgstr ""
+
+msgctxt "#31033"
+msgid "Baltimore Ravens"
+msgstr ""
+
+msgctxt "#31034"
+msgid "Ask for Team"
+msgstr ""
