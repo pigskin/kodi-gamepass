@@ -20,8 +20,8 @@ class pigskin(object):
         self.debug = debug
         self.base_url = 'https://www.nflgamepass.com'
         self.http_session = requests.Session()
-        self.access_token = ''
-        self.refresh_token = ''
+        self.access_token = None
+        self.refresh_token = None
         self.config = self.make_request(self.base_url + '/api/en/content/v1/web/config', 'get')
         self.client_id = self.config["modules"]["API"]["CLIENT_ID"]
         self.nflnShows = {}
@@ -89,8 +89,8 @@ class pigskin(object):
         if isinstance(response, dict):
             for key in response.keys():
                 if key.lower() == 'message':
-                    # raise all messages as GamePassError
-                    raise self.GamePassError(response[key])
+                    if response[key]: # raise all messages as GamePassError if message is not empty
+                        raise self.GamePassError(response[key])
 
         return response
 
@@ -154,11 +154,11 @@ class pigskin(object):
 
         return True
 
-    def refresh_token(self, refresh_token):
+    def refresh_tokens(self):
         """Refreshes authorization tokens."""
         url = self.config["modules"]["API"]["LOGIN"]
         post_data = {
-            'refresh_token': refresh_token,
+            'refresh_token': self.refresh_token,
             'client_id': self.client_id,
             'grant_type': 'refresh_token'
         }
@@ -322,7 +322,7 @@ class pigskin(object):
 
         url = divaconfig.replace('device', 'html5')
         request = self.make_request(url, 'get')
-        divaconfig = xmltodict.parse(request.text)
+        divaconfig = xmltodict.parse(request)
         for parameter in divaconfig['settings']['videoData']['parameter']:
             if parameter['@name']== 'videoDataPath':
                 videoDataPath = parameter['@value'].replace('{V.ID}',video_id)
@@ -330,11 +330,11 @@ class pigskin(object):
             if parameter['@name']== 'processingUrlCallPath':
                 processingUrlCallPath = parameter['@value']
         request = self.make_request(videoDataPath, 'get')
-        akamai_url = xmltodict.parse(request.text)
+        akamai_url = xmltodict.parse(request)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
             if videoSource['@format']== 'HLS':
                 m3u8_url = videoSource['uri']
-        self.get_refresh_token(self.refresh_token)
+        self.refresh_tokens()
 
         post_data = {
             'Type': '1',
@@ -347,11 +347,10 @@ class pigskin(object):
             'other': str(uuid.uuid4()) + '|' + self.access_token + '|web|Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20WOW64%3B%20rv%3A54.0)%20Gecko%2F20100101%20Firefox%2F54.0|undefined|' +  username
         }
 
-        response = self.make_request(url, 'post', payload=post_data)
+        response = self.make_request(processingUrlCallPath, 'post', payload=json.dumps(post_data))
         m3u8_url = response['ContentUrl']
 
-        m3u8_request = self.make_request(m3u8_url, 'get')
-        m3u8_manifest = m3u8_request.text
+        m3u8_manifest = self.make_request(m3u8_url, 'get')
         if full:
             return m3u8_url
         m3u8_header = {'User-Agent': 'Safari/537.36 Mozilla/5.0 AppleWebKit/537.36 Chrome/31.0.1650.57',
