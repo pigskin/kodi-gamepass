@@ -29,7 +29,6 @@ class pigskin(object):
         self.nflnShows = {}
         self.nflnSeasons = []
 
-
         if proxy_config is not None:
             proxy_url = self.build_proxy_url(proxy_config)
             if proxy_url != '':
@@ -37,8 +36,6 @@ class pigskin(object):
                     'http': proxy_url,
                     'https': proxy_url,
                 }
-
-
 
         self.log('Debugging enabled.')
         self.log('Python Version: %s' % sys.version)
@@ -204,7 +201,6 @@ class pigskin(object):
                                 season_dict[week_code] = 'PRO BOWL'
                             if week['weekNameAbbr'] == 'sb':
                                 season_dict[week_code] = 'SUPER BOWL'
-
 
                 seasons_and_weeks[year] = season_dict
         except KeyError:
@@ -446,6 +442,5 @@ class pigskin(object):
         url = url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
         request = requests.get(url, verify=False)
         response = request.json()
-
 
         return response
