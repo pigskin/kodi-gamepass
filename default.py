@@ -256,7 +256,8 @@ class GamepassGUI(xbmcgui.WindowXML):
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
                 listitem.setProperty('game_info', i['title'])
-                #listitem.setProperty('away_thumb', gp.image_url + i['image'])
+                away_thumb = i['videoThumbnail']['templateUrl'].replace('{formatInstructions}', 'w_250,h_250,c_thumb,g_auto,q_auto,f_jpg')
+                listitem.setProperty('away_thumb', away_thumb)
                 #listitem.setProperty('url', i['publishPoint'])
                 listitem.setProperty('id', i['videoId'])
                 listitem.setProperty('is_game', 'false')
