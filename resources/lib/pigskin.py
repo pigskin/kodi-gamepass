@@ -309,6 +309,7 @@ class pigskin(object):
     def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None, full = None):
         """Return the URL for a stream."""
         streams = {}
+        streamResolutionInformation = {}
         self.get_current_season_and_week()  # set cookies
 
         if video_id == 'nfl_network':
@@ -363,11 +364,15 @@ class pigskin(object):
             if m3u8_obj.is_variant:  # if this m3u8 contains links to other m3u8s
                 for playlist in m3u8_obj.playlists:
                     bitrate = int(playlist.stream_info.bandwidth)
+                    resolution = (str(playlist.stream_info.resolution)).replace(', ','x')
                     streams[bitrate] = m3u8_url[:m3u8_url.rfind('/manifest') + 1] + playlist.uri + '?' + m3u8_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+                    streamResolutionInformation[bitrate] = resolution
+                    combindedDictionary = {'url': streams, 'res':streamResolutionInformation}
             else:
                 streams['sole available'] = m3u8_url
 
-        return streams
+        #Return a combinded Dictionary with Streams and the Corresponding Resolution with the Bitrate as indice.
+        return combindedDictionary
 
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""

@@ -304,13 +304,13 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.games_list.getSelectedItem().setProperty('clicked', 'true')
             self.clicked_game = self.games_list.getSelectedPosition()
 
-    def ask_bitrate(self, bitrates):
+    def ask_bitrate(self, bitrates, resolution):
         """Presents a dialog for user to select from a list of bitrates.
         Returns the value of the selected bitrate.
         """
         options = []
         for bitrate in bitrates:
-            options.append(str(bitrate) + ' Kbps')
+            options.append(str(resolution[bitrate]))
         dialog = xbmcgui.Dialog()
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         ret = dialog.select(language(30003), options)
@@ -319,17 +319,19 @@ class GamepassGUI(xbmcgui.WindowXML):
         else:
             return None
 
-    def select_bitrate(self, manifest_bitrates=None):
+    def select_bitrate(self, manifest_bitrates=None, manifest_resolution=None):
         """Returns a bitrate, while honoring the user's /preference/."""
+        manifest_bitrates = manifest_bitrates.keys()
         bitrate_setting = int(addon.getSetting('preferred_bitrate'))
-        bitrate_values = ['3671533', '2394274', '1577316', '1117771', '760027', '555799', '402512']
 
         highest = False
         preferred_bitrate = None
         if bitrate_setting == 0:  # 0 === "highest"
             highest = True
         elif 0 < bitrate_setting and bitrate_setting < 8:  # a specific bitrate. '8' === "ask"
-            preferred_bitrate = bitrate_values[bitrate_setting - 1]
+            if manifest_bitrates:
+                manifest_bitrates.sort(key=int, reverse=True)
+                preferred_bitrate = manifest_bitrates[bitrate_setting - 1]
 
         if manifest_bitrates:
             manifest_bitrates.sort(key=int, reverse=True)
@@ -338,7 +340,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             elif preferred_bitrate and preferred_bitrate in manifest_bitrates:
                 return preferred_bitrate
             else:  # ask user
-                return self.ask_bitrate(manifest_bitrates)
+                return self.ask_bitrate(manifest_bitrates, manifest_resolution)
         else:
             if highest:
                 return bitrate_values[0]
@@ -495,9 +497,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                                     game_streams = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
                                 else:
                                     game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
-                            bitrate = self.select_bitrate(game_streams.keys())
+                            bitrate = self.select_bitrate(game_streams['url'],game_streams['res'])
                             if bitrate:
-                                game_url = game_streams[bitrate]
+                                game_url = game_streams['url'][bitrate]
                                 self.play_url(game_url)
 
             elif self.main_selection == 'NFL Network':
@@ -517,9 +519,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                     video_streams = gp.get_publishpoint_streams(video_id, 'video', '', username)
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
-                        bitrate = self.select_bitrate(video_streams.keys())
+                        bitrate = self.select_bitrate(video_streams['url'],video_streams['res'])
                         if bitrate:
-                            video_url = video_streams[bitrate]
+                            video_url = video_streams['url'][bitrate]
                             self.play_url(video_url)
                     else:
                         dialog = xbmcgui.Dialog()
@@ -529,9 +531,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if show_name == 'NFL RedZone - Live':
                         rz_live_streams = gp.get_publishpoint_streams('redzone', '', '', username)
                         if rz_live_streams:
-                            bitrate = self.select_bitrate(rz_live_streams.keys())
+                            bitrate = self.select_bitrate(rz_live_streams['url'],rz_live_streams['res'])
                             if bitrate:
-                                rz_live_url = rz_live_streams[bitrate]
+                                rz_live_url = rz_live_streams['url'][bitrate]
                                 self.play_url(rz_live_url)
                         else:
                             dialog = xbmcgui.Dialog()
@@ -539,9 +541,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                     elif show_name == 'NFL Network - Live':
                         nw_live_streams = gp.get_publishpoint_streams('nfl_network', '', '', username)
                         if nw_live_streams:
-                            bitrate = self.select_bitrate(nw_live_streams.keys())
+                            bitrate = self.select_bitrate(nw_live_streams['url'],nw_live_streams['res'])
                             if bitrate:
-                                nw_live_url = nw_live_streams[bitrate]
+                                nw_live_url = nw_live_streams['url'][bitrate]
                                 self.play_url(nw_live_url)
                         else:
                             dialog = xbmcgui.Dialog()
