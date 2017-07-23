@@ -191,11 +191,11 @@ class pigskin(object):
                             if week['weekNameAbbr'] == 'hof':
                                 season_dict[week_code] = 'Hall of Fame'
                             else:
-                                season_dict[week_code] = 'Week ' + str(week['number'])
+                                season_dict[week_code] = 'Pre Week ' + str(week['number'])
                     if season_week_types['seasonType'] == "reg":
                         for week in season_week_types['weeks']:
                             week_code = '2' + str(week['number']).zfill(2)
-                            season_dict[week_code] = 'Week ' + str(week['number']+4)
+                            season_dict[week_code] = 'Week ' + str(week['number'])
                     else:  # regular season and post season
                         for week in season_week_types['weeks']:
                             week_code = '3' + str(week['number']).zfill(2)
@@ -266,6 +266,8 @@ class pigskin(object):
                 return teams
             else:
                 for conference in teams['modules']:
+                    if conference == 'analytics':
+                        continue
                     for teamname in teams['modules'][conference]['content']:
                         if team == teamname['fullName']:
                             team = teamname['seoname']

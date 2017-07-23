@@ -148,6 +148,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         if games:
             for weekSet in games['modules']:
+                if weekSet == 'analytics':
+                    continue
                 for game in games['modules'][weekSet]['content']:
                     game_id = game['visitorNickName'].lower() + '-' +  game['homeNickName'].lower() + '-' + str(game['gameId'])
                     home_team = game['homeTeamAbbr']
