@@ -164,3 +164,23 @@ msgstr ""
 msgctxt "#30044"
 msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
 msgstr ""
+
+msgctxt "#30130"
+msgid "Streaming Format"
+msgstr ""
+
+msgctxt "#30131"
+msgid "IIS"
+msgstr ""
+
+msgctxt "#30132"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30133"
+msgid "ConnectTV"
+msgstr ""
+
+msgctxt "#30134"
+msgid "ChromeCast"
+msgstr ""

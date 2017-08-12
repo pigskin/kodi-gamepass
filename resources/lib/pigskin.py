@@ -306,7 +306,7 @@ class pigskin(object):
             print 'Condensed Game available'
             return condensedVideo['videoId']
 
-    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None, full = None):
+    def get_publishpoint_streams(self, video_id, stream_type=None, game_type=None, username=None, formtat = None, full = None):
         """Return the URL for a stream."""
         streams = {}
         self.get_current_season_and_week()  # set cookies
@@ -334,7 +334,7 @@ class pigskin(object):
         request = self.make_request(videoDataPath, 'get')
         akamai_url = xmltodict.parse(request)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
-            if videoSource['@format']== 'ChromeCast':
+            if videoSource['@format']== format:
                 m3u8_url = videoSource['uri']
         self.refresh_tokens()
 
