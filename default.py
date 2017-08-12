@@ -384,6 +384,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
             xbmc.executebuiltin("ActivateWindow(busydialog)")
+            format = language(30131+int(addon.getSetting('StreamFormat')))
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -475,7 +476,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             #    self.playBackStop = False
 
                                 #play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
-                                #play_stream = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
+                                #play_stream = gp.get_publishpoint_streams(coach_id, 'game', game_version, username, format)
                                 #plays = gp.get_coaches_playIDs(game_id, self.selected_season)
                                 #for playID in sorted(plays, key=int):
                                 #    cf_url = str(play_stream).replace('dummy', playID)
@@ -489,12 +490,12 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 #coachGui.doModal()
                                 #del coachGui
                             if game_version == 'condensed':
-                                game_streams = gp.get_publishpoint_streams(condensed_id, 'game', game_version, username)
+                                game_streams = gp.get_publishpoint_streams(condensed_id, 'game', game_version, username, format)
                             else:
                                 if game_version == 'coach':
-                                    game_streams = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
+                                    game_streams = gp.get_publishpoint_streams(coach_id, 'game', game_version, username, format)
                                 else:
-                                    game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username)
+                                    game_streams = gp.get_publishpoint_streams(video_id, 'game', game_version, username, format)
                             bitrate = self.select_bitrate(game_streams.keys())
                             if bitrate:
                                 game_url = game_streams[bitrate]
@@ -514,7 +515,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gp.get_publishpoint_streams(video_id, 'video', '', username)
+                    video_streams = gp.get_publishpoint_streams(video_id, 'video', '', username, format)
                     if video_streams:
                         addon_log('Video-Streams: %s' % video_streams)
                         bitrate = self.select_bitrate(video_streams.keys())
@@ -527,7 +528,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_live_streams = gp.get_publishpoint_streams('redzone', '', '', username)
+                        rz_live_streams = gp.get_publishpoint_streams('redzone', '', '', username, format)
                         if rz_live_streams:
                             bitrate = self.select_bitrate(rz_live_streams.keys())
                             if bitrate:
@@ -537,7 +538,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
-                        nw_live_streams = gp.get_publishpoint_streams('nfl_network', '', '', username)
+                        nw_live_streams = gp.get_publishpoint_streams('nfl_network', '', '', username, format)
                         if nw_live_streams:
                             bitrate = self.select_bitrate(nw_live_streams.keys())
                             if bitrate:

@@ -8,6 +8,7 @@
     <setting id="preferred_game_version" type="select" label="30013" lvalues="30014|30015|30012" default="0"/>
     <setting id="local_tz" type="enum" label="30020" lvalues="30026|30027|30028" default="0"/>
     <setting id="hide_game_length" type="bool" label="30025" default="false"/>
+	<setting id="StreamFormat" type="enum" label="30130" lvalues="30131|30132|30133|30134" default="3"/>
   </category>
   <category label="30033">
     <setting id="proxy_enabled" type="bool" label="30034" default="false"/>
