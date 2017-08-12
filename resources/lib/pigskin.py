@@ -334,7 +334,7 @@ class pigskin(object):
         request = self.make_request(videoDataPath, 'get')
         akamai_url = xmltodict.parse(request)
         for videoSource in akamai_url['video']['videoSources']['videoSource']:
-            if videoSource['@format']== 'HLS':
+            if videoSource['@format']== 'ChromeCast':
                 m3u8_url = videoSource['uri']
         self.refresh_tokens()
 
