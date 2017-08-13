@@ -1,11 +1,14 @@
 # NOTE #
 
-NFL Game Pass has just moved to a new streaming partner. We are updating
-everything to use the new service, but do expect bugs and bumps along the way.
-A lot has changed.
+NFL Game Pass has split into two services: Game Pass Europe and Game Pass
+International.
 
-Version 0.10.2 is the last version to support the old service, and will continue
-to work until 2017.07.31 when the old service is retired.
+This addon currently only supports Game Pass Europe. However, we are very
+interested in supporting Game Pass International, if a developer from one of
+those regions is willing to test and maintain that functionality.
+
+If you're interested, let us know and we'd be happy to work together to make
+this happen.
 
 # NFL Game Pass Kodi Plugin #
 **version 0.11.0 — Jay Cutler Edition**
@@ -27,7 +30,6 @@ This addon is available from the official Kodi repository, and when installed
 from there, all dependencies are installed automatically. However, if you're
 installing directly from the source, make sure the following dependencies are
 installed:
- * xmltodict (http://mirrors.kodi.tv/addons/jarvis/script.module.xmltodict/)
  * Requests 2.x (http://mirrors.kodi.tv/addons/jarvis/script.module.requests/)
  * m3u8 >= 0.2.10 (http://mirrors.kodi.tv/addons/jarvis/script.module.m3u8/)
    * which needs iso8601 (http://mirrors.kodi.tv/addons/jarvis/script.module.iso8601/)
@@ -35,22 +37,23 @@ installed:
 ## What is NFL Game Pass? ##
 
 NFL Game Pass is website that allows those with subscriptions to watch NFL
-games. Archives of old games stretch back to 2009, coaches film (22 man view) is
-available, as is audio from each team's radio network. Overall, it is a sweet
-service offered by the NFL for those of us who must have our American Football
-fix.
+games. Live games, archives of old games, NFL TV shows, NFL Network, and coaches
+tape (22 man view) is available. Overall, it is a sweet service offered by the
+NFL for those of us who must have our American Football fix.
 
-## What is Game Pass Domestic? ##
+## What is Game Pass Europe? ##
 
-NFL Game Pass Domestic is the USA (and parts of Canada and UK) version of Game
-Pass, but the service is blacked out during live games. Previously it lacked
-other features, but with the mid-2015 revamping of their service, it seems the
-two services have mostly converged (though we have yet to find a side-by-side
-comparison).
+Game Pass Europe uses WPP/Bruin as its streaming provider(s).
 
-As most/all of the current developers are located outside of the Domestic
-regions, testing, bug reports, and patches from Game Pass Domestic subscribers
-is most appreciated.
+Game Pass Europe is currently the only service this addon supports.
+
+## What is Game Pass International? ##
+
+Game Pass International uses NeuLion as its streaming partner.
+
+As all of the current developers are located outside of the "International"
+regions, testing, bug reports, and patches from Game Pass International
+subscribers is most appreciated.
 
 ## Why write a plugin for Kodi? ##
 
@@ -62,11 +65,12 @@ to watch a game, nothing else.
 
 ## What features are currently supported? ##
 
+With the 2017 split of Game Pass's service, this list is out of date.
+
 By now, most core features are supported.
 
- * Archived games from 2011 to 2014 (both full and condensed)
+ * Archived games from 2016 forward
  * Live games
- * Coaches Film (22 man view)
  * NFL Network - Live
  * A Football Life
  * NFL Films Presents
@@ -80,21 +84,11 @@ By now, most core features are supported.
  * NFL Total Access
 
 Currently unsupported features:
- * Archived games prior to 2011
- * Alternate team audio
- * Coaches Show
+ * Coaches Film (22 man view)
+ * Game Pass International
 
 ## Release names ##
 
 Want a release to be named after your player/coach of choice? Contribute to the
 project in some way (code, art, debugging, beer, brazen — yet effective —
 flattery, etc), and we'll gladly name a future release after them.
-
-## Roadmap ##
-
-A rough roadmap follows:
-
-* Continue work towards feature completeness
-* Stabilize Game Pass Domestic support
-* Testing
-* Code cleanup
