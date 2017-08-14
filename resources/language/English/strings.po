@@ -180,3 +180,7 @@ msgstr ""
 msgctxt "#30048"
 msgid "WEEK {0}"
 msgstr ""
+
+msgctxt "#30049"
+msgid "Use InputStream Adaptive"
+msgstr ""
