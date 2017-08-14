@@ -8,6 +8,7 @@ from dateutil import tz
 import os
 import sys
 import time
+import json
 from traceback import format_exc
 
 import xbmc
@@ -71,6 +72,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.list_refill = False
         self.focusId = 100
         self.seasons_and_weeks = gp.get_seasons_and_weeks()
+        self.has_inputstream_adaptive = self.has_inputstream_adaptive()
 
         xbmcgui.WindowXML.__init__(self, *args, **kwargs)
         self.action_previous_menu = (9, 10, 92, 216, 247, 257, 275, 61467, 61448)
@@ -247,7 +249,12 @@ class GamepassGUI(xbmcgui.WindowXML):
     def play_url(self, url):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         self.list_refill = True
-        xbmc.Player().play(url)
+        playitem = xbmcgui.ListItem(path=url)
+        if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
+            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+            playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
+        xbmc.Player().play(item=url, listitem=playitem)
 
     def init(self, level):
         if level == 'season':
@@ -349,6 +356,45 @@ class GamepassGUI(xbmcgui.WindowXML):
             return game_version
         else:
             return None
+
+    def has_inputstream_adaptive(self):
+        """Checks if InputStream Adaptive is installed and enabled."""
+        payload = {
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'Addons.GetAddonDetails',
+            'params': {
+                'addonid': 'inputstream.adaptive',
+                'properties': ['enabled']
+            }
+        }
+        response = xbmc.executeJSONRPC(json.dumps(payload))
+        data = json.loads(response)
+        if 'error' not in data and data['result']['addon']['enabled']:
+            addon_log('InputStream Adaptive is installed and enabled.')
+            return True
+        else:
+            addon_log('InputStream Adaptive is not installed and/or enabled.')
+            if addon.getSetting('use_inputstream_adaptive') == 'true':
+                addon_log('Disabling InputStream Adaptive.')
+                addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
+            return False
+
+    def select_stream_url(self, streams):
+        """Determine which stream URL to use from the dict."""
+        if streams:
+            if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
+                stream_url = streams['manifest_url']
+            else:
+                bitrate = self.select_bitrate(streams['bitrates'].keys())
+                if bitrate:
+                    stream_url = streams['bitrates'][bitrate]
+                else:  # bitrate dialog was canceled
+                    return None
+            return stream_url
+        else:
+            addon_log('streams dictionary was empty.')
+            return False
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
@@ -465,16 +511,16 @@ class GamepassGUI(xbmcgui.WindowXML):
                                 #coachGui.doModal()
                                 #del coachGui
                             if game_version == 'condensed':
-                                game_streams = gp.get_stream(condensed_id, 'game', username=username)
+                                stream_url = self.select_stream_url(gp.get_stream(condensed_id, 'game', username=username))
+                            elif game_version == 'coach':
+                                stream_url = self.select_stream_url(gp.get_stream(coach_id, 'game', username=username))
                             else:
-                                if game_version == 'coach':
-                                    game_streams = gp.get_stream(coach_id, 'game', username=username)
-                                else:
-                                    game_streams = gp.get_stream(video_id, 'game', username=username)
-                            bitrate = self.select_bitrate(game_streams.keys())
-                            if bitrate:
-                                game_url = game_streams[bitrate]
-                                self.play_url(game_url)
+                                stream_url = self.select_stream_url(gp.get_stream(video_id, 'game', username=username))
+                            if stream_url:
+                                self.play_url(stream_url)
+                            elif stream_url is False:
+                                dialog = xbmcgui.Dialog()
+                                dialog.ok(language(30043), language(30045))
 
             elif self.main_selection == 'NFL Network':
                 if controlId == 210:  # season is clicked
@@ -490,36 +536,26 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    video_streams = gp.get_stream(video_id, 'video', username=username)
-                    if video_streams:
-                        addon_log('Video-Streams: %s' % video_streams)
-                        bitrate = self.select_bitrate(video_streams.keys())
-                        if bitrate:
-                            video_url = video_streams[bitrate]
-                            self.play_url(video_url)
+                    episode_stream_url = self.select_stream_url(gp.get_stream(video_id, 'video', username=username))
+                    if episode_stream_url:
+                        self.play_url(episode_stream_url)
                     else:
                         dialog = xbmcgui.Dialog()
                         dialog.ok(language(30043), language(30045))
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_live_streams = gp.get_stream('redzone', username=username)
-                        if rz_live_streams:
-                            bitrate = self.select_bitrate(rz_live_streams.keys())
-                            if bitrate:
-                                rz_live_url = rz_live_streams[bitrate]
-                                self.play_url(rz_live_url)
-                        else:
+                        rz_stream_url = self.select_stream_url(gp.get_stream('redzone', username=username))
+                        if rz_stream_url:
+                            self.play_url(rz_stream_url)
+                        elif rz_stream_url is False:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
                     elif show_name == 'NFL Network - Live':
-                        nw_live_streams = gp.get_stream('nfl_network', username=username)
-                        if nw_live_streams:
-                            bitrate = self.select_bitrate(nw_live_streams.keys())
-                            if bitrate:
-                                nw_live_url = nw_live_streams[bitrate]
-                                self.play_url(nw_live_url)
-                        else:
+                        nfln_live_stream = self.select_stream_url(gp.get_stream('nfl_network', username=username))
+                        if nfln_live_stream:
+                            self.play_url(nfln_live_stream)
+                        elif nfln_live_stream is False:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
             xbmc.executebuiltin("Dialog.Close(busydialog)")
