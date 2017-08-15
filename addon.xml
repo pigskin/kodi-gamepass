@@ -11,7 +11,6 @@
     <import addon="xbmc.python" version="2.25.0"/>
     <import addon="script.module.m3u8" version="0.2.10"/>
     <import addon="script.module.requests" version="2.7.0"/>
-    <import addon="script.module.dateutil" version="2.5.3"/>
     <import addon="xbmc.gui" version="5.12.0"/>
   </requires>
   <extension point="xbmc.python.script" library="default.py">

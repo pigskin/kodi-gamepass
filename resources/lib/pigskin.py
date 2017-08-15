@@ -3,13 +3,13 @@ A Kodi-agnostic library for NFL Game Pass
 """
 import codecs
 import uuid
-import re
 import sys
 import json
+import calendar
+import time
 import urllib
 import xml.etree.ElementTree as ET
-from traceback import format_exc
-from urlparse import urlsplit
+from datetime import datetime, timedelta
 
 import requests
 import m3u8
@@ -174,7 +174,7 @@ class pigskin(object):
         seasons_and_weeks = {}
 
         try:
-            url = self.config["modules"]["ROUTES_DATA_PROVIDERS"]["games"]
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
             seasons = self.make_request(url, 'get')
         except:
             self.log('Acquiring season and week data failed.')
@@ -333,7 +333,6 @@ class pigskin(object):
         response = self.make_request(url, 'get')
 
         for show in response['modules']['programs']:
-            name = show['title']
             season_dict = {}
             for season in show['seasons']:
                 season_name = season['value']
@@ -341,7 +340,7 @@ class pigskin(object):
                 season_dict[season_name] = season_id
                 if season_name not in self.nfln_seasons:
                     self.nfln_seasons.append(season_name)
-            show_dict[name] = season_dict
+            show_dict[show['title']] = season_dict
         self.nfln_shows.update(show_dict)
 
     def get_shows(self, season):
@@ -358,17 +357,31 @@ class pigskin(object):
         """Return a list of episodes for a show. Return empty list if none are
         found or if an error occurs."""
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
-        programs_dict = self.make_request(url, 'get')
-        for show in programs_dict['modules']['programs']:
-            name = show['title']
-            if show_name == name:
-                slug = show['slug']
-                for seasons in show['seasons']:
-                    season_name = seasons['value']
-                    if season == season_name:
-                        season_id = seasons['slug']
+        programs = self.make_request(url, 'get')['modules']['programs']
+        for show in programs:
+            if show_name == show['title']:
+                selected_show = show
                 break
+        season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
         request_url = self.config['modules']['API']['NETWORK_EPISODES']
-        final_url = request_url.replace(':seasonSlug', season_id).replace(':tvShowSlug', slug)
+        episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
 
-        return self.make_request(final_url, 'get')
+        return self.make_request(episodes_url, 'get')['modules']['archive']['content']
+
+    def parse_datetime(self, date_string, localize=False):
+        """Parse NFL Game Pass date string to datetime object."""
+        date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        datetime_obj = datetime(*(time.strptime(date_string, date_time_format)[0:6]))
+        if localize:
+            return self.utc_to_local(datetime_obj)
+        else:
+            return datetime_obj
+
+    @staticmethod
+    def utc_to_local(utc_dt):
+        """Convert UTC time to local time."""
+        # get integer timestamp to avoid precision lost
+        timestamp = calendar.timegm(utc_dt.timetuple())
+        local_dt = datetime.fromtimestamp(timestamp)
+        assert utc_dt.resolution >= timedelta(microseconds=1)
+        return local_dt.replace(microsecond=utc_dt.microsecond)
