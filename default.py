@@ -2,14 +2,10 @@
 """
 A Kodi addon/skin for NFL Game Pass
 """
-import calendar
-import datetime
-from dateutil import tz
-import os
 import sys
-import time
 import json
 from traceback import format_exc
+from datetime import timedelta
 
 import xbmc
 import xbmcaddon
@@ -97,7 +93,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
 
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -146,7 +142,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         """Show games for a given season/week"""
         self.games_items = []
         games = gp.get_weeks_games(self.selected_season, self.selected_season_type, self.selected_week)
-        date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         for game in games:
             game_id = '{0}-{1}-{2}'.format(game['visitorNickName'].lower(), game['homeNickName'].lower(), str(game['gameId']))
             game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
@@ -159,27 +154,17 @@ class GamepassGUI(xbmcgui.WindowXML):
             if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
                 # show game duration only if user wants to see it
                 if addon.getSetting('hide_game_length') == 'false':
-                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(datetime.timedelta(seconds=int(float(game['video']['videoDuration'])))))
+                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'])))))
                 else:
                     game_info = game['phase']
             else:
-                try:
-                    if addon.getSetting('local_tz') == '0':  # don't localize
-                        game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
-                        game_info = game_datetime.strftime('%A, %b %d - %I:%M %p')
-                    else:
-                        from_zone = tz.tzutc()
-                        to_zone = tz.tzlocal()
-                        game_datetime = datetime.datetime(*(time.strptime(game['gameDateTimeUtc'], date_time_format)[0:6]))
-                        game_datetime = game_datetime.replace(tzinfo=from_zone)
-                        local_time = game_datetime.astimezone(to_zone)
-                        if addon.getSetting('local_tz') == '1':  # localize and use 12-hour clock
-                            game_info = local_time.strftime('%A, %b %d - %I:%M %p')
-                        else:  # localize and use 24-hour clock
-                            game_info = local_time.strftime('%A, %b %d - %H:%M')
-                except:  # all else fails, just use their raw date value
-                    game_datetime = game['gameDateTimeUtc'].split('T')
-                    game_info = game_datetime[0] + '[CR]' + game_datetime[1].split('.')[0] + ' ET'
+                if addon.getSetting('time_notation') == '0':  # 12-hour clock
+                    datetime_format = '%A, %b %d - %I:%M %p'
+                else:  # 24-hour clock
+                    datetime_format = '%A, %b %d - %H:%M'
+
+                datetime_obj = gp.parse_datetime(game['gameDateTimeUtc'], True)
+                game_info = datetime_obj.strftime(datetime_format)
 
             if game['videoStatus'] == 'SCHEDULED':
                 isPlayable = 'false'
@@ -228,15 +213,13 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_shows_episodes(self, show_name, season):
         """Show episodes for a given season/show"""
         self.games_items = []
-        items = gp.get_shows_episodes(show_name, season)
+        episodes = gp.get_shows_episodes(show_name, season)
 
-        for i in items['modules']['archive']['content']:
+        for episode in episodes:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
-                listitem.setProperty('game_info', i['title'])
-                #listitem.setProperty('away_thumb', gp.image_url + i['image'])
-                #listitem.setProperty('url', i['publishPoint'])
-                listitem.setProperty('id', i['videoId'])
+                listitem.setProperty('game_info', episode['title'])
+                listitem.setProperty('id', episode['videoId'])
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
@@ -247,7 +230,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
@@ -293,7 +276,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         for bitrate in bitrates:
             options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
         ret = dialog.select(language(30003), options)
         if ret > -1:
             return bitrates[ret]
@@ -342,7 +325,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             if 'Coach' in game_versions:
                 versions.append(language(30032))
             dialog = xbmcgui.Dialog()
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
+            xbmc.executebuiltin('Dialog.Close(busydialog)')
             preferred_version = dialog.select(language(30016), versions)
 
         if preferred_version == 1 and 'Condensed' in game_versions:
@@ -403,7 +386,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
-            xbmc.executebuiltin("ActivateWindow(busydialog)")
+            xbmc.executebuiltin('ActivateWindow(busydialog)')
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -448,7 +431,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
 
-                xbmc.executebuiltin("Dialog.Close(busydialog)")
+                xbmc.executebuiltin('Dialog.Close(busydialog)')
                 return
 
             if self.main_selection == 'GamePass':
@@ -538,9 +521,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         elif nfln_live_stream is False:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
+            xbmc.executebuiltin('Dialog.Close(busydialog)')
         except Exception:  # catch anything that might fail
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
+            xbmc.executebuiltin('Dialog.Close(busydialog)')
             addon_log(format_exc())
 
             dialog = xbmcgui.Dialog()
@@ -553,7 +536,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
 
 class CoachesFilmGUI(xbmcgui.WindowXML):
-    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin="Default", defaultRes="720p"):  # pylint: disable=invalid-name
+    def __init__(self, xmlFilename, scriptPath, plays, defaultSkin='Default', defaultRes='720p'):  # pylint: disable=invalid-name
         self.playsList = None
         self.playsItems = plays
 
@@ -570,7 +553,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
         url = self.playsList.getListItem(0).getProperty('url')
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
         xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
@@ -578,9 +561,9 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
             url = self.playsList.getSelectedItem().getProperty('url')
             xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     addon_log('script starting')
-    xbmc.executebuiltin("Dialog.Close(busydialog)")
+    xbmc.executebuiltin('Dialog.Close(busydialog)')
 
     try:
         gp.login(username, password)
