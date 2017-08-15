@@ -519,7 +519,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     episode_stream_url = self.select_stream_url(gp.get_stream(video_id, 'video', username=username))
                     if episode_stream_url:
                         self.play_url(episode_stream_url)
-                    else:
+                    elif episode_stream_url is False:
                         dialog = xbmcgui.Dialog()
                         dialog.ok(language(30043), language(30045))
                 elif controlId == 240:  # Live content (though not games)
