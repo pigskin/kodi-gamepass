@@ -4,11 +4,9 @@ NFL Game Pass has split into two services: Game Pass Europe and Game Pass
 International.
 
 This addon currently only supports Game Pass Europe. However, we are very
-interested in supporting Game Pass International, if a developer from one of
-those regions is willing to test and maintain that functionality.
-
-If you're interested, let us know and we'd be happy to work together to make
-this happen.
+interested in supporting Game Pass International. If you're a Python developer
+with a Game Pass International subscription and are interested in helping out,
+check out issue #313. It'd be great to get those subscriptions working again.
 
 # NFL Game Pass Kodi Plugin #
 **version 0.11.0 — Jay Cutler Edition**
@@ -36,16 +34,15 @@ installed:
 
 ## What is NFL Game Pass? ##
 
-NFL Game Pass is website that allows those with subscriptions to watch NFL
+NFL Game Pass is service that allows those with subscriptions to watch NFL
 games. Live games, archives of old games, NFL TV shows, NFL Network, and coaches
-tape (22 man view) is available. Overall, it is a sweet service offered by the
+tape (22 man view) are available. Overall, it is a sweet service offered by the
 NFL for those of us who must have our American Football fix.
 
 ## What is Game Pass Europe? ##
 
-Game Pass Europe uses WPP/Bruin as its streaming provider(s).
-
-Game Pass Europe is currently the only service this addon supports.
+Game Pass Europe uses WPP/Bruin as its streaming provider(s), and is currently
+the only service this addon supports.
 
 ## What is Game Pass International? ##
 
@@ -53,7 +50,8 @@ Game Pass International uses NeuLion as its streaming partner.
 
 As all of the current developers are located outside of the "International"
 regions, testing, bug reports, and patches from Game Pass International
-subscribers is most appreciated.
+subscribers is most appreciated. Please checkout issue #313 if you're interested
+in helping out.
 
 ## Why write a plugin for Kodi? ##
 
