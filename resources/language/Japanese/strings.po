@@ -165,3 +165,23 @@ msgstr "再生に問題が発生しました"
 msgctxt "#30044"
 msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
 msgstr "再生できない試合があります。公式アプリで再生できる場合、バグをレポートしてください。"
+
+msgctxt "#30045"
+msgid "No valid stream URL was found."
+msgstr ""
+
+msgctxt "#30046"
+msgid "There is currently no data available for this week."
+msgstr ""
+
+msgctxt "#30047"
+msgid "PRESEASON WEEK {0}"
+msgstr ""
+
+msgctxt "#30048"
+msgid "WEEK {0}"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Use InputStream Adaptive"
+msgstr ""
