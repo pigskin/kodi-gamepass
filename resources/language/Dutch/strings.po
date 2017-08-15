@@ -78,8 +78,8 @@ msgid "Choose a game version"
 msgstr "Kies een wedstrijd versie"
 
 msgctxt "#30020"
-msgid "Date/time in local time"
-msgstr "Datum/tijd in lokale tijd"
+msgid "Time Notation"
+msgstr "Tijd Weergave"
 
 msgctxt "#30021"
 msgid "Error"
@@ -106,12 +106,12 @@ msgid "No"
 msgstr "Nee"
 
 msgctxt "#30027"
-msgid "Yes, with 12-hour clock (AM/PM)"
-msgstr "Ja, met 12-uurs klok (AM/PM)"
+msgid "12-hour clock (AM/PM)"
+msgstr "12-uurs klok (AM/PM)"
 
 msgctxt "#30028"
-msgid "Yes, with 24-hour clock"
-msgstr "Ja, met 24-uurs klok"
+msgid "24-hour clock"
+msgstr "24-uurs klok"
 
 msgctxt "#30029"
 msgid "General"

@@ -78,8 +78,8 @@ msgid "Choose a game version"
 msgstr "Wähle eine Spiel Version"
 
 msgctxt "#30020"
-msgid "Date/time in local time"
-msgstr "Uhrzeit in lokaler Zeitzone"
+msgid "Time Notation"
+msgstr ""
 
 msgctxt "#30021"
 msgid "Error"
@@ -106,11 +106,11 @@ msgid "No"
 msgstr ""
 
 msgctxt "#30027"
-msgid "Yes, with 12-hour clock (AM/PM)"
+msgid "12-hour clock (AM/PM)"
 msgstr ""
 
 msgctxt "#30028"
-msgid "Yes, with 24-hour clock"
+msgid "24-hour clock"
 msgstr ""
 
 msgctxt "#30029"

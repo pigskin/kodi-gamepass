@@ -79,8 +79,8 @@ msgid "Choose a game version"
 msgstr "再生バージョン選択"
 
 msgctxt "#30020"
-msgid "Localize Game Date/Time"
-msgstr "現地時間"
+msgid "Time Notation"
+msgstr ""
 
 msgctxt "#30021"
 msgid "Error"
@@ -107,12 +107,12 @@ msgid "No"
 msgstr "いいえ"
 
 msgctxt "#30027"
-msgid "Yes, with 12-hour clock (AM/PM)"
-msgstr "はい、12時間制 (AM/PM)"
+msgid "12-hour clock (AM/PM)"
+msgstr "12時間制 (AM/PM)"
 
 msgctxt "#30028"
-msgid "Yes, with 24-hour clock"
-msgstr "はい、24時間制"
+msgid "24-hour clock"
+msgstr "24時間制"
 
 msgctxt "#30029"
 msgid "General"
