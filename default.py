@@ -490,26 +490,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                             game_version = self.select_version(game_versions)
                         if game_version:
-                            #if game_version == 'coach':
-                            #    xbmc.executebuiltin("ActivateWindow(busydialog)")
-                            #    coachesItems = []
-                            #    game_date = selectedGame.getProperty('game_date').replace('-', '/')
-                            #    self.playBackStop = False
-
-                                #play_stream = gp.get_coaches_url(game_id, game_date, 'dummy')
-                                #play_stream = gp.get_publishpoint_streams(coach_id, 'game', game_version, username)
-                                #plays = gp.get_coaches_playIDs(game_id, self.selected_season)
-                                #for playID in sorted(plays, key=int):
-                                #    cf_url = str(play_stream).replace('dummy', playID)
-                                #    item = xbmcgui.ListItem(plays[playID])
-                                #    item.setProperty('url', cf_url)
-                                #    coachesItems.append(item)
-
-                                #self.list_refill = True
-                                #xbmc.executebuiltin("Dialog.Close(busydialog)")
-                                #coachGui = CoachesFilmGUI('script-gamepass-coach.xml', ADDON_PATH, plays=coachesItems)
-                                #coachGui.doModal()
-                                #del coachGui
                             if game_version == 'condensed':
                                 stream_url = self.select_stream_url(gp.get_stream(condensed_id, 'game', username=username))
                             elif game_version == 'coach':
