@@ -234,7 +234,12 @@ class GamepassGUI(xbmcgui.WindowXML):
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
                 listitem.setProperty('game_info', i['title'])
-                #listitem.setProperty('away_thumb', gp.image_url + i['image'])
+                url = gp.config['modules']['API']['NETWORK_PROGRAMS']
+                response = gp.make_request(url, 'get')
+                for show in response['modules']['programs']:
+                    if show['slug'] == i['nflprogram']:
+                        away_thumb = show['thumbnail']['templateUrl'].replace('{formatInstructions}', 'c_thumb,q_auto,f_png')
+                        listitem.setProperty('away_thumb', away_thumb)
                 #listitem.setProperty('url', i['publishPoint'])
                 listitem.setProperty('id', i['videoId'])
                 listitem.setProperty('is_game', 'false')
