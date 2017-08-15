@@ -301,17 +301,19 @@ class pigskin(object):
         return self.parse_m3u8_manifest(response['ContentUrl'])
 
     def parse_m3u8_manifest(self, manifest_url):
-        """Return the stream URL along with its bitrate."""
+        """Return the manifest URL along with its bitrate."""
         streams = {}
-        m3u8_manifest = self.make_request(manifest_url, 'get')
         m3u8_header = {
             'Connection': 'keep-alive',
             'User-Agent': self.user_agent
         }
+        streams['manifest_url'] = manifest_url + '|' + urllib.urlencode(m3u8_header)
+        streams['bitrates'] = {}
+        m3u8_manifest = self.make_request(manifest_url, 'get')
         m3u8_obj = m3u8.loads(m3u8_manifest)
         for playlist in m3u8_obj.playlists:
             bitrate = int(playlist.stream_info.bandwidth) / 1000
-            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + manifest_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+            streams['bitrates'][bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + manifest_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
 
         return streams
 
