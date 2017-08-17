@@ -233,10 +233,11 @@ class GamepassGUI(xbmcgui.WindowXML):
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
+                listitem.setProperty('away_thumb', episode['videoThumbnail']['templateUrl'].replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
                 self.games_items.append(listitem)
             except:
                 addon_log('Exception adding archive directory: %s' % format_exc())
-                addon_log('Directory name: %s' % i['title'])
+                addon_log('Directory name: %s' % episode['title'])
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):

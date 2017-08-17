@@ -365,8 +365,12 @@ class pigskin(object):
         season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
         request_url = self.config['modules']['API']['NETWORK_EPISODES']
         episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
+        episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
+        for episode in episodes_data:
+            if not episode['videoThumbnail']['templateUrl']:  # set programs thumbnail as episode thumbnail
+                episode['videoThumbnail']['templateUrl'] = [x['thumbnail']['templateUrl'] for x in programs if x['slug'] == episode['nflprogram']][0]
 
-        return self.make_request(episodes_url, 'get')['modules']['archive']['content']
+        return episodes_data
 
     def parse_datetime(self, date_string, localize=False):
         """Parse NFL Game Pass date string to datetime object."""
