@@ -20,6 +20,8 @@ ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
 ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
 LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
+busydialog = xbmcgui.DialogBusy()
+
 if not xbmcvfs.exists(ADDON_PROFILE):
     xbmcvfs.mkdir(ADDON_PROFILE)
 
@@ -47,6 +49,14 @@ def addon_log(string):
     msg = '%s: %s' % (LOGGING_PREFIX, string)
     xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
 
+def show_busy_dialog():
+    busydialog.create()
+
+def hide_busy_dialog():
+    try:
+        busydialog.close()
+    except RuntimeError,e:
+        addon_log('Error closing busy dialog: %s' % e.message)
 
 class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
@@ -93,7 +103,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
 
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -230,7 +240,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
@@ -276,7 +286,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         for bitrate in bitrates:
             options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         ret = dialog.select(language(30003), options)
         if ret > -1:
             return bitrates[ret]
@@ -325,7 +335,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             if 'Coach' in game_versions:
                 versions.append(language(30032))
             dialog = xbmcgui.Dialog()
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
+            hide_busy_dialog()
             preferred_version = dialog.select(language(30016), versions)
 
         if preferred_version == 1 and 'Condensed' in game_versions:
@@ -386,7 +396,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
-            xbmc.executebuiltin('ActivateWindow(busydialog)')
+            show_busy_dialog()
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -431,7 +441,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
 
-                xbmc.executebuiltin('Dialog.Close(busydialog)')
+                hide_busy_dialog()
                 return
 
             if self.main_selection == 'GamePass':
@@ -521,9 +531,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         elif nfln_live_stream is False:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
+            hide_busy_dialog()
         except Exception:  # catch anything that might fail
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
+            hide_busy_dialog()
             addon_log(format_exc())
 
             dialog = xbmcgui.Dialog()
@@ -553,7 +563,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
         url = self.playsList.getListItem(0).getProperty('url')
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
@@ -563,7 +573,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
 
 if __name__ == '__main__':
     addon_log('script starting')
-    xbmc.executebuiltin('Dialog.Close(busydialog)')
+    hide_busy_dialog()
 
     try:
         gp.login(username, password)
