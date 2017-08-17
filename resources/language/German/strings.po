@@ -78,12 +78,12 @@ msgid "Choose a game version"
 msgstr "Wählen Sie eine Spielversion"
 
 msgctxt "#30020"
-msgid "Date/time in local time"
-msgstr "Uhrzeit in lokaler Zeitzone"
+msgid "Time Notation"
+msgstr "Zeitformat"
 
 msgctxt "#30021"
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 msgctxt "#30022"
 msgid "Due to broadcast restrictions, NFL Game Pass Domestic is currently unavailable. Please try again later."
@@ -106,12 +106,12 @@ msgid "No"
 msgstr "Nein"
 
 msgctxt "#30027"
-msgid "Yes, with 12-hour clock (AM/PM)"
-msgstr "Ja, mit 12-Stunden-Anzeige (AM/PM)"
+msgid "12-hour clock (AM/PM)"
+msgstr "12-Stunden-Uhr (AM/PM)"
 
 msgctxt "#30028"
-msgid "Yes, with 24-hour clock"
-msgstr "Ja, mit 24-Stunden-Anzeige"
+msgid "24-hour clock"
+msgstr "24-Stunden-Uhr"
 
 msgctxt "#30029"
 msgid "General"
@@ -164,3 +164,23 @@ msgstr "Es gab ein Problem bei Abspielen des Streams"
 msgctxt "#30044"
 msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
 msgstr "Einige Sendungen laufen leider nicht. Bitte senden Sie einen Bugreport, sofern die Sendung verfügbar ist und in der offiziellen App funktioniert."
+
+msgctxt "#30045"
+msgid "No valid stream URL was found."
+msgstr "Es wurde keine gültige URL für den Stream gefunden."
+
+msgctxt "#30046"
+msgid "There is currently no data available for this week."
+msgstr "Es stehen zur Zeit keine Daten für diese Woche zur Verfügung."
+
+msgctxt "#30047"
+msgid "PRESEASON WEEK {0}"
+msgstr "PRESEASON WOCHE {0}"
+
+msgctxt "#30048"
+msgid "WEEK {0}"
+msgstr "WOCHE {0}"
+
+msgctxt "#30049"
+msgid "Use InputStream Adaptive"
+msgstr "Nutze InputSream Adaptive"
