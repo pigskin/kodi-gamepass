@@ -183,4 +183,4 @@ msgstr "WOCHE {0}"
 
 msgctxt "#30049"
 msgid "Use InputStream Adaptive"
-msgstr "Nutze InputSream Adaptive"
+msgstr "Nutze InputStream Adaptive"
