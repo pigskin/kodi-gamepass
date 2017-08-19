@@ -61,23 +61,6 @@ def hide_busy_dialog():
         addon_log('Error closing busy dialog: %s' % e.message)
 
 
-def ensure_login_provided():
-    global username
-    global password
-
-    if username == "" or password == "":
-        dialog = xbmcgui.Dialog()
-        answer = dialog.ok(language(30021), language(30050))
-
-        if answer:
-            xbmcaddon.Addon(addon.getAddonInfo('id')).openSettings()
-
-            username = addon.getSetting('email')
-            password = addon.getSetting('password')
-        else:
-            sys.exit(0)
-
-
 class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
         self.season_list = None
@@ -596,7 +579,17 @@ if __name__ == '__main__':
     addon_log('script starting')
     hide_busy_dialog()
 
-    ensure_login_provided()
+    if username == "" or password == "":
+        dialog = xbmcgui.Dialog()
+        answer = dialog.ok(language(30021), language(30050))
+
+        if answer:
+            addon.openSettings()
+
+            username = addon.getSetting('email')
+            password = addon.getSetting('password')
+        else:
+            sys.exit(0)
 
     try:
         gp.login(username, password)
