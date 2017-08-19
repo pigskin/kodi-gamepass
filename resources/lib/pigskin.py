@@ -229,30 +229,20 @@ class pigskin(object):
 
         return sorted(games, key=lambda x: x['gameDateTimeUtc'])
 
-    def has_coaches_tape(self, game_id, season):
-        """Return whether coaches tape is available for a given game."""
+    def get_game_versions(self, game_id, season):
+        """Return a dict of available game versions for a single game."""
+        game_versions = {}
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
-        response = self.make_request(url, 'get')
-        coaches_tape = response['modules']['singlegame']['content'][0]['coachfilmVideo']
-        if coaches_tape:
-            self.log('Coaches Tape found.')
-            return coaches_tape['videoId']
-        else:
-            self.log('No Coaches Tape found for this game.')
-            return False
+        data = self.make_request(url, 'get')['modules']['singlegame']['content'][0]
+        if data['video']:
+            game_versions[data['video']['kind']] = data['video']['videoId']
+        if data['condensedVideo']:
+            game_versions[data['condensedVideo']['kind']] = data['condensedVideo']['videoId']
+        if data['coachfilmVideo']:
+            game_versions[data['coachfilmVideo']['kind']] = data['coachfilmVideo']['videoId']
 
-
-    def has_condensed_game(self, game_id, season):
-        """Return whether condensed game version is available."""
-        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
-        response = self.make_request(url, 'get')
-        condensed = response['modules']['singlegame']['content'][0]['condensedVideo']
-        if condensed:
-            self.log('Condensed game found.')
-            return condensed['videoId']
-        else:
-            self.log('No condensed version was found for this game.')
-            return False
+        self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
+        return game_versions
 
     def get_stream(self, video_id, game_type=None, username=None):
         """Return the URL for a stream."""
