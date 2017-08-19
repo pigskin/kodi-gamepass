@@ -579,13 +579,12 @@ if __name__ == '__main__':
     addon_log('script starting')
     hide_busy_dialog()
 
-    if username == "" or password == "":
+    if not (username and password):
         dialog = xbmcgui.Dialog()
         answer = dialog.ok(language(30021), language(30050))
 
         if answer:
             addon.openSettings()
-
             username = addon.getSetting('email')
             password = addon.getSetting('password')
         else:
