@@ -184,3 +184,7 @@ msgstr "WOCHE {0}"
 msgctxt "#30049"
 msgid "Use InputStream Adaptive"
 msgstr "Nutze InputStream Adaptive"
+
+msgctxt "#30050"
+msgid "Please enter the username and password for your NFL Game Pass subscription."
+msgstr ""
