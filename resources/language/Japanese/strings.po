@@ -187,5 +187,5 @@ msgid "Use InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30050"
-msgid "Please enter your account information for the NFL Game Pass subscription."
+msgid "Please enter the username and password for your NFL Game Pass subscription."
 msgstr ""
