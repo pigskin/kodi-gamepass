@@ -20,6 +20,8 @@ ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
 ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
 LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
+busydialog = xbmcgui.DialogBusy()
+
 if not xbmcvfs.exists(ADDON_PROFILE):
     xbmcvfs.mkdir(ADDON_PROFILE)
 
@@ -47,6 +49,14 @@ def addon_log(string):
     msg = '%s: %s' % (LOGGING_PREFIX, string)
     xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
 
+def show_busy_dialog():
+    busydialog.create()
+
+def hide_busy_dialog():
+    try:
+        busydialog.close()
+    except RuntimeError,e:
+        addon_log('Error closing busy dialog: %s' % e.message)
 
 class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
@@ -93,7 +103,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
 
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -153,7 +163,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
                 # show game duration only if user wants to see it
-                if addon.getSetting('hide_game_length') == 'false':
+                if addon.getSetting('hide_game_length') == 'false' and game['video']:
                     game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'])))))
                 else:
                     game_info = game['phase']
@@ -174,13 +184,10 @@ class GamepassGUI(xbmcgui.WindowXML):
                 video_id = str(game['video']['videoId'])
                 isPlayable = 'true'
                 isBlackedOut = 'false'
-                listitem.setProperty('video_id', video_id)
-                listitem.setProperty('game_versions', 'Live')
+                listitem.setProperty('live_video_id', video_id)
             else:  # ONDEMAND
-                video_id = str(game['video']['videoId'])
                 isPlayable = 'true'
                 isBlackedOut = 'false'
-                listitem.setProperty('video_id', video_id)
 
             listitem.setProperty('isPlayable', isPlayable)
             listitem.setProperty('isBlackedOut', isBlackedOut)
@@ -223,14 +230,15 @@ class GamepassGUI(xbmcgui.WindowXML):
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
+                listitem.setProperty('away_thumb', episode['videoThumbnail']['templateUrl'].replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
                 self.games_items.append(listitem)
             except:
                 addon_log('Exception adding archive directory: %s' % format_exc())
-                addon_log('Directory name: %s' % i['title'])
+                addon_log('Directory name: %s' % episode['title'])
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
@@ -276,7 +284,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         for bitrate in bitrates:
             options.append(str(bitrate) + ' Kbps')
         dialog = xbmcgui.Dialog()
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         ret = dialog.select(language(30003), options)
         if ret > -1:
             return bitrates[ret]
@@ -312,33 +320,32 @@ class GamepassGUI(xbmcgui.WindowXML):
                 return self.ask_bitrate(bitrate_values)
 
     def select_version(self, game_versions):
-        """Returns a game version, while honoring the user's /preference/.
-        Note: the full version is always available but not always the condensed.
-        """
+        """Selects a game version and returns the video ID while honoring the user's /preference/."""
         preferred_version = int(addon.getSetting('preferred_game_version'))
+        if preferred_version == 0:
+            selected_version = 'Game video'
+        elif preferred_version == 1:
+            selected_version = 'Condensed game'
+        elif preferred_version == 2:
+            selected_version = 'Coach film'
+        else:
+            selected_version = None
 
         # user wants to be asked to select version
-        if preferred_version == 2:
-            versions = [language(30014)]
-            if 'Condensed' in game_versions:
-                versions.append(language(30015))
-            if 'Coach' in game_versions:
-                versions.append(language(30032))
+        # bring up selection when preferred game version is unavailable
+        if not selected_version or selected_version not in game_versions:
+            versions = game_versions.keys()
             dialog = xbmcgui.Dialog()
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
-            preferred_version = dialog.select(language(30016), versions)
+            hide_busy_dialog()
+            answer = dialog.select(language(30016), versions)
+            if answer > -1:
+                selected_version = versions[answer]
+                addon_log('Selected version: %s' % selected_version)
+            else:
+                addon_log('Select version dialog was cancelled.')
+                return None
 
-        if preferred_version == 1 and 'Condensed' in game_versions:
-            game_version = 'condensed'
-        elif preferred_version == 2 and 'Coach' in game_versions:
-            game_version = 'coach'
-        else:
-            game_version = 'archive'
-
-        if preferred_version > -1:
-            return game_version
-        else:
-            return None
+        return game_versions[selected_version]
 
     def has_inputstream_adaptive(self):
         """Checks if InputStream Adaptive is installed and enabled."""
@@ -386,7 +393,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
-            xbmc.executebuiltin('ActivateWindow(busydialog)')
+            show_busy_dialog()
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -431,7 +438,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
 
-                xbmc.executebuiltin('Dialog.Close(busydialog)')
+                hide_busy_dialog()
                 return
 
             if self.main_selection == 'GamePass':
@@ -447,38 +454,19 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                     self.display_weeks_games()
                 elif controlId == 230:  # game is clicked
-                    selectedGame = self.games_list.getSelectedItem()
-                    if selectedGame.getProperty('isPlayable') == 'true':
+                    selected_game = self.games_list.getSelectedItem()
+                    if selected_game.getProperty('isPlayable') == 'true':
                         self.init('game/episode')
-                        game_id = selectedGame.getProperty('game_id')
-                        video_id = selectedGame.getProperty('video_id')
-                        game_versions = selectedGame.getProperty('game_versions')
+                        game_id = selected_game.getProperty('game_id')
 
-                        if 'Live' in game_versions:
-                            if 'Final' in selectedGame.getProperty('game_info'):
-                                game_version = self.select_version(game_versions)
-                                if game_version == 'archive':
-                                    game_version = 'dvr'
-                            else:
-                                game_version = 'live'
+                        if selected_game.getProperty('live_video_id'):
+                            video_id = selected_game.getProperty('live_video_id')
                         else:
-                            # check for coaches film availability
-                            if gp.has_coaches_tape(game_id, self.selected_season):
-                                game_versions = game_versions + ' Coach'
-                                coach_id = gp.has_coaches_tape(game_id, self.selected_season)
-                            # check for condensed film availability
-                            if gp.has_condensed_game(game_id, self.selected_season):
-                                game_versions = game_versions + ' Condensed'
-                                condensed_id = gp.has_condensed_game(game_id, self.selected_season)
+                            game_versions = gp.get_game_versions(game_id, self.selected_season)
+                            video_id = self.select_version(game_versions)
 
-                            game_version = self.select_version(game_versions)
-                        if game_version:
-                            if game_version == 'condensed':
-                                stream_url = self.select_stream_url(gp.get_stream(condensed_id, 'game', username=username))
-                            elif game_version == 'coach':
-                                stream_url = self.select_stream_url(gp.get_stream(coach_id, 'game', username=username))
-                            else:
-                                stream_url = self.select_stream_url(gp.get_stream(video_id, 'game', username=username))
+                        if video_id:
+                            stream_url = self.select_stream_url(gp.get_stream(video_id, 'game', username=username))
                             if stream_url:
                                 self.play_url(stream_url)
                             elif stream_url is False:
@@ -521,9 +509,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                         elif nfln_live_stream is False:
                             dialog = xbmcgui.Dialog()
                             dialog.ok(language(30043), language(30045))
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
+            hide_busy_dialog()
         except Exception:  # catch anything that might fail
-            xbmc.executebuiltin('Dialog.Close(busydialog)')
+            hide_busy_dialog()
             addon_log(format_exc())
 
             dialog = xbmcgui.Dialog()
@@ -553,7 +541,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
         self.playsList.addItems(self.playsItems)
         self.setFocus(self.playsList)
         url = self.playsList.getListItem(0).getProperty('url')
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        hide_busy_dialog()
         xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
@@ -563,7 +551,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
 
 if __name__ == '__main__':
     addon_log('script starting')
-    xbmc.executebuiltin('Dialog.Close(busydialog)')
+    hide_busy_dialog()
 
     try:
         gp.login(username, password)
