@@ -221,8 +221,8 @@ class pigskin(object):
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail'].replace(':seasonType', season_type).replace(':season', season).replace(':week', week)
             games_data = self.make_request(url, 'get')
-            # collect the games from all keys in 'modules'
-            games = [g for x in games_data['modules'].keys() for g in games_data['modules'][x]['content']]
+            # collect the games from all keys in 'modules' that has 'content' as a key
+            games = [g for x in games_data['modules'].keys() if 'content' in games_data['modules'][x] for g in games_data['modules'][x]['content']]
         except:
             self.log('Acquiring games data failed.')
             raise
