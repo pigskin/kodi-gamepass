@@ -262,12 +262,9 @@ class pigskin(object):
         game_versions = {}
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
         data = self.make_request(url, 'get')['modules']['singlegame']['content'][0]
-        if data['video']:
-            game_versions[data['video']['kind']] = data['video']['videoId']
-        if data['condensedVideo']:
-            game_versions[data['condensedVideo']['kind']] = data['condensedVideo']['videoId']
-        if data['coachfilmVideo']:
-            game_versions[data['coachfilmVideo']['kind']] = data['coachfilmVideo']['videoId']
+        for key in data.keys():
+            if isinstance(data[key], dict) and 'videoId' in data[key]:
+                game_versions[data[key]['kind']] = data[key]['videoId']
 
         self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
         return game_versions
