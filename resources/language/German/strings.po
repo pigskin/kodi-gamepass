@@ -159,7 +159,7 @@ msgstr "Schalte 'Basic'-Authentifizierung ein"
 
 msgctxt "#30043"
 msgid "There was a problem playing that stream"
-msgstr "Es gab ein Problem bei Abspielen des Streams"
+msgstr "Es gab ein Problem beim Abspielen des Streams"
 
 msgctxt "#30044"
 msgid "Some shows are known to not work. Please file a bug if the show is available and works in the official app."
@@ -187,4 +187,4 @@ msgstr "Nutze InputStream Adaptive"
 
 msgctxt "#30050"
 msgid "Please enter the username and password for your NFL Game Pass subscription."
-msgstr ""
+msgstr "Bitte geben Sie Benutzernamen und Passwort für Ihr NFL Game Pass Abo ein."
