@@ -5,7 +5,7 @@
      marooned on an old version. -->
 <addon id="plugin.video.nfl.gamepass"
        name="NFL Game Pass"
-       version="0.11.1-dev"
+       version="0.11.1"
        provider-name="Alexqw,divingmule,BaumSchorle,eriksoderblom,kaileu,emilsvennesson">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
@@ -25,7 +25,13 @@
     <source>https://github.com/aqw/xbmc-gamepass</source>
     <forum></forum>
     <disclaimer lang="en_GB">This addon requires you to have a subscription to NFL Game Pass.[CR]Please note that these subscriptions are region restricted by the NFL.[CR]This addon is completely unofficial and is /not/ endorsed by the NFL in any way.</disclaimer>
-    <news>2017.??.?? v0.11.1-dev -- ? Edition
+    <news>2017.08.24 v0.11.1 -- Kenny Easley Edition
+    + Fix "everything is broken"; Game Pass broke their API again (emilsvennesson)
+    + Add groundwork for what will become a Team View (kaileu)
+    + Open Settings when login info is missing (pyrocumulus)
+    + Restore show/episode thumbnails (emilsvennesson)
+    + Updated German translation (sieversMartin)
+    + Code cleanup (emilsvennesson)
     </news>
     <assets>
       <icon>resources/art/icon.png</icon>
