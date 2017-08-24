@@ -95,7 +95,7 @@ msgstr "Einloggen nicht erfolgreich. Bitte stellen Sie sicher, dass Ihre Account
 
 msgctxt "#30024"
 msgid "Unexpected error ='(. Please enable debugging in Kodi and submit a bug report."
-msgstr "Unerwarteter Fehler ='(. Bitte schalten Sie den Debugmodus sowohl für das Addon als auch für Kodi ein und melden Sie den Fehler samt Bericht."
+msgstr "Unerwarteter Fehler ='(. Bitte schalten Sie den Debugmodus in Kodi ein und melden Sie den Fehler samt Bericht."
 
 msgctxt "#30025"
 msgid "Hide game length"
