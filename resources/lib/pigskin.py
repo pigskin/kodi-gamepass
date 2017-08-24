@@ -229,17 +229,42 @@ class pigskin(object):
 
         return sorted(games, key=lambda x: x['gameDateTimeUtc'])
 
+    def get_team_games(self, season, team=None):
+        try:
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
+            teams = self.make_request(url, 'get')
+            if team is None:
+                return teams
+            else:
+                # look for the team name
+                for conference in teams['modules']:
+                    if 'content' in teams['modules'][conference]:
+                        for teamname in teams['modules'][conference]['content']:
+                            if team == teamname['fullName']:
+                                team = teamname['seoname']
+                                break;
+                            else:
+                                return None
+
+                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
+                games_data = self.make_request(url, 'get')
+                # collect games from all keys in 'modules' for a specific season
+                games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
+
+        except:
+            self.log('Acquiring Team games data failed.')
+            raise
+
+        return sorted(games, key=lambda x: x['gameDateTimeUtc'])
+
     def get_game_versions(self, game_id, season):
         """Return a dict of available game versions for a single game."""
         game_versions = {}
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
         data = self.make_request(url, 'get')['modules']['singlegame']['content'][0]
-        if data['video']:
-            game_versions[data['video']['kind']] = data['video']['videoId']
-        if data['condensedVideo']:
-            game_versions[data['condensedVideo']['kind']] = data['condensedVideo']['videoId']
-        if data['coachfilmVideo']:
-            game_versions[data['coachfilmVideo']['kind']] = data['coachfilmVideo']['videoId']
+        for key in data.keys():
+            if isinstance(data[key], dict) and 'videoId' in data[key]:
+                game_versions[data[key]['kind']] = data[key]['videoId']
 
         self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
         return game_versions
