@@ -94,7 +94,7 @@ msgid "Logging into NFL Game Pass failed. Make sure that your account informatio
 msgstr "Inloggen bij NFL Game Pass is mislukt. Zorg ervoor dat uw accountgegevens correct zijn en uw abonnement geldig is."
 
 msgctxt "#30024"
-msgid "Unexpected error ='(. Please enable debuging for both the addon and Kodi, and submit a bug report."
+msgid "Unexpected error ='(. Please enable debugging in Kodi and submit a bug report."
 msgstr "Onverwachte fout ='(. Schakel debug logging in voor zowel de addon als Kodi en verstuur een bug report."
 
 msgctxt "#30025"
