@@ -1,3 +1,5 @@
+2017.??.?? v0.11.2-dev -- ??? Edition
+
 2017.08.24 v0.11.1 -- Kenny Easley Edition
 + Fix "everything is broken"; Game Pass broke their API again (emilsvennesson)
 + Add groundwork for what will become a Team View (kaileu)
