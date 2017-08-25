@@ -130,9 +130,8 @@ class pigskin(object):
         return proxy_url
 
     def login(self, username, password):
-        """Blindly authenticate to Game Pass. Use has_subscription() to
-        determine success.
-        """
+        """Attempt to authenticate to Game Pass. Raises error_unauthorised on failure.
+        Use check_for_subscription() to determine if the user has a valid subscription."""
         url = self.config['modules']['API']['LOGIN']
         post_data = {
             'username': username,
@@ -148,12 +147,17 @@ class pigskin(object):
         return True
 
     def check_for_subscription(self):
-        """Returns True if a subscription is detected. Raises error_unauthorised on failure."""
-        url = self.config['modules']['API']['USER_PROFILE']
+        """Return True if a subscription is detected and raise 'no_subscription' on failure."""
+        url = self.config['modules']['API']['USER_ACCOUNT']
         headers = {'Authorization': 'Bearer {0}'.format(self.access_token)}
-        self.make_request(url, 'get', headers=headers)
+        account_data = self.make_request(url, 'get', headers=headers)
 
-        return True
+        if account_data['subscriptions']:
+            self.log('NFL Game Pass Europe subscription detected.')
+            return True
+        else:
+            self.log('No active NFL Game Pass Europe subscription was found.')
+            raise self.GamePassError('no_subscription')
 
     def refresh_tokens(self):
         """Refreshes authorization tokens."""

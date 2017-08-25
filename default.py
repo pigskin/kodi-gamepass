@@ -571,7 +571,7 @@ if __name__ == '__main__':
         gp.login(username, password)
     except gp.GamePassError as error:
         dialog = xbmcgui.Dialog()
-        if error.value == 'error_unauthorised':
+        if error.value == 'error_unauthorised' or error.value == 'no_subscription':
             dialog.ok(language(30021), language(30023))
         else:
             dialog.ok(language(30021), error.value)
