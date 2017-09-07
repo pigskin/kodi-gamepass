@@ -130,9 +130,8 @@ class pigskin(object):
         return proxy_url
 
     def login(self, username, password):
-        """Blindly authenticate to Game Pass. Use has_subscription() to
-        determine success.
-        """
+        """Attempt to authenticate to Game Pass. Raises error_unauthorised on failure.
+        Use check_for_subscription() to determine if the user has a valid subscription."""
         url = self.config['modules']['API']['LOGIN']
         post_data = {
             'username': username,
@@ -148,12 +147,17 @@ class pigskin(object):
         return True
 
     def check_for_subscription(self):
-        """Returns True if a subscription is detected. Raises error_unauthorised on failure."""
-        url = self.config['modules']['API']['USER_PROFILE']
+        """Return True if a subscription is detected and raise 'no_subscription' on failure."""
+        url = self.config['modules']['API']['USER_ACCOUNT']
         headers = {'Authorization': 'Bearer {0}'.format(self.access_token)}
-        self.make_request(url, 'get', headers=headers)
+        account_data = self.make_request(url, 'get', headers=headers)
 
-        return True
+        if account_data['subscriptions']:
+            self.log('NFL Game Pass Europe subscription detected.')
+            return True
+        else:
+            self.log('No active NFL Game Pass Europe subscription was found.')
+            raise self.GamePassError('no_subscription')
 
     def refresh_tokens(self):
         """Refreshes authorization tokens."""
@@ -221,38 +225,53 @@ class pigskin(object):
         try:
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail'].replace(':seasonType', season_type).replace(':season', season).replace(':week', week)
             games_data = self.make_request(url, 'get')
-            # collect the games from all keys in 'modules'
-            games = [g for x in games_data['modules'].keys() for g in games_data['modules'][x]['content']]
+            # collect the games from all keys in 'modules' that has 'content' as a key
+            games = [g for x in games_data['modules'].keys() if 'content' in games_data['modules'][x] for g in games_data['modules'][x]['content']]
         except:
             self.log('Acquiring games data failed.')
             raise
 
         return sorted(games, key=lambda x: x['gameDateTimeUtc'])
 
-    def has_coaches_tape(self, game_id, season):
-        """Return whether coaches tape is available for a given game."""
-        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
-        response = self.make_request(url, 'get')
-        coaches_tape = response['modules']['singlegame']['content'][0]['coachfilmVideo']
-        if coaches_tape:
-            self.log('Coaches Tape found.')
-            return coaches_tape['videoId']
-        else:
-            self.log('No Coaches Tape found for this game.')
-            return False
+    def get_team_games(self, season, team=None):
+        try:
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
+            teams = self.make_request(url, 'get')
+            if team is None:
+                return teams
+            else:
+                # look for the team name
+                for conference in teams['modules']:
+                    if 'content' in teams['modules'][conference]:
+                        for teamname in teams['modules'][conference]['content']:
+                            if team == teamname['fullName']:
+                                team = teamname['seoname']
+                                break;
+                            else:
+                                return None
 
+                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
+                games_data = self.make_request(url, 'get')
+                # collect games from all keys in 'modules' for a specific season
+                games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
 
-    def has_condensed_game(self, game_id, season):
-        """Return whether condensed game version is available."""
+        except:
+            self.log('Acquiring Team games data failed.')
+            raise
+
+        return sorted(games, key=lambda x: x['gameDateTimeUtc'])
+
+    def get_game_versions(self, game_id, season):
+        """Return a dict of available game versions for a single game."""
+        game_versions = {}
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
-        response = self.make_request(url, 'get')
-        condensed = response['modules']['singlegame']['content'][0]['condensedVideo']
-        if condensed:
-            self.log('Condensed game found.')
-            return condensed['videoId']
-        else:
-            self.log('No condensed version was found for this game.')
-            return False
+        data = self.make_request(url, 'get')['modules']['singlegame']['content'][0]
+        for key in data.keys():
+            if isinstance(data[key], dict) and 'videoId' in data[key]:
+                game_versions[data[key]['kind']] = data[key]['videoId']
+
+        self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
+        return game_versions
 
     def get_stream(self, video_id, game_type=None, username=None):
         """Return the URL for a stream."""
