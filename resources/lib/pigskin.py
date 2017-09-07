@@ -334,9 +334,14 @@ class pigskin(object):
 
         for show in response['modules']['programs']:
             season_dict = {}
-            for season in show['seasons']:
-                season_name = season['value']
-                season_id = season['slug']
+            request_url = self.config['modules']['API']['NETWORK_EPISODES']
+            episodes_url = request_url.replace(':seasonSlug/', '').replace(':tvShowSlug', show['slug'])
+            episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
+            for season in episodes_data:
+                if not season['season']:
+                    continue
+                season_name = season['season'].replace('season-', '')
+                season_id = season['season']
                 season_dict[season_name] = season_id
                 if season_name not in self.nfln_seasons:
                     self.nfln_seasons.append(season_name)
@@ -362,7 +367,7 @@ class pigskin(object):
             if show_name == show['title']:
                 selected_show = show
                 break
-        season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
+        season_slug = 'season-' + season
         request_url = self.config['modules']['API']['NETWORK_EPISODES']
         episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
         episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
