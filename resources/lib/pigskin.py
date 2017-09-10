@@ -282,6 +282,11 @@ class pigskin(object):
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
             response = self.make_request(url, 'get')
             video_id = response['modules']['networkLiveVideo']['content'][0]['videoId']
+        elif video_id == 'redzone':
+            diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
+            response = self.make_request(url, 'get')
+            video_id = response['modules']['redZoneLive']['content'][0]['videoId']
         else:
             if game_type == 'live':
                 diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['LiveNoData']
