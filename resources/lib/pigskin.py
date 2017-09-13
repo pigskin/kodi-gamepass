@@ -365,7 +365,21 @@ class pigskin(object):
                 if season_name not in self.nfln_seasons:
                     self.nfln_seasons.append(season_name)
             show_dict[show['title']] = season_dict
-        self.nfln_shows.update(show_dict)
+        #RedZone
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
+        response = self.make_request(url, 'get')
+
+        for show in response['modules']['redZoneVod']['content']:
+            season_dict = {}
+            if show['season']:
+                season_name = show['season'].replace('season-','')
+                season_id = season
+                season_dict[season_name] = season_id
+                if season_name not in self.nfln_seasons:
+                    self.nfln_seasons.append(season_name)
+            show_dict['RedZone'] = season_dict
+
+    self.nfln_shows.update(show_dict)
 
     def get_shows(self, season):
         """Return a list of all shows for a season."""
@@ -380,6 +394,15 @@ class pigskin(object):
     def get_shows_episodes(self, show_name, season=None):
         """Return a list of episodes for a show. Return empty list if none are
         found or if an error occurs."""
+        #RedZone
+        if show_name == 'RedZone':
+            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
+            response = self.make_request(url, 'get')
+            episode_data = response['modules']['redZoneVod']['content']
+
+            return episode_data
+
+        #NFL-Network
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
         programs = self.make_request(url, 'get')['modules']['programs']
         for show in programs:
