@@ -353,6 +353,8 @@ class pigskin(object):
     def parse_shows(self):
         """Dynamically parse the NFL Network shows into a dict."""
         show_dict = {}
+
+        # NFL Network shows
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
         response = self.make_request(url, 'get')
 
@@ -365,21 +367,21 @@ class pigskin(object):
                 if season_name not in self.nfln_seasons:
                     self.nfln_seasons.append(season_name)
             show_dict[show['title']] = season_dict
-        #RedZone
+
+        # RedZone
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
         response = self.make_request(url, 'get')
 
-        for show in response['modules']['redZoneVod']['content']:
-            season_dict = {}
-            if show['season']:
-                season_name = show['season'].replace('season-','')
-                season_id = season
-                season_dict[season_name] = season_id
-                if season_name not in self.nfln_seasons:
-                    self.nfln_seasons.append(season_name)
-            show_dict['RedZone'] = season_dict
+        season_dict = {}
+        for episode in response['modules']['redZoneVod']['content']:
+            season_name = episode['season'].replace('season-','')
+            if season_name not in self.nfln_seasons:
+                self.nfln_seasons.append(season_name)
 
-    self.nfln_shows.update(show_dict)
+            season_dict[season_name] = ''
+        show_dict['RedZone'] = season_dict
+
+        self.nfln_shows.update(show_dict)
 
     def get_shows(self, season):
         """Return a list of all shows for a season."""
@@ -394,28 +396,24 @@ class pigskin(object):
     def get_shows_episodes(self, show_name, season=None):
         """Return a list of episodes for a show. Return empty list if none are
         found or if an error occurs."""
-        #RedZone
-        if show_name == 'RedZone':
+        if show_name == 'RedZone':  # RedZone
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
             response = self.make_request(url, 'get')
-            episode_data = response['modules']['redZoneVod']['content']
-
-            return episode_data
-
-        #NFL-Network
-        url = self.config['modules']['API']['NETWORK_PROGRAMS']
-        programs = self.make_request(url, 'get')['modules']['programs']
-        for show in programs:
-            if show_name == show['title']:
-                selected_show = show
-                break
-        season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
-        request_url = self.config['modules']['API']['NETWORK_EPISODES']
-        episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
-        episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
-        for episode in episodes_data:
-            if not episode['videoThumbnail']['templateUrl']:  # set programs thumbnail as episode thumbnail
-                episode['videoThumbnail']['templateUrl'] = [x['thumbnail']['templateUrl'] for x in programs if x['slug'] == episode['nflprogram']][0]
+            episodes_data = response['modules']['redZoneVod']['content']
+        else:  # NFL Network shows
+            url = self.config['modules']['API']['NETWORK_PROGRAMS']
+            programs = self.make_request(url, 'get')['modules']['programs']
+            for show in programs:
+                if show_name == show['title']:
+                    selected_show = show
+                    break
+            season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
+            request_url = self.config['modules']['API']['NETWORK_EPISODES']
+            episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
+            episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
+            for episode in episodes_data:
+                if not episode['videoThumbnail']['templateUrl']:  # set programs thumbnail as episode thumbnail
+                    episode['videoThumbnail']['templateUrl'] = [x['thumbnail']['templateUrl'] for x in programs if x['slug'] == episode['nflprogram']][0]
 
         return episodes_data
 
