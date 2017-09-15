@@ -25,7 +25,6 @@ class pigskin(object):
         self.config = self.make_request(self.base_url + '/api/en/content/v1/web/config', 'get')
         self.client_id = self.config['modules']['API']['CLIENT_ID']
         self.nfln_shows = {}
-        self.nfln_seasons = []
         self.parse_shows()
 
         if proxy_config is not None:
