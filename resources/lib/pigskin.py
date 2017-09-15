@@ -359,27 +359,23 @@ class pigskin(object):
         response = self.make_request(url, 'get')
 
         for show in response['modules']['programs']:
-            season_dict = {}
+            season_list = []
             for season in show['seasons']:
                 season_name = season['value']
-                season_id = season['slug']
-                season_dict[season_name] = season_id
-                if season_name not in self.nfln_seasons:
-                    self.nfln_seasons.append(season_name)
-            show_dict[show['title']] = season_dict
+                season_list.append(season_name)
+
+            show_dict[show['title']] = season_list
 
         # RedZone
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
         response = self.make_request(url, 'get')
 
-        season_dict = {}
+        season_list = []
         for episode in response['modules']['redZoneVod']['content']:
             season_name = episode['season'].replace('season-','')
-            if season_name not in self.nfln_seasons:
-                self.nfln_seasons.append(season_name)
 
-            season_dict[season_name] = ''
-        show_dict['RedZone'] = season_dict
+            season_list.append(season_name)
+        show_dict['RedZone'] = season_list
 
         self.nfln_shows.update(show_dict)
 
@@ -387,8 +383,8 @@ class pigskin(object):
         """Return a list of all shows for a season."""
         seasons_shows = []
 
-        for show_name, show_codes in self.nfln_shows.items():
-            if season in show_codes:
+        for show_name, years in self.nfln_shows.items():
+            if season in years:
                 seasons_shows.append(show_name)
 
         return sorted(seasons_shows)

@@ -134,8 +134,8 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_nfln_seasons(self):
         """List seasons"""
         self.season_items = []
-        # sort so that years are first (descending) followed by text
-        for season in sorted(gp.nfln_seasons, key=lambda x: (x[0].isdigit(), x), reverse=True):
+        self.seasons = set([year for show in gp.nfln_shows for year in gp.nfln_shows[show]])
+        for season in sorted(self.seasons, reverse=True):
             listitem = xbmcgui.ListItem(season)
             self.season_items.append(listitem)
 
