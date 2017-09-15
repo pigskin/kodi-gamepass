@@ -359,10 +359,20 @@ class pigskin(object):
         response = self.make_request(url, 'get')
 
         for show in response['modules']['programs']:
-            season_list = []
-            for season in show['seasons']:
-                season_name = season['value']
-                season_list.append(season_name)
+            # Unfortunately, the 'seasons' list for each show cannot be trusted.
+            # So we loop over every episode for every show to build the list.
+            # TODO: this causes a lot of network traffic and slows down init
+            #       quite a bit. Would be nice to have a better workaround.
+            request_url = self.config['modules']['API']['NETWORK_EPISODES']
+            episodes_url = request_url.replace(':seasonSlug/', '').replace(':tvShowSlug', show['slug'])
+            episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
+
+            # 'season' is often left unset. It's impossible to know for sure,
+            # but the year of the broadcast date seems like a sane best guess.
+            # TODO: but apparently 'scheduleDate' often contains errors. Yay...
+            season_list = set([episode['season'].replace('season-','')
+                               if episode['season'] else episode['scheduleDate'][:4]
+                               for episode in episodes_data])
 
             show_dict[show['title']] = season_list
 
@@ -403,7 +413,12 @@ class pigskin(object):
                 if show_name == show['title']:
                     selected_show = show
                     break
-            season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
+
+            # not all shows list all their seasons, if missing use hardcoded usual slug
+            season_slug = 'season-' + season
+            if any(x.get('value', None) == season for x in selected_show['seasons']):
+                season_slug = [x['slug'] for x in selected_show['seasons'] if season == x['value']][0]
+
             request_url = self.config['modules']['API']['NETWORK_EPISODES']
             episodes_url = request_url.replace(':seasonSlug', season_slug).replace(':tvShowSlug', selected_show['slug'])
             episodes_data = self.make_request(episodes_url, 'get')['modules']['archive']['content']
