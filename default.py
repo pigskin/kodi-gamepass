@@ -12,6 +12,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+import threading
+
 from resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
@@ -60,9 +62,16 @@ def hide_busy_dialog():
     except RuntimeError, e:
         addon_log('Error closing busy dialog: %s' % e.message)
 
+def abort_all_threads(threads):
+    for t in threads:
+        t.cancel()
+    addon_log('Cancel all remaining Threads')
+    threads = []
+    return threads
 
 class GamepassGUI(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
+        self.threads = []
         self.season_list = None
         self.season_items = []
         self.clicked_season = -1
@@ -200,6 +209,15 @@ class GamepassGUI(xbmcgui.WindowXML):
             listitem.setProperty('home_thumb', 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' % game['homeTeamAbbr'])
             self.games_items.append(listitem)
         self.games_list.addItems(self.games_items)
+        addon_log('Starting Thread to refresh display_weeks_games')
+        self.display_weeks_games_thread = threading.Timer(60.0, self.display_weeks_games_refresh)
+        self.display_weeks_games_thread.start()
+        self.threads.append(self.display_weeks_games_thread)
+
+    def display_weeks_games_refresh(self):
+        self.threads = abort_all_threads(self.threads)
+        self.games_list.reset()
+        self.display_weeks_games()
 
     def display_seasons_weeks(self):
         """List weeks for a given season"""
@@ -375,6 +393,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def select_stream_url(self, streams):
         """Determine which stream URL to use from the dict."""
+        self.threads = abort_all_threads(self.threads)
         if streams:
             if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
                 stream_url = streams['manifest_url']
@@ -428,6 +447,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                         addon_log('Error while reading seasons weeks and games')
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
+                    self.threads = abort_all_threads(self.threads)
                     self.window.setProperty('NW_clicked', 'true')
                     self.window.setProperty('GP_clicked', 'false')
 
@@ -585,6 +605,6 @@ if __name__ == '__main__':
 
     gui = GamepassGUI('script-gamepass.xml', ADDON_PATH)
     gui.doModal()
+    abort_all_threads(gui.threads)
     del gui
-
 addon_log('script finished')
