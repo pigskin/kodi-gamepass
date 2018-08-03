@@ -167,7 +167,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
                 # show game duration only if user wants to see it
                 if addon.getSetting('hide_game_length') == 'false' and game['video']:
-                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'])))))
+                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'].replace(',','.'))))))
                 else:
                     game_info = game['phase']
             else:
