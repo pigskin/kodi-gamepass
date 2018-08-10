@@ -252,7 +252,9 @@ class pigskin(object):
                 url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
                 games_data = self.make_request(url, 'get')
                 # collect games from all keys in 'modules' for a specific season
-                games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
+                # At the Moment there is only the Current Season which is supported maybe the season category will return so this code will only be commented out.
+				#games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
+                games = [g for x in games_data['modules'].keys() if x == 'gamesCurrentSeason' for g in games_data['modules'][x]['content']]
 
         except:
             self.log('Acquiring Team games data failed.')
@@ -302,9 +304,16 @@ class pigskin(object):
         akamai_xml_data = self.make_request(stream_request_url, 'get')
         akamai_xml_root = ET.fromstring(akamai_xml_data)
         for i in akamai_xml_root.iter('videoSource'):
-            if i.attrib['format'] == 'ChromeCast':
+            if i.attrib['format'].lower() == 'chromecast':
                 for text in i.itertext():
                     if 'http' in text:
+                        m3u8_url = text
+                        break
+            if i.attrib['format'].lower() == 'hls':
+                for text in i.itertext():
+                    self.log('m3u8 url.')
+                    self.log('Python Version: %s' % text)
+                    if 'http' in text and 'highlights' in text:
                         m3u8_url = text
                         break
 
