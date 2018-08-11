@@ -64,7 +64,12 @@ class pigskin(object):
         if params:
             self.log('Params: %s' % params)
         if payload:
+            if 'password' in payload:
+                password = payload['password']
+                payload['password'] = 'xxxxxxxxxxxx'
             self.log('Payload: %s' % payload)
+            if 'password' in payload:
+                payload['password'] = password
         if headers:
             self.log('Headers: %s' % headers)
 
