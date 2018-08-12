@@ -72,13 +72,31 @@ class pigskin(object):
                 payload['password'] = password
         if headers:
             self.log('Headers: %s' % headers)
-
-        if method == 'get':
-            req = self.http_session.get(url, params=params, headers=headers)
-        elif method == 'put':
-            req = self.http_session.put(url, params=params, data=payload, headers=headers)
-        else:  # post
-            req = self.http_session.post(url, params=params, data=payload, headers=headers)
+        
+        # requests session implements connection pooling, after being idle for some time the connection might be closed server side. 
+        # In case it's the servers being very slow, the timeout should fail fast and retry with longer timeout.
+        failed = False
+        for t in [3 , 22]:
+            try:
+                if method == 'get':
+                    req = self.http_session.get(url, params=params, headers=headers, timeout=t)
+                elif method == 'put':
+                    req = self.http_session.put(url, params=params, data=payload, headers=headers, timeout=t)
+                else:  # post
+                    req = self.http_session.post(url, params=params, data=payload, headers=headers, timeout=t)
+                #We made it without error, exit the loop
+                break
+            except requests.Timeout:
+                self.log('Timeout condition occured after %i seconds' % t)
+                if failed:
+                    #failed twice while sending request, should we show a dialog here? Ask only for debug log if the servers are confirmed functional?
+                    pass
+                else:
+                    failed = True
+            except:
+                #Something went wrong, not a timeout
+                pass
+        
         self.log('Response code: %s' % req.status_code)
         self.log('Response: %s' % req.content)
 
