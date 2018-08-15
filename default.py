@@ -232,16 +232,19 @@ class GamepassGUI(xbmcgui.WindowXML):
         for episode in episodes:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
-                listitem.setProperty('game_info', episode['title'])
-                listitem.setProperty('id', episode['videoId'])
+                for episode_title, episode_videoId_thumbnail in episode.items():
+                    listitem.setProperty('game_info', episode_title)
+                    for episode_videoId, episode_thumbnail in episode_videoId_thumbnail.items():
+                        print episode_thumbnail
+                        listitem.setProperty('id', episode_videoId)
+                        listitem.setProperty('away_thumb', episode_thumbnail.replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
                 listitem.setProperty('is_game', 'false')
                 listitem.setProperty('is_show', 'true')
                 listitem.setProperty('isPlayable', 'true')
-                listitem.setProperty('away_thumb', episode['videoThumbnail']['templateUrl'].replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
                 self.games_items.append(listitem)
             except:
                 addon_log('Exception adding archive directory: %s' % format_exc())
-                addon_log('Directory name: %s' % episode['title'])
+                addon_log('Directory name: %s' % episode_title)
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
@@ -434,6 +437,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
                     self.window.setProperty('GP_clicked', 'false')
+                    gp.parse_shows()
 
                     listitem = xbmcgui.ListItem('NFL Network - Live', 'NFL Network - Live')
                     self.live_items.append(listitem)
