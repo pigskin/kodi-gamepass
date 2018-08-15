@@ -1,3 +1,5 @@
+2018??.?? -- ? Edition
+
 2018.08.15 -- Quarterback by Committee Edition
 + Assorted fixes for 2018 season breakage (kaileu)
 + Add RedZone Live (kaileu)
