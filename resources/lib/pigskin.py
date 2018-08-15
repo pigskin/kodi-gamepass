@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import requests
 import m3u8
 
+
 class pigskin(object):
     def __init__(self, proxy_config, debug=False):
         self.debug = debug
@@ -94,7 +95,7 @@ class pigskin(object):
         if isinstance(response, dict):
             for key in response.keys():
                 if key.lower() == 'message':
-                    if response[key]: # raise all messages as GamePassError if message is not empty
+                    if response[key]:  # raise all messages as GamePassError if message is not empty
                         raise self.GamePassError(response[key])
 
         return response
@@ -250,15 +251,17 @@ class pigskin(object):
                         for teamname in teams['modules'][conference]['content']:
                             if team == teamname['fullName']:
                                 team = teamname['seoname']
-                                break;
+                                break
                             else:
                                 return None
 
                 url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
                 games_data = self.make_request(url, 'get')
                 # collect games from all keys in 'modules' for a specific season
-                # At the Moment there is only the Current Season which is supported maybe the season category will return so this code will only be commented out.
-				#games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
+                # At the moment, only the Current Season which is supported;
+                # maybe the season category will return so this code will only
+                # be commented out.
+                # games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
                 games = [g for x in games_data['modules'].keys() if x == 'gamesCurrentSeason' for g in games_data['modules'][x]['content']]
 
         except:
@@ -383,7 +386,7 @@ class pigskin(object):
             # 'season' is often left unset. It's impossible to know for sure,
             # but the year of the broadcast date seems like a sane best guess.
             # TODO: but apparently 'scheduleDate' often contains errors. Yay...
-            season_list = set([episode['season'].replace('season-','')
+            season_list = set([episode['season'].replace('season-', '')
                                if episode['season'] else episode['scheduleDate'][:4]
                                for episode in episodes_data])
 
@@ -395,11 +398,10 @@ class pigskin(object):
 
         season_list = []
         for episode in response['modules']['redZoneVod']['content']:
-            season_name = episode['season'].replace('season-','')
-
+            season_name = episode['season'].replace('season-', '')
             season_list.append(season_name)
-        show_dict['RedZone'] = season_list
 
+        show_dict['RedZone'] = season_list
         self.nfln_shows.update(show_dict)
 
     def get_shows(self, season):

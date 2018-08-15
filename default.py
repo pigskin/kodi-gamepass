@@ -169,7 +169,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 if addon.getSetting('hide_game_length') == 'false' and game['video']:
                     if game['video']['videoDuration'] == '':
                         game['video']['videoDuration'] = '0'
-                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'].replace(',','.'))))))
+                    game_info = '%s [CR] Duration: %s' % (game['phase'], str(timedelta(seconds=int(float(game['video']['videoDuration'].replace(',', '.'))))))
                 else:
                     game_info = game['phase']
                     if addon.getSetting('hide_game_length') == 'true' and game_info == 'FINAL_OVERTIME':
@@ -555,6 +555,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
         if controlId == 110:
             url = self.playsList.getSelectedItem().getProperty('url')
             xbmc.executebuiltin('PlayMedia(%s,False,1)' % url)
+
 
 if __name__ == '__main__':
     addon_log('script starting')
