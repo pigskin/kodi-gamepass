@@ -12,7 +12,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from resources.lib.pigskin import pigskin
+from .resources.lib.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
@@ -57,7 +57,7 @@ def show_busy_dialog():
 def hide_busy_dialog():
     try:
         busydialog.close()
-    except RuntimeError, e:
+    except RuntimeError as e:
         addon_log('Error closing busy dialog: %s' % e.message)
 
 
