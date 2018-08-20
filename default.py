@@ -267,7 +267,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             self.season_list.getSelectedItem().setProperty('clicked', 'true')
             self.clicked_season = self.season_list.getSelectedPosition()
-        elif level == 'week/show':
+        elif level in {'week', 'show'}:
             self.games_list.reset()
             self.clicked_game = -1
 
@@ -276,7 +276,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             self.weeks_list.getSelectedItem().setProperty('clicked', 'true')
             self.clicked_week = self.weeks_list.getSelectedPosition()
-        elif level == 'game/episode':
+        elif level in {'game', 'episode'}:
             if self.clicked_game > -1:  # unset previously selected game/episode
                 self.games_list.getListItem(self.clicked_game).setProperty('clicked', 'false')
 
@@ -463,7 +463,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                     self.display_seasons_weeks()
                 elif controlId == 220:  # week is clicked
-                    self.init('week/show')
+                    self.init('week')
                     self.selected_week = self.weeks_list.getSelectedItem().getProperty('week')
                     self.selected_season_type = self.weeks_list.getSelectedItem().getProperty('season_type')
 
@@ -471,7 +471,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # game is clicked
                     selected_game = self.games_list.getSelectedItem()
                     if selected_game.getProperty('isPlayable') == 'true':
-                        self.init('game/episode')
+                        self.init('game')
                         game_id = selected_game.getProperty('game_id')
 
                         if selected_game.getProperty('live_video_id'):
@@ -491,12 +491,12 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                     self.display_nfl_network_archive()
                 elif controlId == 220:  # show is clicked
-                    self.init('week/show')
+                    self.init('show')
                     show_name = self.weeks_list.getSelectedItem().getLabel()
 
                     self.display_shows_episodes(show_name, self.selected_season)
                 elif controlId == 230:  # episode is clicked
-                    self.init('game/episode')
+                    self.init('episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
                     episode_stream_url = self.select_stream_url(gp.get_stream(video_id, 'video', username=username))
                     self.play_url(episode_stream_url)
