@@ -377,21 +377,29 @@ class GamepassGUI(xbmcgui.WindowXML):
                 addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
             return False
 
-    def select_stream_url(self, streams):
-        """Determine which stream URL to use from the dict."""
-        if streams:
-            if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
-                stream_url = streams['manifest_url']
-            else:
-                bitrate = self.select_bitrate(streams['bitrates'].keys())
+    def select_stream_url(self, url):
+        """Determine which stream URL to use."""
+        if not url:
+            addon_log('no stream URL was provided!')
+            dialog = xbmcgui.Dialog()
+            dialog.ok(language(30043), language(30045))
+            return False
+
+        if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
+            return url
+        else:  # choose a specific bitrate
+            try:
+                m3u8_streams = gp.m3u8_to_dict(url)
+                bitrate = self.select_bitrate(m3u8_streams.keys())
                 if bitrate:
-                    stream_url = streams['bitrates'][bitrate]
+                    return m3u8_streams[bitrate]
                 else:  # bitrate dialog was canceled
                     return None
-            return stream_url
-        else:
-            addon_log('streams dictionary was empty.')
-            return False
+            except:
+                addon_log('unable to parse the m3u8 manifest.')
+                dialog = xbmcgui.Dialog()
+                dialog.ok(language(30043), language(30045))
+                return False
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
@@ -474,11 +482,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                         if video_id:
                             stream_url = self.select_stream_url(gp.get_stream(video_id, 'game', username=username))
-                            if stream_url:
-                                self.play_url(stream_url)
-                            elif stream_url is False:
-                                dialog = xbmcgui.Dialog()
-                                dialog.ok(language(30043), language(30045))
+                            self.play_url(stream_url)
 
             elif self.main_selection == 'NFL Network':
                 if controlId == 210:  # season is clicked
@@ -495,27 +499,15 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.init('game/episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
                     episode_stream_url = self.select_stream_url(gp.get_stream(video_id, 'video', username=username))
-                    if episode_stream_url:
-                        self.play_url(episode_stream_url)
-                    elif episode_stream_url is False:
-                        dialog = xbmcgui.Dialog()
-                        dialog.ok(language(30043), language(30045))
+                    self.play_url(episode_stream_url)
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
                         rz_stream_url = self.select_stream_url(gp.get_stream('redzone', username=username))
-                        if rz_stream_url:
-                            self.play_url(rz_stream_url)
-                        elif rz_stream_url is False:
-                            dialog = xbmcgui.Dialog()
-                            dialog.ok(language(30043), language(30045))
+                        self.play_url(rz_stream_url)
                     elif show_name == 'NFL Network - Live':
                         nfln_live_stream = self.select_stream_url(gp.get_stream('nfl_network', username=username))
-                        if nfln_live_stream:
-                            self.play_url(nfln_live_stream)
-                        elif nfln_live_stream is False:
-                            dialog = xbmcgui.Dialog()
-                            dialog.ok(language(30043), language(30045))
+                        self.play_url(nfln_live_stream)
             hide_busy_dialog()
         except Exception:  # catch anything that might fail
             hide_busy_dialog()
