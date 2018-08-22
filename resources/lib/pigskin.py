@@ -312,6 +312,10 @@ class pigskin(object):
     def get_streams(self, video_id, game_type=None, username=None):
         """Return a dict of available streams."""
         streams = {}
+        m3u8_header = {
+            'Connection': 'keep-alive',
+            'User-Agent': self.user_agent
+        }
         self.refresh_tokens()
 
         if video_id == 'nfl_network':
@@ -357,7 +361,7 @@ class pigskin(object):
                 }
                 response = self.make_request(processing_url, 'post', payload=json.dumps(post_data))
 
-                streams[vs_format] = response['ContentUrl']
+                streams[vs_format] = response['ContentUrl'] + '|' + urllib.urlencode(m3u8_header)
 
             except:
                 pass
