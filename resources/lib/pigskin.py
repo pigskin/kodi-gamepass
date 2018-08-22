@@ -509,10 +509,11 @@ class pigskin(object):
         """Parse NFL Game Pass date string to datetime object."""
         date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         datetime_obj = datetime(*(time.strptime(date_string, date_time_format)[0:6]))
+
         if localize:
             return self.utc_to_local(datetime_obj)
-        else:
-            return datetime_obj
+
+        return datetime_obj
 
     @staticmethod
     def utc_to_local(utc_dt):
