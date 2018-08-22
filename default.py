@@ -380,13 +380,20 @@ class GamepassGUI(xbmcgui.WindowXML):
                 addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
             return False
 
-    def select_stream_url(self, url):
+    def select_stream_url(self, streams):
         """Determine which stream URL to use."""
-        if not url:
-            addon_log('no stream URL was provided!')
+        if not streams:
+            addon_log('no streams list was provided!')
             dialog = xbmcgui.Dialog()
             dialog.ok(language(30043), language(30045))
             return False
+
+        # prefer chromecast streams (as they're of higher quality) but fallback
+        # to HLS when they're not present
+        try:
+            url = streams['chromecast']
+        except KeyError:
+            url = streams['hls']
 
         if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
             return url
@@ -485,7 +492,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                             video_id = self.select_version(game_versions)
 
                         if video_id:
-                            stream_url = self.select_stream_url(gp.get_stream(video_id, 'game', username=username))
+                            streams = gp.get_streams(video_id, 'game', username=username)
+                            stream_url = self.select_stream_url(streams)
                             self.play_url(stream_url)
 
             elif self.main_selection == 'NFL Network':
@@ -502,16 +510,22 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    episode_stream_url = self.select_stream_url(gp.get_stream(video_id, 'video', username=username))
-                    self.play_url(episode_stream_url)
+                    streams = gp.get_streams(video_id, 'video', username=username)
+                    stream_url = self.select_stream_url(streams)
+
+                    self.play_url(stream_url)
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        rz_stream_url = self.select_stream_url(gp.get_stream('redzone', username=username))
-                        self.play_url(rz_stream_url)
+                        streams = gp.get_streams('redzone', username=username)
+                        stream_url = self.select_stream_url(streams)
+
+                        self.play_url(stream_url)
                     elif show_name == 'NFL Network - Live':
-                        nfln_live_stream = self.select_stream_url(gp.get_stream('nfl_network', username=username))
-                        self.play_url(nfln_live_stream)
+                        streams = gp.get_streams('nfl_network', username=username)
+                        stream_url = self.select_stream_url(streams)
+
+                        self.play_url(stream_url)
             hide_busy_dialog()
         except Exception:  # catch anything that might fail
             hide_busy_dialog()
