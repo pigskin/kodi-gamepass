@@ -309,9 +309,9 @@ class pigskin(object):
         self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
         return game_versions
 
-    def get_stream(self, video_id, game_type=None, username=None):
-        # TODO: return all available stream types (HLS, chromecast, etc) or accept preferred stream-type as an argument
-        """Return the URL for a stream."""
+    def get_streams(self, video_id, game_type=None, username=None):
+        """Return a dict of available streams."""
+        streams = {}
         self.refresh_tokens()
 
         if video_id == 'nfl_network':
@@ -341,24 +341,28 @@ class pigskin(object):
         akamai_xml_root = ET.fromstring(akamai_xml_data)
 
         for i in akamai_xml_root.iter('videoSource'):
-            if i.attrib['format'].lower() == 'hls':
-                m3u8_url = i.findtext('uri')
-                break
+            try:
+                vs_format = i.attrib['format'].lower()
+                vs_url = i.findtext('uri')
 
-        post_data = {
-            'Type': '1',
-            'User': '',
-            'VideoId': video_id,
-            'VideoSource': m3u8_url,
-            'VideoKind': 'Video',
-            'AssetState': '3',
-            'PlayerType': 'HTML5',
-            'other': '{0}|{1}|web|{1}|undefined|{2}' .format(str(uuid.uuid4()), self.access_token, self.user_agent, username)
-        }
+                post_data = {
+                    'Type': '1',
+                    'User': '',
+                    'VideoId': video_id,
+                    'VideoSource': vs_url,
+                    'VideoKind': 'Video',
+                    'AssetState': '3',
+                    'PlayerType': 'HTML5',
+                    'other': '{0}|{1}|web|{1}|undefined|{2}' .format(str(uuid.uuid4()), self.access_token, self.user_agent, username)
+                }
+                response = self.make_request(processing_url, 'post', payload=json.dumps(post_data))
 
-        response = self.make_request(processing_url, 'post', payload=json.dumps(post_data))
+                streams[vs_format] = response['ContentUrl']
 
-        return response['ContentUrl']
+            except:
+                pass
+
+        return streams
 
     def m3u8_to_dict(self, manifest_url):
         """Return a dict of available bitrates and their respective stream. This
