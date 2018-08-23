@@ -49,12 +49,7 @@ class pigskin(object):
     def log(self, string):
         if self.debug:
             try:
-                print('[pigskin]: %s' % string)
-            except UnicodeEncodeError:
-                # we can't anticipate everything in unicode they might throw at
-                # us, but we can handle a simple BOM
-                bom = unicode(codecs.BOM_UTF8, 'utf8')
-                print('[pigskin]: %s' % string.replace(bom, ''))
+                print('[pigskin]: %s' % string.decode('utf-8-sig'))
             except:
                 pass
 
