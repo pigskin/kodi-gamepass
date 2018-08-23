@@ -28,21 +28,12 @@ if not xbmcvfs.exists(ADDON_PROFILE):
 username = addon.getSetting('email')
 password = addon.getSetting('password')
 
-proxy_config = None
-if addon.getSetting('proxy_enabled') == 'true':
-    proxy_config = {
-        'scheme': addon.getSetting('proxy_scheme'),
-        'host': addon.getSetting('proxy_host'),
-        'port': addon.getSetting('proxy_port'),
-        'auth': {
-            'username': addon.getSetting('proxy_username'),
-            'password': addon.getSetting('proxy_password'),
-        },
-    }
-    if addon.getSetting('proxy_auth') == 'false':
-        proxy_config['auth'] = None
 
-gp = pigskin(proxy_config, debug=True)
+proxy_url = None
+if addon.getSetting('proxy_enabled') == 'true':
+    proxy_url = build_proxy_url(self)
+
+gp = pigskin(proxy_url=proxy_url, debug=True)
 
 
 def log(string, log_level=xbmc.LOGDEBUG):
@@ -112,6 +103,32 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.setFocus(self.window.getControl(self.focusId))
         except:
             log('Focus not possible: %s' % self.focusId)
+
+    def build_proxy_url(self):
+        proxy_url = ''
+        protocol = addon.getSetting('proxy_scheme') + '://'
+
+        auth = ''
+        if addon.getSetting('proxy_auth') == 'true':
+            username = addon.getSetting('proxy_username').strip()
+            password = addon.getSetting('proxy_password')
+
+            if not username or not password:
+                return ''
+
+            auth = '%s:%s@' % (urllib.quote(username), urllib.quote(password))
+
+        host = addon.getSetting('proxy_host').strip()
+        if not host:
+            return ''
+
+        port = addon.getSetting('proxy_port').strip()
+        if port:
+            host = host + ':' + port
+
+        proxy_url = protocol + auth + host
+
+        return proxy_url
 
     def coloring(self, text, meaning):
         """Return the text wrapped in appropriate color markup."""
