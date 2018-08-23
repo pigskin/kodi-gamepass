@@ -16,11 +16,16 @@ import m3u8
 
 
 class pigskin(object):
-    def __init__(self, proxy_config, debug=False):
+    def __init__(
+            self,
+            debug=False,
+            proxy_url=None
+        ):
         self.debug = debug
         self.base_url = 'https://www.nflgamepass.com'
         self.user_agent = 'Firefox'
         self.http_session = requests.Session()
+
         self.access_token = None
         self.refresh_token = None
         self.config = self.make_request(self.base_url + '/api/en/content/v1/web/config', 'get')
@@ -28,13 +33,8 @@ class pigskin(object):
         self.nfln_shows = {}
         self.episode_list = []
 
-        if proxy_config is not None:
-            proxy_url = self.build_proxy_url(proxy_config)
-            if proxy_url != '':
-                self.http_session.proxies = {
-                    'http': proxy_url,
-                    'https': proxy_url,
-                }
+        self.http_session.proxies['http'] = proxy_url
+        self.http_session.proxies['https'] = proxy_url
 
         self.log('Debugging enabled.')
         self.log('Python Version: %s' % sys.version)
@@ -121,40 +121,6 @@ class pigskin(object):
                         raise self.GamePassError(response[key])
 
         return response
-
-    def build_proxy_url(self, config):
-        proxy_url = ''
-
-        if 'scheme' in config:
-            scheme = config['scheme'].lower().strip()
-            if scheme != 'http' and scheme != 'https':
-                return ''
-            proxy_url += scheme + '://'
-
-        if 'auth' in config and config['auth'] is not None:
-            try:
-                username = config['auth']['username']
-                password = config['auth']['password']
-                if username == '' or password == '':
-                    return ''
-                proxy_url += '%s:%s@' % (urllib.quote(username), urllib.quote(password))
-            except KeyError:
-                return ''
-
-        if 'host' not in config or config['host'].strip() == '':
-            return ''
-        proxy_url += config['host'].strip()
-
-        if 'port' in config:
-            try:
-                port = int(config['port'])
-                if port <= 0 or port > 65535:
-                    return ''
-                proxy_url += ':' + str(port)
-            except ValueError:
-                return ''
-
-        return proxy_url
 
     def login(self, username, password):
         """Attempt to authenticate to Game Pass. Raises error_unauthorised on failure.
