@@ -235,7 +235,6 @@ class GamepassGUI(xbmcgui.WindowXML):
                 for episode_title, episode_videoId_thumbnail in episode.items():
                     listitem.setProperty('game_info', episode_title)
                     for episode_videoId, episode_thumbnail in episode_videoId_thumbnail.items():
-                        print episode_thumbnail
                         listitem.setProperty('id', episode_videoId)
                         listitem.setProperty('away_thumb', episode_thumbnail.replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
                 listitem.setProperty('is_game', 'false')
