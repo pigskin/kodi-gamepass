@@ -18,7 +18,7 @@ addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
 ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
 ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
-LOGGING_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
+LOG_PREFIX = '[%s-%s]' % (addon.getAddonInfo('id'), addon.getAddonInfo('version'))
 
 busydialog = xbmcgui.DialogBusy()
 
@@ -45,9 +45,9 @@ if addon.getSetting('proxy_enabled') == 'true':
 gp = pigskin(proxy_config, debug=True)
 
 
-def addon_log(string):
-    msg = '%s: %s' % (LOGGING_PREFIX, string)
-    xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
+def log(string, log_level=xbmc.LOGDEBUG):
+    log_msg = '%s: %s' % (LOG_PREFIX, string)
+    xbmc.log(msg=log_msg, level=log_level)
 
 
 def show_busy_dialog():
@@ -58,7 +58,7 @@ def hide_busy_dialog():
     try:
         busydialog.close()
     except RuntimeError as e:
-        addon_log('Error closing busy dialog: %s' % e.message)
+        log('Error closing busy dialog: %s' % e.message)
 
 
 class GamepassGUI(xbmcgui.WindowXML):
@@ -111,7 +111,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         try:
             self.setFocus(self.window.getControl(self.focusId))
         except:
-            addon_log('Focus not possible: %s' % self.focusId)
+            log('Focus not possible: %s' % self.focusId)
 
     def coloring(self, text, meaning):
         """Return the text wrapped in appropriate color markup."""
@@ -242,8 +242,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                 listitem.setProperty('isPlayable', 'true')
                 self.games_items.append(listitem)
             except:
-                addon_log('Exception adding archive directory: %s' % format_exc())
-                addon_log('Directory name: %s' % episode_title)
+                log('Exception adding archive directory: %s' % format_exc())
+                log('Directory name: %s' % episode_title)
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
@@ -349,9 +349,9 @@ class GamepassGUI(xbmcgui.WindowXML):
             answer = dialog.select(language(30016), versions)
             if answer > -1:
                 selected_version = versions[answer]
-                addon_log('Selected version: %s' % selected_version)
+                log('Selected version: %s' % selected_version)
             else:
-                addon_log('Select version dialog was cancelled.')
+                log('Select version dialog was cancelled.')
                 return None
 
         return game_versions[selected_version]
@@ -370,19 +370,19 @@ class GamepassGUI(xbmcgui.WindowXML):
         response = xbmc.executeJSONRPC(json.dumps(payload))
         data = json.loads(response)
         if 'error' not in data and data['result']['addon']['enabled']:
-            addon_log('InputStream Adaptive is installed and enabled.')
+            log('InputStream Adaptive is installed and enabled.')
             return True
         else:
-            addon_log('InputStream Adaptive is not installed and/or enabled.')
+            log('InputStream Adaptive is not installed and/or enabled.')
             if addon.getSetting('use_inputstream_adaptive') == 'true':
-                addon_log('Disabling InputStream Adaptive.')
+                log('Disabling InputStream Adaptive.')
                 addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
             return False
 
     def select_stream_url(self, streams):
         """Determine which stream URL to use."""
         if not streams:
-            addon_log('no streams list was provided!')
+            log('no streams list was provided!')
             dialog = xbmcgui.Dialog()
             dialog.ok(language(30043), language(30045))
             return False
@@ -405,7 +405,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 else:  # bitrate dialog was canceled
                     return None
             except:
-                addon_log('unable to parse the m3u8 manifest.')
+                log('unable to parse the m3u8 manifest.')
                 dialog = xbmcgui.Dialog()
                 dialog.ok(language(30043), language(30045))
                 return False
@@ -446,7 +446,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                         self.display_seasons_weeks()
                         self.display_weeks_games()
                     except:
-                        addon_log('Error while reading seasons weeks and games')
+                        log('Error while reading seasons weeks and games')
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
@@ -528,7 +528,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             hide_busy_dialog()
         except Exception:  # catch anything that might fail
             hide_busy_dialog()
-            addon_log(format_exc())
+            log(format_exc())
 
             dialog = xbmcgui.Dialog()
             if self.main_selection == 'NFL Network' and controlId == 230:  # episode
@@ -567,7 +567,7 @@ class CoachesFilmGUI(xbmcgui.WindowXML):
 
 
 if __name__ == '__main__':
-    addon_log('script starting')
+    log('script starting')
     hide_busy_dialog()
 
     if not username or not password:
@@ -591,7 +591,7 @@ if __name__ == '__main__':
             dialog.ok(language(30021), error.value)
         sys.exit(0)
     except:
-        addon_log(format_exc())
+        log(format_exc())
         dialog = xbmcgui.Dialog()
         dialog.ok('Epic Failure',
                   language(30024))
@@ -601,4 +601,4 @@ if __name__ == '__main__':
     gui.doModal()
     del gui
 
-addon_log('script finished')
+log('script finished')
