@@ -12,7 +12,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from resources.lib.pigskin import pigskin
+from resources.lib.pigskin.pigskin import pigskin
 
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString

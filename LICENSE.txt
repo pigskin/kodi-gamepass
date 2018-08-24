@@ -467,7 +467,7 @@ License: CC BY-NC 2.0
  You. This License may not be modified without the mutual written agreement of
  the Licensor and You.
 
-Files: resources/lib/pigskin.py
+Files: resources/lib/pigskin/pigskin.py
 Copyright: 2012-2018, see git log for respective authors
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a copy
