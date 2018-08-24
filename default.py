@@ -13,6 +13,8 @@ import xbmcgui
 import xbmcvfs
 
 from resources.lib.pigskin.pigskin import pigskin
+from resources.lib import kodiutils
+from resources.lib import kodilogging
 
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
