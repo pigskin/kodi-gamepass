@@ -5,6 +5,7 @@ import uuid
 import sys
 import json
 import calendar
+import logging
 import time
 import urllib
 import xml.etree.ElementTree as ET
@@ -17,10 +18,14 @@ import m3u8
 class pigskin(object):
     def __init__(
             self,
-            debug=False,
             proxy_url=None
         ):
-        self.debug = debug
+        self.logger = logging.getLogger(__name__)
+        self.ch = logging.StreamHandler()
+        self.ch.setLevel(logging.INFO)
+
+        self.logger.addHandler(self.ch)
+
         self.base_url = 'https://www.nflgamepass.com'
         self.user_agent = 'Firefox'
         self.http_session = requests.Session()
@@ -35,8 +40,8 @@ class pigskin(object):
         self.http_session.proxies['http'] = proxy_url
         self.http_session.proxies['https'] = proxy_url
 
-        self.log('Debugging enabled.')
-        self.log('Python Version: %s' % sys.version)
+        self.logger.debug('Debugging enabled.')
+        self.logger.debug('Python Version: %s' % sys.version)
 
     class GamePassError(Exception):
         def __init__(self, value):
@@ -45,28 +50,21 @@ class pigskin(object):
         def __str__(self):
             return repr(self.value)
 
-    def log(self, string):
-        if self.debug:
-            try:
-                print('[pigskin]: %s' % string.decode('utf-8-sig'))
-            except:
-                pass
-
     def make_request(self, url, method, params=None, payload=None, headers=None):
         """Make an HTTP request. Return the response."""
-        self.log('Request URL: %s' % url)
-        self.log('Method: %s' % method)
+        self.logger.debug('Request URL: %s' % url)
+        self.logger.debug('Method: %s' % method)
         if params:
-            self.log('Params: %s' % params)
+            self.logger.debug('Params: %s' % params)
         if payload:
             if 'password' in payload:
                 password = payload['password']
                 payload['password'] = 'xxxxxxxxxxxx'
-            self.log('Payload: %s' % payload)
+            self.logger.debug('Payload: %s' % payload)
             if 'password' in payload:
                 payload['password'] = password
         if headers:
-            self.log('Headers: %s' % headers)
+            self.logger.debug('Headers: %s' % headers)
 
         # requests session implements connection pooling, after being idle for
         # some time the connection might be closed server side.
@@ -84,7 +82,7 @@ class pigskin(object):
                 # We made it without error, exit the loop
                 break
             except requests.Timeout:
-                self.log('Timeout condition occurred after %i seconds' % t)
+                self.logger.warning('Timeout condition occurred after %i seconds' % t)
                 if failed:
                     # failed twice while sending request
                     # TODO: this should be raised so the user can be informed.
@@ -96,8 +94,8 @@ class pigskin(object):
                 # TODO: raise this
                 pass
 
-        self.log('Response code: %s' % req.status_code)
-        self.log('Response: %s' % req.content)
+        self.logger.debug('Response code: %s' % req.status_code)
+        self.logger.debug('Response: %s' % req.content)
 
         return self.parse_response(req)
 
@@ -132,8 +130,8 @@ class pigskin(object):
             self.refresh_token = data['refresh_token']
             self.check_for_subscription()
         except TypeError:
-            self.log('Login Failed.')
-            self.log(data)
+            self.logger.error('Login Failed.')
+            self.logger.info(data)
             raise self.GamePassError('failed_login')
 
         return True
@@ -145,10 +143,10 @@ class pigskin(object):
         account_data = self.make_request(url, 'get', headers=headers)
 
         try:
-            self.log('subscription: %s' % account_data['subscriptions'])
+            self.logger.debug('subscription: %s' % account_data['subscriptions'])
             return True
         except TypeError:
-            self.log('No active NFL Game Pass Europe subscription was found.')
+            self.logger.error('No active NFL Game Pass Europe subscription was found.')
             raise self.GamePassError('no_subscription')
 
     def refresh_tokens(self):
@@ -173,7 +171,7 @@ class pigskin(object):
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
             seasons = self.make_request(url, 'get')
         except:
-            self.log('Acquiring season and week data failed.')
+            self.logger.error('Acquiring season and week data failed.')
             raise
 
         try:
@@ -191,7 +189,7 @@ class pigskin(object):
 
                 seasons_and_weeks[year] = weeks
         except KeyError:
-            self.log('Parsing season and week data failed.')
+            self.logger.error('Parsing season and week data failed.')
             raise
 
         return seasons_and_weeks
@@ -202,7 +200,7 @@ class pigskin(object):
             url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
             seasons = self.make_request(url, 'get')
         except:
-            self.log('Acquiring season and week data failed.')
+            self.logger.error('Acquiring season and week data failed.')
             raise
 
         current_s_w = {
@@ -220,7 +218,7 @@ class pigskin(object):
             # collect the games from all keys in 'modules' that has 'content' as a key
             games = [g for x in games_data['modules'].keys() if 'content' in games_data['modules'][x] for g in games_data['modules'][x]['content']]
         except:
-            self.log('Acquiring games data failed.')
+            self.logger.error('Acquiring games data failed.')
             raise
 
         return sorted(games, key=lambda x: x['gameDateTimeUtc'])
@@ -252,7 +250,7 @@ class pigskin(object):
                 games = [g for x in games_data['modules'].keys() if x == 'gamesCurrentSeason' for g in games_data['modules'][x]['content']]
 
         except:
-            self.log('Acquiring Team games data failed.')
+            self.logger.error('Acquiring Team games data failed.')
             raise
 
         return sorted(games, key=lambda x: x['gameDateTimeUtc'])
@@ -266,7 +264,7 @@ class pigskin(object):
             if isinstance(data[key], dict) and 'videoId' in data[key]:
                 game_versions[data[key]['kind']] = data[key]['videoId']
 
-        self.log('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
+        self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
         return game_versions
 
     def get_streams(self, video_id, game_type=None, username=None):
