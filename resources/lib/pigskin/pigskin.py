@@ -104,7 +104,7 @@ class pigskin(object):
     def parse_response(self, req):
         """Try to load JSON data into dict and raise potential errors."""
         try:
-            response = json.loads(req.content)
+            response = req.json()
         except ValueError:  # if response is not json
             response = req.content
 
