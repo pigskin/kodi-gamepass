@@ -1,7 +1,6 @@
 """
 A Python library for NFL Game Pass
 """
-import codecs
 import uuid
 import sys
 import json
