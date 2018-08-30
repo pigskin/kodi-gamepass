@@ -32,7 +32,7 @@ class pigskin(object):
 
         self.access_token = None
         self.refresh_token = None
-        self.config = self.make_request(self.base_url + '/api/en/content/v1/web/config', 'get')
+        self.config = self.populate_config()
         self.client_id = self.config['modules']['API']['CLIENT_ID']
         self.nfln_shows = {}
         self.episode_list = []
@@ -49,6 +49,13 @@ class pigskin(object):
 
         def __str__(self):
             return repr(self.value)
+
+
+    def populate_config(self):
+        url = self.base_url + '/api/en/content/v1/web/config'
+        r = self.http_session.get(url)
+        return r.json()
+
 
     def make_request(self, url, method, params=None, payload=None, headers=None):
         """Make an HTTP request. Return the response."""
