@@ -29,6 +29,8 @@ class pigskin(object):
         self.base_url = 'https://www.nflgamepass.com'
         self.user_agent = 'Firefox'
         self.http_session = requests.Session()
+        self.http_session.proxies['http'] = proxy_url
+        self.http_session.proxies['https'] = proxy_url
 
         self.access_token = None
         self.refresh_token = None
@@ -36,9 +38,6 @@ class pigskin(object):
         self.client_id = self.config['modules']['API']['CLIENT_ID']
         self.nfln_shows = {}
         self.episode_list = []
-
-        self.http_session.proxies['http'] = proxy_url
-        self.http_session.proxies['https'] = proxy_url
 
         self.logger.debug('Debugging enabled.')
         self.logger.debug('Python Version: %s' % sys.version)
@@ -89,7 +88,7 @@ class pigskin(object):
 
             try:
                 response_dict['body'] = r.json()
-            except ValueError as e:
+            except ValueError:
                 response_dict['body'] = str(r.content)
             response_dict['headers'] = dict(r.headers)
             response_dict['method'] = r.request.method
@@ -200,7 +199,7 @@ class pigskin(object):
             r = self.http_session.post(url, data=post_data)
             self._log_request(r)
             data = r.json()
-        except TypeError as e:
+        except TypeError:
             self.logger.error('login failed and/or server response is invalid')
             return False
         except Exception as e:
@@ -209,7 +208,7 @@ class pigskin(object):
         try:
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
-        except KeyError as e:
+        except KeyError:
             self.logger.error('could not acquire GP tokens')
             return False
         except Exception as e:
