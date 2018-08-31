@@ -94,10 +94,19 @@ class pigskin(object):
             response_dict['method'] = r.request.method
             response_dict['status_code'] = r.status_code
 
-        self.logger.debug('request:')
-        self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
-        self.logger.debug('response:')
-        self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
+        try:
+            self.logger.debug('request:')
+            self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
+        except UnicodeDecodeError:  # python 2.7
+            request_dict['body'] = 'BINARY DATA'
+            self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
+
+        try:
+            self.logger.debug('response:')
+            self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
+        except UnicodeDecodeError:  # python 2.7
+            response_dict['body'] = 'BINARY DATA'
+            self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
 
         return True
 
