@@ -57,6 +57,52 @@ class pigskin(object):
         return r.json()
 
 
+    def _log_request(self, r):
+        """Log (at the debug level) everything about a provided HTTP request.
+
+        Note
+        ----
+        TODO: optional password filtering
+
+        Parameters
+        ----------
+        r : requests.models.Response
+            The handle of a Requests request.
+
+        Examples
+        --------
+        >>> r = self.http_session.get(url)
+        >>> self._log_request(r)
+
+        Returns
+        -------
+        bool
+            True if successful
+        """
+        request_dict = {}
+        response_dict = {}
+        if type(r) == requests.models.Response:
+            request_dict['body'] = r.request.body
+            request_dict['headers'] = dict(r.request.headers)
+            request_dict['method'] = r.request.method
+            request_dict['uri'] = r.request.url
+
+            try:
+                response_dict['body'] = r.json()
+            except ValueError as e:
+                response_dict['body'] = str(r.content)
+            response_dict['headers'] = dict(r.headers)
+            response_dict['method'] = r.request.method
+            response_dict['status_code'] = r.status_code
+
+        self.logger.debug('request:')
+        self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
+        self.logger.debug('response:')
+        self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
+
+        return True
+
+
     def make_request(self, url, method, params=None, payload=None, headers=None):
         """Make an HTTP request. Return the response."""
         self.logger.debug('Request URL: %s' % url)
