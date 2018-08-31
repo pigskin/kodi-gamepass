@@ -243,18 +243,44 @@ class pigskin(object):
             raise self.GamePassError('no_subscription')
 
     def refresh_tokens(self):
-        """Refreshes authorization tokens."""
-        url = self.config['modules']['API']['LOGIN']
+        """Refresh the ``access`` and ``refresh`` tokens to access content.
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise.
+        """
+        url = self.config['modules']['API']['REFRESH_TOKEN']
         post_data = {
             'refresh_token': self.refresh_token,
             'client_id': self.client_id,
             'grant_type': 'refresh_token'
         }
-        data = self.make_request(url, 'post', payload=post_data)
-        self.access_token = data['access_token']
-        self.refresh_token = data['refresh_token']
 
+        try:
+            r = self.http_session.post(url, data=post_data)
+            self._log_request(r)
+            data = r.json()
+        except TypeError:
+            self.logger.error('failed to contact token refresh server and/or server response is invalid')
+            return False
+        except Exception as e:
+            raise e
+
+        try:
+            self.access_token = data['access_token']
+            self.refresh_token = data['refresh_token']
+        except KeyError:
+            self.logger.error('could not find GP tokens to refresh')
+            return False
+        except Exception as e:
+            raise e
+
+        # TODO: check for status codes, just in case
+
+        self.logger.debug('successfully refreshed tokens')
         return True
+
 
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
