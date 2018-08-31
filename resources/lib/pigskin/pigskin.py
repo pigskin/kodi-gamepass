@@ -168,26 +168,58 @@ class pigskin(object):
         return response
 
     def login(self, username, password):
-        """Attempt to authenticate to Game Pass. Raises error_unauthorised on failure.
-        Use check_for_subscription() to determine if the user has a valid subscription."""
+        """Login to NFL Game Pass.
+
+        Note
+        ----
+        A successful login does not necessarily mean that access to content is
+        granted (i.e. has a valid subscription). Use ``check_for_subscription()``
+        to determine if access has been granted.
+
+        Parameters
+        ----------
+        username : str
+            Your NFL Game Pass username.
+        password : str
+            The user's password.
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise.
+        """
         url = self.config['modules']['API']['LOGIN']
         post_data = {
+            'client_id': self.client_id,
             'username': username,
             'password': password,
-            'client_id': self.client_id,
             'grant_type': 'password'
         }
+
         try:
-            data = self.make_request(url, 'post', payload=post_data)
+            r = self.http_session.post(url, data=post_data)
+            self._log_request(r)
+            data = r.json()
+        except TypeError as e:
+            self.logger.error('login failed and/or server response is invalid')
+            return False
+        except Exception as e:
+            raise e
+
+        try:
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
-            self.check_for_subscription()
-        except TypeError:
-            self.logger.error('Login Failed.')
-            self.logger.info(data)
-            raise self.GamePassError('failed_login')
+        except KeyError as e:
+            self.logger.error('could not acquire GP tokens')
+            return False
+        except Exception as e:
+            raise e
 
+        # TODO: check for status codes, just in case
+
+        self.logger.debug('login was successful')
         return True
+
 
     def check_for_subscription(self):
         """Return True if a subscription is detected and raise 'no_subscription' on failure."""
