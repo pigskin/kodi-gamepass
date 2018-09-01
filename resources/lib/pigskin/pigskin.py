@@ -378,38 +378,6 @@ class pigskin(object):
         return weeks
 
 
-    def get_seasons_and_weeks(self):
-        """Return a multidimensional array of all seasons and weeks."""
-        seasons_and_weeks = {}
-
-        try:
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
-            seasons = self.make_request(url, 'get')
-        except:
-            self.logger.error('Acquiring season and week data failed.')
-            raise
-
-        try:
-            for season in seasons['modules']['mainMenu']['seasonStructureList']:
-                weeks = []
-                year = str(season['season'])
-                for season_type in season['seasonTypes']:
-                    for week in season_type['weeks']:
-                        week_dict = {
-                            'week_number': str(week['number']),
-                            'week_name': week['weekNameAbbr'],
-                            'season_type': season_type['seasonType']
-                        }
-                        weeks.append(week_dict)
-
-                seasons_and_weeks[year] = weeks
-        except KeyError:
-            self.logger.error('Parsing season and week data failed.')
-            raise
-
-        return seasons_and_weeks
-
-
     def get_current_season_and_week(self):
         """Get the current season (year), season type, and week.
 
