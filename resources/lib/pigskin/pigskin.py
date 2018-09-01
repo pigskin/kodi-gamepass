@@ -204,7 +204,7 @@ class pigskin(object):
             r = self.http_session.post(url, data=post_data)
             self._log_request(r)
             data = r.json()
-        except TypeError:
+        except ValueError:
             self.logger.error('login: server response is invalid')
             return False
         except Exception as e:
@@ -260,7 +260,7 @@ class pigskin(object):
             r = self.http_session.post(url, data=post_data)
             self._log_request(r)
             data = r.json()
-        except TypeError:
+        except ValueError:
             self.logger.error('token refresh: server response is invalid')
             return False
         except Exception as e:
