@@ -23,7 +23,6 @@ class pigskin(object):
         self.logger = logging.getLogger(__name__)
         self.ch = logging.StreamHandler()
         self.ch.setLevel(logging.INFO)
-
         self.logger.addHandler(self.ch)
 
         self.base_url = 'https://www.nflgamepass.com'
@@ -35,11 +34,9 @@ class pigskin(object):
         self.access_token = None
         self.refresh_token = None
         self.config = self.populate_config()
-        self.client_id = self.config['modules']['API']['CLIENT_ID']
         self.nfln_shows = {}
         self.episode_list = []
 
-        self.logger.debug('Debugging enabled.')
         self.logger.debug('Python Version: %s' % sys.version)
 
     class GamePassError(Exception):
@@ -91,18 +88,17 @@ class pigskin(object):
             except ValueError:
                 response_dict['body'] = str(r.content)
             response_dict['headers'] = dict(r.headers)
-            response_dict['method'] = r.request.method
             response_dict['status_code'] = r.status_code
 
+        self.logger.debug('request:')
         try:
-            self.logger.debug('request:')
             self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
         except UnicodeDecodeError:  # python 2.7
             request_dict['body'] = 'BINARY DATA'
             self.logger.debug(json.dumps(request_dict, sort_keys=True, indent=4))
 
+        self.logger.debug('response:')
         try:
-            self.logger.debug('response:')
             self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
         except UnicodeDecodeError:  # python 2.7
             response_dict['body'] = 'BINARY DATA'
@@ -198,7 +194,7 @@ class pigskin(object):
         """
         url = self.config['modules']['API']['LOGIN']
         post_data = {
-            'client_id': self.client_id,
+            'client_id': self.config['modules']['API']['CLIENT_ID'],
             'username': username,
             'password': password,
             'grant_type': 'password'
@@ -209,16 +205,18 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except TypeError:
-            self.logger.error('login failed and/or server response is invalid')
+            self.logger.error('login: server response is invalid')
             return False
         except Exception as e:
             raise e
 
         try:
+            # TODO: are these tokens provided for valid accounts without a subscription?
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
         except KeyError:
             self.logger.error('could not acquire GP tokens')
+            self.logger.error('login failed')
             return False
         except Exception as e:
             raise e
@@ -242,6 +240,7 @@ class pigskin(object):
             self.logger.error('No active NFL Game Pass Europe subscription was found.')
             raise self.GamePassError('no_subscription')
 
+
     def refresh_tokens(self):
         """Refresh the ``access`` and ``refresh`` tokens to access content.
 
@@ -252,8 +251,8 @@ class pigskin(object):
         """
         url = self.config['modules']['API']['REFRESH_TOKEN']
         post_data = {
+            'client_id': self.config['modules']['API']['CLIENT_ID'],
             'refresh_token': self.refresh_token,
-            'client_id': self.client_id,
             'grant_type': 'refresh_token'
         }
 
@@ -262,7 +261,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except TypeError:
-            self.logger.error('failed to contact token refresh server and/or server response is invalid')
+            self.logger.error('token refresh: server response is invalid')
             return False
         except Exception as e:
             raise e
