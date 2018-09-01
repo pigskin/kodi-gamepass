@@ -312,22 +312,43 @@ class pigskin(object):
 
         return seasons_and_weeks
 
+
     def get_current_season_and_week(self):
-        """Return the current season, season type, and week in a dict."""
+        """Get the current season (year), season type, and week.
+
+        Returns
+        -------
+        dict
+            with the ``season``, ``season_type``, and ``week`` fields populated
+            if successful; empty if otherwise.
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
+        current = {}
+
         try:
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
-            seasons = self.make_request(url, 'get')
-        except:
-            self.logger.error('Acquiring season and week data failed.')
-            raise
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('current_season_and_week: server response is invalid')
+            return {}
+        except Exception as e:
+            raise e
 
-        current_s_w = {
-            'season': seasons['modules']['meta']['currentContext']['currentSeason'],
-            'season_type': seasons['modules']['meta']['currentContext']['currentSeasonType'],
-            'week': str(seasons['modules']['meta']['currentContext']['currentWeek'])
-        }
+        try:
+            current = {
+                'season': data['modules']['meta']['currentContext']['currentSeason'],
+                'season_type': data['modules']['meta']['currentContext']['currentSeasonType'],
+                'week': str(data['modules']['meta']['currentContext']['currentWeek'])
+            }
+        except KeyError:
+            self.logger.error('could not determine the current season and week')
+            return {}
+        except Exception as e:
+            raise e
 
-        return current_s_w
+        return current
+
 
     def get_weeks_games(self, season, season_type, week):
         try:
