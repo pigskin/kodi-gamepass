@@ -281,6 +281,42 @@ class pigskin(object):
         return True
 
 
+    def get_seasons(self):
+        """Get a list of available seasons.
+
+        Returns
+        -------
+        list
+            a list of available seasons, sorted from the most to least recent;
+            empty if there was a failure.
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games']
+        seasons = []
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('')
+            return []
+        except Exception as e:
+            raise e
+
+        try:
+            self.logger.debug('parsing seasons')
+            giga_list = data['modules']['mainMenu']['seasonStructureList']
+            seasons = [str(x['season']) for x in giga_list if x.get('season') != None]
+            seasons.sort(reverse=True)
+        except KeyError:
+            self.logger.error('unable to find the seasons list')
+            return []
+        except Exception as e:
+            raise e
+
+        return seasons
+
+
     def get_seasons_and_weeks(self):
         """Return a multidimensional array of all seasons and weeks."""
         seasons_and_weeks = {}
