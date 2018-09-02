@@ -415,17 +415,58 @@ class pigskin(object):
         return current
 
 
-    def get_weeks_games(self, season, season_type, week):
-        try:
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail'].replace(':seasonType', season_type).replace(':season', season).replace(':week', week)
-            games_data = self.make_request(url, 'get')
-            # collect the games from all keys in 'modules' that has 'content' as a key
-            games = [g for x in games_data['modules'].keys() if 'content' in games_data['modules'][x] for g in games_data['modules'][x]['content']]
-        except:
-            self.logger.error('Acquiring games data failed.')
-            raise
+    def get_games(self, season, season_type, week):
+        """Get the raw game data for a given season (year), season type, and week.
+        Parameters
+        ----------
+        season : str or int
+            The season can be provided as either a ``str`` or ``int``.
+        season_type : str
+            The season_type can be either ``pre``, ``reg``, or ``post``.
+        week : str or int
+            The week can be provided as either a ``str`` or ``int``.
 
-        return sorted(games, key=lambda x: x['gameDateTimeUtc'])
+        Returns
+        -------
+        list
+            of dicts with the metadata for each game
+
+        Note
+        ----
+        TODO: the data returned really should be normalized, rather than a
+        (nearly) straight dump of the raw data.
+
+        Examples
+        --------
+        >>> games = gp.get_games(2017, 'reg', 1)
+        >>> print(games[1]['video']['title'])
+        'New York Jets @ Buffalo Bills
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
+        url = url.replace(':seasonType', season_type).replace(':season', str(season)).replace(':week', str(week))
+        games = []
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('')
+            return []
+        except Exception as e:
+            raise e
+
+        try:
+            games = [g for x in data['modules'] if data['modules'][x].get('content') for g in data['modules'][x]['content']]
+            games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
+        except KeyError:
+            self.logger.error('')
+            return []
+        except Exception as e:
+            raise e
+
+        return games
+
 
     def get_team_games(self, season, team=None):
         try:
