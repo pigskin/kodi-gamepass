@@ -65,15 +65,15 @@ class pigskin(object):
         r : requests.models.Response
             The handle of a Requests request.
 
-        Examples
-        --------
-        >>> r = self.http_session.get(url)
-        >>> self._log_request(r)
-
         Returns
         -------
         bool
             True if successful
+
+        Examples
+        --------
+        >>> r = self.http_session.get(url)
+        >>> self._log_request(r)
         """
         request_dict = {}
         response_dict = {}
@@ -417,6 +417,7 @@ class pigskin(object):
 
     def get_games(self, season, season_type, week):
         """Get the raw game data for a given season (year), season type, and week.
+
         Parameters
         ----------
         season : str or int
@@ -440,7 +441,7 @@ class pigskin(object):
         --------
         >>> games = gp.get_games(2017, 'reg', 1)
         >>> print(games[1]['video']['title'])
-        'New York Jets @ Buffalo Bills
+        New York Jets @ Buffalo Bills
         """
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
         url = url.replace(':seasonType', season_type).replace(':season', str(season)).replace(':week', str(week))
@@ -451,7 +452,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('')
+            self.logger.error('get_games: server response is invalid')
             return []
         except Exception as e:
             raise e
@@ -460,6 +461,7 @@ class pigskin(object):
             games = [g for x in data['modules'] if data['modules'][x].get('content') for g in data['modules'][x]['content']]
             games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
         except KeyError:
+            self.logger.error('could not parse/build the games list')
             self.logger.error('')
             return []
         except Exception as e:
@@ -469,14 +471,14 @@ class pigskin(object):
 
 
     def get_team_games(self, season, team):
-        """Get the raw game data for a given season (year), season type, and week.
+        """Get the raw game data for a given season (year) and team.
 
         Parameters
         ----------
         season : str or int
             The season can be provided as either a ``str`` or ``int``.
         team : str
-            Accepts the team "seo name". For a list of team seo names, see
+            Accepts the team ``seo_name``. For a list of team seo names, see
             self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].
 
         Returns
