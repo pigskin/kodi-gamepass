@@ -468,37 +468,67 @@ class pigskin(object):
         return games
 
 
-    def get_team_games(self, season, team=None):
+    def get_team_games(self, season, team):
+        """Get the raw game data for a given season (year), season type, and week.
+
+        Parameters
+        ----------
+        season : str or int
+            The season can be provided as either a ``str`` or ``int``.
+        team : str
+            Accepts the team "seo name". For a list of team seo names, see
+            self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].
+
+        Returns
+        -------
+        list
+            of dicts with the metadata for each game
+
+        Note
+        ----
+        TODO: the data returned really should be normalized, rather than a
+              (nearly) straight dump of the raw data.
+        TODO: currently only the current season is supported
+        TODO: create a ``get_team_seo_name()`` helper
+
+        See Also
+        --------
+        ``get_current_season_and_week()``
+
+        Examples
+        --------
+        >>> games = gp.get_team_games(2018, '49ers')
+        >>> print(games[2]['weekName'])
+        Preseason Week 3
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail']
+        url = url.replace(':team', team)
+        games = []
+
+        # TODO: bail if ``season`` isn't the current season
+
         try:
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['teams']
-            teams = self.make_request(url, 'get')
-            if team is None:
-                return teams
-            else:
-                # look for the team name
-                for conference in teams['modules']:
-                    if 'content' in teams['modules'][conference]:
-                        for teamname in teams['modules'][conference]['content']:
-                            if team == teamname['fullName']:
-                                team = teamname['seoname']
-                                break
-                            else:
-                                return None
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('get_team_games: server response is invalid')
+            return []
+        except Exception as e:
+            raise e
 
-                url = self.config['modules']['ROUTES_DATA_PROVIDERS']['team_detail'].replace(':team', team)
-                games_data = self.make_request(url, 'get')
-                # collect games from all keys in 'modules' for a specific season
-                # At the moment, only the Current Season which is supported;
-                # maybe the season category will return so this code will only
-                # be commented out.
-                # games = [g for x in games_data['modules'].keys() if x == 'videos'+season for g in games_data['modules'][x]['content']]
-                games = [g for x in games_data['modules'].keys() if x == 'gamesCurrentSeason' for g in games_data['modules'][x]['content']]
+        try:
+            # currently, only data for the current season is available
+            games = [x for x in data['modules']['gamesCurrentSeason']['content']]
+            games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
+        except KeyError:
+            self.logger.error('could not parse/build the team_games list')
+            return []
+        except Exception as e:
+            raise e
 
-        except:
-            self.logger.error('Acquiring Team games data failed.')
-            raise
+        return games
 
-        return sorted(games, key=lambda x: x['gameDateTimeUtc'])
 
     def get_game_versions(self, game_id, season):
         """Return a dict of available game versions for a single game."""
