@@ -531,16 +531,64 @@ class pigskin(object):
 
 
     def get_game_versions(self, game_id, season):
-        """Return a dict of available game versions for a single game."""
-        game_versions = {}
-        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page'].replace(':season', season).replace(':gameslug', game_id)
-        data = self.make_request(url, 'get')['modules']['singlegame']['content'][0]
-        for key in data.keys():
-            if isinstance(data[key], dict) and 'videoId' in data[key]:
-                game_versions[data[key]['kind']] = data[key]['videoId']
+        """Return a dict of available game versions (full, condensed, coaches,
+        etc) for a game.
 
-        self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(game_versions.keys())))
-        return game_versions
+        Parameters
+        ----------
+        season : str or int
+            The season can be provided as either a ``str`` or ``int``.
+        game_id : str or int
+            A game's ``game_id`` can be found in the metadata returned by either
+            ``get_games()`` or ``get_team_games()``.
+
+        Returns
+        -------
+        dict
+            with the ``key`` as game version and its ``value`` being the
+            ``video_id`` of the corresponding stream.
+
+        See Also
+        --------
+        ``get_games()``
+        ``get_team_games()``
+
+        Examples
+        --------
+        >>> versions = gp.get_game_versions('2017090700', '2017')
+        >>> print(versions.keys())
+        dict_keys(['Coach film', 'Condensed game', 'Game video'])
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['game_page']
+        url = url.replace(':gameslug', str(game_id)).replace(':season', str(season))
+        versions = {}
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('get_game_versions: server response is invalid')
+            return {}
+        except Exception as e:
+            raise e
+
+        try:
+            game_data = data['modules']['singlegame']['content'][0]
+            for key in game_data:
+                try:
+                    versions[game_data[key]['kind']] = game_data[key]['videoId']
+                except (KeyError, TypeError):
+                    pass
+        except KeyError:
+            self.logger.error('could not parse/build the game versions data')
+            return {}
+        except Exception as e:
+            raise e
+
+        self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(versions.keys())))
+        return versions
+
 
     def get_streams(self, video_id, game_type=None, username=None):
         """Return a dict of available streams."""
