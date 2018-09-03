@@ -889,6 +889,7 @@ class pigskin(object):
     def parse_shows(self):
         """Dynamically parse the NFL Network shows into a dict."""
         show_dict = {}
+        self.episode_list = []
 
         # NFL Network shows
         url = self.config['modules']['API']['NETWORK_PROGRAMS']
