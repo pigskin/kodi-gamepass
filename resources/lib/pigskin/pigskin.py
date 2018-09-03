@@ -7,9 +7,12 @@ import json
 import calendar
 import logging
 import time
-import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
+try:
+    from urllib.parse import urlencode
+except ImportError:  # Python 2.7
+    from urllib import urlencode
 
 import requests
 import m3u8
@@ -665,7 +668,7 @@ class pigskin(object):
         m3u8_obj = m3u8.loads(m3u8_manifest)
         for playlist in m3u8_obj.playlists:
             bitrate = int(playlist.stream_info.bandwidth) / 1000
-            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + manifest_url.split('?')[1] + '|' + urllib.urlencode(m3u8_header)
+            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + manifest_url.split('?')[1] + '|' + urlencode(m3u8_header)
 
         return streams
 
