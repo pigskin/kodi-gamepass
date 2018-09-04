@@ -4,15 +4,17 @@ A Python library for NFL Game Pass
 import uuid
 import sys
 import json
-import calendar
 import logging
-import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
 try:
     from urllib.parse import urlencode
 except ImportError:  # Python 2.7
     from urllib import urlencode
+try:
+    from datetime import datetime, timezone
+except ImportError:  # Python 2.7
+    import calendar
+    from datetime import datetime, timedelta
 
 import requests
 import m3u8
@@ -1015,21 +1017,47 @@ class pigskin(object):
 
         return episodes_data
 
-    def parse_datetime(self, date_string, localize=False):
-        """Parse NFL Game Pass date string to datetime object."""
-        date_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        datetime_obj = datetime(*(time.strptime(date_string, date_time_format)[0:6]))
+
+    def nfldate_to_datetime(self, nfldate, localize=False):
+        """Return a datetime object from an NFL Game Pass date string.
+
+        Parameters
+        ----------
+        nfldata : str
+            The DIVA config URL that you need parsed.
+        localize : bool
+            Whether the datetime object should be localized.
+
+        Returns
+        -------
+        datetime
+            A datetime object when successful, None otherwise.
+        """
+        nfldate_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+
+        try:
+            dt_utc = datetime.strptime(nfldate, nfldate_format)
+        except ValueError:
+            self.logger.error('unable to parse the nfldate string')
+            return None
 
         if localize:
-            return self.utc_to_local(datetime_obj)
+            try:
+                return dt_utc.replace(tzinfo=timezone.utc).astimezone(tz=None)
+            except NameError:  # Python 2.7
+                return self.utc_to_local(dt_utc)
+            except Exception:
+                self.logger.error('unable to localize the nfl datetime object')
+                return None
 
-        return datetime_obj
+        return dt_utc
+
 
     @staticmethod
-    def utc_to_local(utc_dt):
+    def utc_to_local(dt_utc):
         """Convert UTC time to local time."""
         # get integer timestamp to avoid precision lost
-        timestamp = calendar.timegm(utc_dt.timetuple())
-        local_dt = datetime.fromtimestamp(timestamp)
-        assert utc_dt.resolution >= timedelta(microseconds=1)
-        return local_dt.replace(microsecond=utc_dt.microsecond)
+        timestamp = calendar.timegm(dt_utc.timetuple())
+        dt_local = datetime.fromtimestamp(timestamp)
+        assert dt_utc.resolution >= timedelta(microseconds=1)
+        return dt_local.replace(microsecond=dt_utc.microsecond)
