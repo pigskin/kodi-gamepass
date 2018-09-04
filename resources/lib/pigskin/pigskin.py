@@ -782,8 +782,12 @@ class pigskin(object):
         self.refresh_tokens() # determine when we actually need this. I'm guessing when we post
 
         diva_config = self._get_diva_config(diva_config_url)
-        video_data_url = diva_config['video_data_url'].replace('{V.ID}', video_id)
-        processing_url = diva_config['processing_url']
+        try:
+            video_data_url = diva_config['video_data_url'].replace('{V.ID}', video_id)
+            processing_url = diva_config['processing_url']
+        except KeyError:
+            self.logger.error('_get_diva_streams: diva config was not set!')
+            return {}
 
         try:
             r = self.http_session.get(video_data_url)
