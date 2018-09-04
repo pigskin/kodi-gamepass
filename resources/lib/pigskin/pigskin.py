@@ -214,6 +214,7 @@ class pigskin(object):
             raise e
 
         try:
+            self.username = username
             # TODO: are these tokens provided for valid accounts without a subscription?
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
@@ -553,6 +554,12 @@ class pigskin(object):
             with the ``key`` as game version and its ``value`` being the
             ``video_id`` of the corresponding stream.
 
+        NOTE
+        ----
+        TODO: it seems that they return a schload of info with get_games(),
+              including the video_id. Verify that they actually provide that for
+              all games, and perhaps this entire function can be retired.
+
         See Also
         --------
         ``get_games()``
@@ -595,64 +602,262 @@ class pigskin(object):
         return versions
 
 
-    def get_streams(self, video_id, game_type=None, username=None):
-        """Return a dict of available streams."""
+    def get_nfl_network_streams(self):
+        """Return a dict of available stream formats and their URLs for NFL
+        Network Live.
+
+        Returns
+        -------
+        dict
+            with the stream format (hls, chromecast, etc) as the key and the
+            stream content_url as the value.
+        """
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
+        diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
+        self.refresh_tokens()  # we aren't even told about the live video unless we have up-to-date tokens
         streams = {}
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('get_nfl_network_streams: server response is invalid')
+            return {}
+        except Exception as e:
+            raise e
+
+        try:
+            video_id = data['modules']['networkLiveVideo']['content'][0]['videoId']
+        except KeyError:
+            # TODO: move refresh_tokens() here and retry
+            self.logger.error('could not parse the nfl network video_id data')
+            return {}
+        except Exception as e:
+            raise e
+
+        streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
+        return streams
+
+
+    def get_redzone_streams(self):
+        """Return a dict of available stream formats and their URLs for NFL Red
+        Zone.
+
+        Returns
+        -------
+        dict
+            with the stream format (hls, chromecast, etc) as the key and the
+            stream content_url as the value.
+        """
+        # TODO: do we need refresh_tokens() like get_nfl_network_streams()? likely
+        url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
+        diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
+        streams = {}
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('get_redzone_streams: server response is invalid')
+            return {}
+        except Exception as e:
+            raise e
+
+        try:
+            video_id = data['modules']['redZoneLive']['content'][0]['videoId']
+        except (KeyError, IndexError):
+            self.logger.error('could not parse the redzone video_id data')
+            return {}
+        except Exception as e:
+            raise e
+
+        streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
+        return streams
+
+
+    def get_game_streams(self, video_id, live=False):
+        """Return a dict of available stream formats and their URLs for a game.
+
+        Parameters
+        ----------
+        video_id : str
+            The video_id of a game
+        live : bool
+            Whether the game is live or not
+
+        Returns
+        -------
+        dict
+            with the stream format (hls, chromecast, etc) as the key and the
+            stream content_url as the value.
+
+        See Also
+        --------
+        ``get_game_versions()``
+
+        Examples
+        --------
+        >>> games = gp.get_games('2017', 'reg', '1')
+        >>> versions = gp.get_game_versions(games[1]['gameId'], '2017')
+        >>> streams = gp.get_game_streams(versions['Condensed game'])
+        >>> print(streams.keys())
+        dict_keys(['hls', 'chromecast', 'connecttv'])
+        """
+        diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
+        if live:
+            diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['LiveNoData']
+
+        streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
+        return streams
+
+
+    def _get_diva_config(self, diva_config_url):
+        """Return the parsed DIVA config.
+
+        Parameters
+        ----------
+        diva_config_url : str
+            The DIVA config URL that you need parsed.
+
+        Returns
+        -------
+        dict
+            with the keys ``processing_url`` and ``video_data_id`` set.
+        """
+        url = diva_config_url.replace('device', 'html5')
+        diva_config = {}
+
+        try:
+            r = self.http_session.get(url)
+            self._log_request(r)
+            data = r.content
+        except Exception as e:
+            raise e
+
+        try:
+            data_xml = ET.fromstring(data)
+        except (ET.ParseError, TypeError):
+            self.logger.error('_get_diva_config: server response is invalid')
+            return {}
+
+        try:
+            diva_config['processing_url'] = data_xml.find(".//parameter[@name='processingUrlCallPath']").get('value')
+            diva_config['video_data_url'] = data_xml.find(".//parameter[@name='videoDataPath']").get('value')
+        except AttributeError:
+            self.logger.error('_get_diva_config: unable to parse the diva XML')
+            return {}
+
+        return diva_config
+
+
+    def _get_diva_streams(self, video_id, diva_config_url):
+        """Return a dict of available stream formats and their URLs.
+
+        Parameters
+        ----------
+        video_id : str
+            The video_id of a game/show
+        diva_config_url : str
+            The DIVA config URL that you need parsed.
+
+        Returns
+        -------
+        dict
+            with the stream format (hls, chromecast, etc) as the key and the
+            stream content_url as the value.
+        """
+        streams = {}
+        self.refresh_tokens() # determine when we actually need this. I'm guessing when we post
+
+        diva_config = self._get_diva_config(diva_config_url)
+        video_data_url = diva_config['video_data_url'].replace('{V.ID}', video_id)
+        processing_url = diva_config['processing_url']
+
+        try:
+            r = self.http_session.get(video_data_url)
+            self._log_request(r)
+            akamai_data = r.content
+        except Exception as e:
+            raise e
+
+        try:
+            akamai_xml = ET.fromstring(akamai_data)
+        except (ET.ParseError, TypeError):
+            self.logger.error('_get_diva_streams: server response is invalid')
+            return {}
+
+        # TODO: is this how the service even works anymore? It seems arcane.
+        # TODO: allow user-agent override
         m3u8_header = {
             'Connection': 'keep-alive',
             'User-Agent': self.user_agent
         }
-        self.refresh_tokens()
-
-        if video_id == 'nfl_network':
-            diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['network']
-            response = self.make_request(url, 'get')
-            video_id = response['modules']['networkLiveVideo']['content'][0]['videoId']
-        elif video_id == 'redzone':
-            diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['Live24x7']
-            url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
-            response = self.make_request(url, 'get')
-            video_id = response['modules']['redZoneLive']['content'][0]['videoId']
-        else:
-            if game_type == 'live':
-                diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['LiveNoData']
-            else:
-                diva_config_url = self.config['modules']['DIVA']['HTML5']['SETTINGS']['VodNoData']
-
-        diva_config_data = self.make_request(diva_config_url.replace('device', 'html5'), 'get')
-        diva_config_root = ET.fromstring(diva_config_data)
-        for i in diva_config_root.iter('parameter'):
-            if i.attrib['name'] == 'processingUrlCallPath':
-                processing_url = i.attrib['value']
-            elif i.attrib['name'] == 'videoDataPath':
-                stream_request_url = i.attrib['value'].replace('{V.ID}', video_id)
-        akamai_xml_data = self.make_request(stream_request_url, 'get')
-        akamai_xml_root = ET.fromstring(akamai_xml_data)
-
-        for i in akamai_xml_root.iter('videoSource'):
+        for vs in akamai_xml.iter('videoSource'):
             try:
-                vs_format = i.attrib['format'].lower()
-                vs_url = i.findtext('uri')
+                vs_format = vs.attrib['format'].lower()
+                vs_url = vs.find('uri').text
+            except (KeyError, AttributeError):
+                continue
 
-                post_data = {
-                    'Type': '1',
-                    'User': '',
-                    'VideoId': video_id,
-                    'VideoSource': vs_url,
-                    'VideoKind': 'Video',
-                    'AssetState': '3',
-                    'PlayerType': 'HTML5',
-                    'other': '{0}|{1}|web|{1}|undefined|{2}' .format(str(uuid.uuid4()), self.access_token, self.user_agent, username)
-                }
-                response = self.make_request(processing_url, 'post', payload=json.dumps(post_data))
+            payload = self._build_processing_url_payload(video_id, vs_url)
 
-                streams[vs_format] = response['ContentUrl'] + '|' + urllib.urlencode(m3u8_header)
+            try:
+                r = self.http_session.post(url=processing_url, data=payload)
+                self._log_request(r)
+                data = r.json()
+            except ValueError:
+                self.logger.error('_get_diva_streams: server response is invalid')
+                continue
+            except Exception as e:
+                raise e
 
-            except:
-                pass
+            streams[vs_format] = data['ContentUrl'] + '|' + urlencode(m3u8_header)
 
         return streams
+
+
+    def _build_processing_url_payload(self, video_id, vs_url):
+        """Return the payload needed to request a content URL from a
+        processing_url.
+
+        Parameters
+        ----------
+        video_id : str
+            The video_id of a game/show
+        vs_url : str
+            The URL to a given video source
+
+        Returns
+        -------
+        str
+            a JSON string (suitable for passing as a post payload)
+
+        See Also
+        --------
+        ``_get_diva_streams()``
+        """
+        # TODO: take a look at the official client and determine if we can move
+        # the unique_id gen to __init__, login(), or refresh_tokens() rather
+        # than regenerating for each request.
+        unique_id = str(uuid.uuid4())
+        # TODO: This does not look right, and doesn't even use the username
+        other = '{0}|{1}|web|{1}|undefined|{2}'.format(unique_id, self.access_token, self.user_agent, self.username)
+        post_data = {
+            'Type': '1',
+            'User': '',
+            'VideoId': video_id,
+            'VideoSource': vs_url,
+            'VideoKind': 'Video',
+            'AssetState': '3',
+            'PlayerType': 'HTML5',
+            'other': other,
+        }
+
+        payload = json.dumps(post_data)
+        return payload
+
 
     def m3u8_to_dict(self, manifest_url):
         """Return a dict of available bitrates and their respective stream. This
