@@ -89,6 +89,9 @@ class pigskin(object):
             try:
                 response_dict['body'] = r.json()
             except ValueError:
+                # TODO: it would be nice handle XML too, but I have been unable
+                # to find a solution within the standard library to convert XML
+                # to a python object.
                 response_dict['body'] = str(r.content)
             response_dict['headers'] = dict(r.headers)
             response_dict['status_code'] = r.status_code
@@ -174,6 +177,7 @@ class pigskin(object):
 
         return response
 
+
     def login(self, username, password):
         """Login to NFL Game Pass.
 
@@ -252,6 +256,10 @@ class pigskin(object):
         -------
         bool
             True if successful, False otherwise.
+
+        Note
+        ----
+        TODO: raise an error on failure so people can catch and attempt to login again
         """
         url = self.config['modules']['API']['REFRESH_TOKEN']
         post_data = {
@@ -439,13 +447,15 @@ class pigskin(object):
         Note
         ----
         TODO: the data returned really should be normalized, rather than a
-        (nearly) straight dump of the raw data.
+              (nearly) straight dump of the raw data.
 
         Examples
         --------
         >>> games = gp.get_games(2017, 'reg', 1)
         >>> print(games[1]['video']['title'])
         New York Jets @ Buffalo Bills
+        >>> print(games[1]['gameId'])
+        2017091000
         """
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['games_detail']
         url = url.replace(':seasonType', season_type).replace(':season', str(season)).replace(':week', str(week))
