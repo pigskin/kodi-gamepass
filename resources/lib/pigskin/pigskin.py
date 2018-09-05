@@ -180,6 +180,57 @@ class pigskin(object):
         return response
 
 
+    def _gigya_auth(self, username, password):
+        """Authenticate against the gigya servers
+
+        Parameters
+        ----------
+        username : str
+            Your NFL Game Pass username.
+        password : str
+            The user's password.
+
+        Returns
+        -------
+        dict
+            the entire gigya auth response is returned, parsed into a dict.
+
+        See Also
+        --------
+        ``login()``
+        """
+        url = 'https://accounts.us1.gigya.com/accounts.login'
+        api_key = self.config['modules']['GIGYA']['JAVASCRIPT_API_URL'].split('apiKey=')[1]
+        post_data = {
+            'apiKey' : api_key,
+            'loginID' : username,
+            'password' : password
+        }
+
+        try:
+            r = self.http_session.post(url, data=post_data)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('token refresh: server response is invalid')
+            return False
+        except Exception as e:
+            raise e
+
+        try:
+            # make sure some key data is here
+            data['UID']
+            data['UIDSignature']
+            data['signatureTimestamp']
+        except KeyError:
+            self.logger.error('could not parse gigya auth response')
+            return False
+        except Exception as e:
+            raise e
+
+        return data
+
+
     def login(self, username, password):
         """Login to NFL Game Pass.
 
@@ -202,11 +253,21 @@ class pigskin(object):
             True if successful, False otherwise.
         """
         url = self.config['modules']['API']['LOGIN']
+        gigya_data = self._gigya_auth(username, password)
+
+        if not gigya_data:
+            return False
+
+        # TODO: audit if in fact all these fields are needed
         post_data = {
-            'client_id': self.config['modules']['API']['CLIENT_ID'],
-            'username': username,
-            'password': password,
-            'grant_type': 'password'
+            'client_id' : self.config['modules']['API']['CLIENT_ID'],
+            'errorCode' : '0',
+            'grant_type' : 'password',
+            'password' : password,
+            'signature' : gigya_data['UIDSignature'],
+            'ts' : gigya_data['signatureTimestamp'],
+            'username' : username,
+            'uuid' : gigya_data['UID'],
         }
 
         try:
