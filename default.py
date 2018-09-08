@@ -70,7 +70,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.player = None
         self.list_refill = False
         self.focusId = 100
-        self.seasons_and_weeks = gp.get_seasons_and_weeks()
+        self.seasons = gp.get_seasons()
         self.has_inputstream_adaptive = self.has_inputstream_adaptive()
 
         xbmcgui.WindowXML.__init__(self, *args, **kwargs)
@@ -141,7 +141,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_seasons(self):
         """List seasons"""
         self.season_items = []
-        for season in sorted(self.seasons_and_weeks.keys(), reverse=True):
+        for season in self.seasons:
             listitem = xbmcgui.ListItem(season)
             self.season_items.append(listitem)
 
@@ -170,7 +170,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def display_weeks_games(self):
         """Show games for a given season/week"""
         self.games_items = []
-        games = gp.get_weeks_games(self.selected_season, self.selected_season_type, self.selected_week)
+        games = gp.get_games(self.selected_season, self.selected_season_type, self.selected_week)
         for game in games:
             game_id = '{0}-{1}-{2}'.format(game['visitorNickName'].lower(), game['homeNickName'].lower(), str(game['gameId']))
             game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
@@ -196,7 +196,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 else:  # 24-hour clock
                     datetime_format = '%A, %b %d - %H:%M'
 
-                datetime_obj = gp.parse_datetime(game['gameDateTimeUtc'], True)
+                datetime_obj = gp.nfldate_to_datetime(game['gameDateTimeUtc'], True)
                 game_info = datetime_obj.strftime(datetime_format).encode('utf-8')
 
             if game['videoStatus'] == 'SCHEDULED':
@@ -223,21 +223,23 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def display_seasons_weeks(self):
         """List weeks for a given season"""
-        weeks_dict = self.seasons_and_weeks[self.selected_season]
+        weeks_dict = gp.get_weeks(self.selected_season)
 
-        for week in weeks_dict:
-            if week['week_name'] == 'p':
-                title = language(30047).format(week['week_number'])
-            elif week['week_name'] == 'week':
-                title = language(30048).format(week['week_number'])
-            else:
-                title = week['week_name'].upper()
-            future = 'false'
-            listitem = xbmcgui.ListItem(title)
-            listitem.setProperty('week', week['week_number'])
-            listitem.setProperty('season_type', week['season_type'])
-            listitem.setProperty('future', future)
-            self.weeks_items.append(listitem)
+        for season_type in weeks_dict:
+            for week_num in sorted(weeks_dict[season_type], key=int):
+                if season_type == 'pre':
+                    title = language(30047).format(week_num)
+                elif season_type == 'reg':
+                    title = language(30048).format(week_num)
+                elif season_type == 'post':
+                    title = weeks_dict[season_type][week_num].upper()
+
+                future = 'false'
+                listitem = xbmcgui.ListItem(title)
+                listitem.setProperty('week', week_num)
+                listitem.setProperty('season_type', season_type)
+                listitem.setProperty('future', future)
+                self.weeks_items.append(listitem)
         self.weeks_list.addItems(self.weeks_items)
 
     def display_shows_episodes(self, show_name, season):
@@ -499,15 +501,17 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if selected_game.getProperty('isPlayable') == 'true':
                         self.init('game')
                         game_id = selected_game.getProperty('game_id')
+                        live = False
 
                         if selected_game.getProperty('live_video_id'):
                             video_id = selected_game.getProperty('live_video_id')
+                            live = True
                         else:
                             game_versions = gp.get_game_versions(game_id, self.selected_season)
                             video_id = self.select_version(game_versions)
 
                         if video_id:
-                            streams = gp.get_streams(video_id, 'game', username=username)
+                            streams = gp.get_game_streams(video_id, live)
                             stream_url = self.select_stream_url(streams)
                             self.play_url(stream_url)
 
@@ -525,19 +529,19 @@ class GamepassGUI(xbmcgui.WindowXML):
                 elif controlId == 230:  # episode is clicked
                     self.init('episode')
                     video_id = self.games_list.getSelectedItem().getProperty('id')
-                    streams = gp.get_streams(video_id, 'video', username=username)
+                    streams = gp.get_game_streams(video_id)
                     stream_url = self.select_stream_url(streams)
 
                     self.play_url(stream_url)
                 elif controlId == 240:  # Live content (though not games)
                     show_name = self.live_list.getSelectedItem().getLabel()
                     if show_name == 'NFL RedZone - Live':
-                        streams = gp.get_streams('redzone', username=username)
+                        streams = gp.get_redzone_streams()
                         stream_url = self.select_stream_url(streams)
 
                         self.play_url(stream_url)
                     elif show_name == 'NFL Network - Live':
-                        streams = gp.get_streams('nfl_network', username=username)
+                        streams = gp.get_nfl_network_streams()
                         stream_url = self.select_stream_url(streams)
 
                         self.play_url(stream_url)
@@ -598,13 +602,16 @@ if __name__ == '__main__':
             sys.exit(0)
 
     try:
-        gp.login(username, password)
+        login_success = gp.login(username, password)
+        if not login_success:
+            dialog = xbmcgui.Dialog()
+            dialog.ok(language(30021), language(30023))
+            sys.exit(0)
+
+        gp.check_for_subscription()
     except gp.GamePassError as error:
         dialog = xbmcgui.Dialog()
-        if error.value == 'error_unauthorised' or error.value == 'no_subscription':
-            dialog.ok(language(30021), language(30023))
-        else:
-            dialog.ok(language(30021), error.value)
+        dialog.ok(language(30021), language(30023))
         sys.exit(0)
     except:
         logger.error(format_exc())
