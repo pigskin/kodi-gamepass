@@ -41,6 +41,7 @@ class pigskin(object):
         self.config = self.populate_config()
         self.nfln_shows = {}
         self.episode_list = []
+        self.gigya_auth_url = 'https://accounts.us1.gigya.com/accounts.login'
 
         self.logger.debug('Python Version: %s' % sys.version)
 
@@ -199,7 +200,7 @@ class pigskin(object):
         --------
         ``login()``
         """
-        url = 'https://accounts.us1.gigya.com/accounts.login'
+        url = self.gigya_auth_url
         api_key = self.config['modules']['GIGYA']['JAVASCRIPT_API_URL'].split('apiKey=')[1]
         post_data = {
             'apiKey' : api_key,
