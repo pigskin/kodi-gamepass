@@ -607,13 +607,7 @@ if __name__ == '__main__':
             dialog = xbmcgui.Dialog()
             dialog.ok(language(30021), language(30023))
             sys.exit(0)
-
-        gp.check_for_subscription()
-    except gp.GamePassError as error:
-        dialog = xbmcgui.Dialog()
-        dialog.ok(language(30021), language(30023))
-        sys.exit(0)
-    except:
+    except Exception:
         logger.error(format_exc())
         dialog = xbmcgui.Dialog()
         dialog.ok('Epic Failure',
