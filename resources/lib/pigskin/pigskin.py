@@ -300,17 +300,40 @@ class pigskin(object):
 
 
     def check_for_subscription(self):
-        """Return True if a subscription is detected and raise 'no_subscription' on failure."""
+        """Check if the user has a valid subscription.
+
+        Returns
+        -------
+        bool
+            Returns True on the presence of a subscription, False otherwise.
+
+        Note
+        ----
+        There are different types of subscriptions.
+        TODO: This (or another function) should return the type of subscription.
+
+        See Also
+        --------
+        ``login()``
+        """
         url = self.config['modules']['API']['USER_ACCOUNT']
         headers = {'Authorization': 'Bearer {0}'.format(self.access_token)}
-        account_data = self.make_request(url, 'get', headers=headers)
 
         try:
-            self.logger.debug('subscription: %s' % account_data['subscriptions'])
-            return True
-        except TypeError:
+            r = self.http_session.get(url, headers=headers)
+            self._log_request(r)
+            data = r.json()
+        except ValueError:
+            self.logger.error('check_for_subscription: unable to parse server response')
+            return False
+
+        try:
+            assert data['subscriptions']
+        except (KeyError, AssertionError):
             self.logger.error('No active NFL Game Pass Europe subscription was found.')
-            raise self.GamePassError('no_subscription')
+            return False
+
+        return True
 
 
     def refresh_tokens(self):
