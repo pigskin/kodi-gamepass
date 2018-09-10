@@ -182,7 +182,8 @@ class pigskin(object):
 
 
     def _gigya_auth(self, username, password):
-        """Authenticate against the gigya servers
+        """Authenticate to Game Pass by first going through Gigya's
+        authentication servers.
 
         Parameters
         ----------
@@ -194,11 +195,12 @@ class pigskin(object):
         Returns
         -------
         dict
-            the entire gigya auth response is returned, parsed into a dict.
+            A dict containing the authentication data; empty if there's an error
 
         See Also
         --------
         ``login()``
+        ``_gp_auth()``
         """
         url = self.gigya_auth_url
         api_key = self.config['modules']['GIGYA']['JAVASCRIPT_API_URL'].split('apiKey=')[1]
@@ -211,65 +213,70 @@ class pigskin(object):
         try:
             r = self.http_session.post(url, data=post_data)
             self._log_request(r)
-            data = r.json()
+            gigya_data = r.json()
         except ValueError:
-            self.logger.error('token refresh: server response is invalid')
-            return False
+            self.logger.error('_gigya_auth: server response is invalid')
+            return {}
         except Exception as e:
             raise e
 
         try:
             # make sure some key data is here
-            data['UID']
-            data['UIDSignature']
-            data['signatureTimestamp']
+            assert gigya_data['UID']
+            assert gigya_data['UIDSignature']
+            assert gigya_data['signatureTimestamp']
+        except AssertionError:
+            pass
         except KeyError:
             self.logger.error('could not parse gigya auth response')
-            return False
+            return {}
         except Exception as e:
             raise e
+
+        data = self._gp_auth(username, password, gigya_data)
 
         return data
 
 
-    def login(self, username, password):
-        """Login to NFL Game Pass.
-
-        Note
-        ----
-        A successful login does not necessarily mean that access to content is
-        granted (i.e. has a valid subscription). Use ``check_for_subscription()``
-        to determine if access has been granted.
+    def _gp_auth(self, username, password, gigya_data=False):
+        """Authenticate to the Game Pass servers.
 
         Parameters
         ----------
-        username : str
-            Your NFL Game Pass username.
-        password : str
-            The user's password.
+        gigya : dict
+            The data needed to authenticate using gigya auth data.
 
         Returns
         -------
-        bool
-            True if successful, False otherwise.
+        dict
+            A dict containing the authentication data; empty if there's an error
+
+        See Also
+        --------
+        ``_gigya_auth()``
+        ``login()``
         """
         url = self.config['modules']['API']['LOGIN']
-        gigya_data = self._gigya_auth(username, password)
 
-        if not gigya_data:
-            return False
-
-        # TODO: audit if in fact all these fields are needed
         post_data = {
-            'client_id' : self.config['modules']['API']['CLIENT_ID'],
-            'errorCode' : '0',
-            'grant_type' : 'password',
-            'password' : password,
-            'signature' : gigya_data['UIDSignature'],
-            'ts' : gigya_data['signatureTimestamp'],
-            'username' : username,
-            'uuid' : gigya_data['UID'],
+            'client_id': self.config['modules']['API']['CLIENT_ID'],
+            'username': username,
+            'password': password,
+            'grant_type': 'password'
         }
+
+        if gigya_data:
+            # TODO: audit if in fact all these fields are needed
+            post_data = {
+                'client_id' : self.config['modules']['API']['CLIENT_ID'],
+                'uuid' : gigya_data['UID'],
+                'signature' : gigya_data['UIDSignature'],
+                'ts' : gigya_data['signatureTimestamp'],
+                'errorCode' : '0',
+                'username' : username,
+                'password' : password,
+                'grant_type' : 'password'
+            }
 
         try:
             r = self.http_session.post(url, data=post_data)
@@ -277,26 +284,76 @@ class pigskin(object):
             data = r.json()
         except ValueError:
             self.logger.error('login: server response is invalid')
-            return False
+            return {}
         except Exception as e:
             raise e
 
         try:
-            self.username = username
-            # TODO: are these tokens provided for valid accounts without a subscription?
-            self.access_token = data['access_token']
-            self.refresh_token = data['refresh_token']
-        except KeyError:
-            self.logger.error('could not acquire GP tokens')
-            self.logger.error('login failed')
-            return False
+            # make sure some key data is here
+            assert data['access_token']
+            assert data['refresh_token']
+        except (KeyError, AssertionError):
+            self.logger.error('could not parse auth response')
+            return {}
         except Exception as e:
             raise e
 
         # TODO: check for status codes, just in case
+        return data
 
-        self.logger.debug('login was successful')
-        return True
+
+    def login(self, username, password, force=False):
+        """Login to NFL Game Pass.
+
+        Parameters
+        ----------
+        username : str
+            Your NFL Game Pass username.
+        password : str
+            The user's password.
+        force : bool
+            Skip checking if access is already granted, and instead always
+            authenticate.
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise.
+
+        Note
+        ----
+        A successful login does not necessarily mean that access to content is
+        granted (i.e. has a valid subscription). Use ``check_for_subscription()``
+        to determine if access has been granted.
+        """
+        # if the user already has access, just skip the entire auth process
+        if not force:
+            if self.check_for_subscription():
+                self.logger.debug('No need to login; the user already has access.')
+                return True
+
+
+        for auth in [self._gp_auth, self._gigya_auth]:
+            self.logger.debug('Trying {0} authentication.'.format(auth.__name__))
+            try:
+                data = auth(username, password)
+                assert data['access_token']
+                assert data['refresh_token']
+            except (KeyError, AssertionError):
+                self.logger.error('Could not acquire GP tokens')
+            except Exception as e:
+                raise e
+            else:
+                self.username = username
+                # TODO: are these tokens provided for valid accounts without a subscription?
+                self.access_token = data['access_token']
+                self.refresh_token = data['refresh_token']
+
+                self.logger.debug('login was successful')
+                return True
+
+        self.logger.error('login failed')
+        return False
 
 
     def check_for_subscription(self):
