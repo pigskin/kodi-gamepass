@@ -121,6 +121,10 @@ msgctxt "#30030"
 msgid "Display/Video"
 msgstr "Anzeige"
 
+msgctxt "#30031"
+msgid "Advanced"
+msgstr ""
+
 msgctxt "#30032"
 msgid "Coaches Film"
 msgstr ""
@@ -188,3 +192,7 @@ msgstr "Nutze InputStream Adaptive"
 msgctxt "#30050"
 msgid "Please enter the username and password for your NFL Game Pass subscription."
 msgstr "Bitte geben Sie Benutzernamen und Passwort für Ihr NFL Game Pass Abo ein."
+
+msgctxt "#30050"
+msgid "Enable Debugging"
+msgstr ""
