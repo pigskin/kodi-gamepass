@@ -265,10 +265,9 @@ class pigskin(object):
                 'uuid' : gigya_data['UID'],
                 'signature' : gigya_data['UIDSignature'],
                 'ts' : gigya_data['signatureTimestamp'],
-                'errorCode' : '0',
+                'device_type' : 'web',
                 'username' : username,
-                'password' : password,
-                'grant_type' : 'password'
+                'grant_type' : 'shield_authentication',
             }
 
         try:
@@ -315,13 +314,21 @@ class pigskin(object):
         """
         # if the user already has access, just skip the entire auth process
         if not force:
-            if self.check_for_subscription():
-                self.logger.debug('No need to login; the user already has access.')
-                return True
+            try:
+                if self.check_for_subscription():
+                    self.logger.debug('No need to login; the user already has access.')
+                    return True
+            except Exception:
+                self.logger.warn('subscription check failed; continuing on.')
 
         for auth in [self._gp_auth, self._gigya_auth]:
             self.logger.debug('Trying {0} authentication.'.format(auth.__name__))
-            data = auth(username, password)
+            try:
+                data = auth(username, password)
+            except Exception:
+                self.logger.warn('Auth failed, trying the next auth type.')
+                continue
+
             try:
                 self.username = username
                 # TODO: are these tokens provided for valid accounts without a subscription?
