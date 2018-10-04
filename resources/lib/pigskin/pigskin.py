@@ -207,6 +207,7 @@ class pigskin(object):
         post_data = {
             'apiKey' : api_key,
             'loginID' : username,
+            'includeUserInfo': 'false',
             'password' : password
         }
 
@@ -217,22 +218,14 @@ class pigskin(object):
         except ValueError:
             self.logger.error('_gigya_auth: server response is invalid')
             return {}
-        except Exception as e:
-            raise e
 
-        try:
-            # make sure some key data is here
-            assert gigya_data['UID']
-            assert gigya_data['UIDSignature']
-            assert gigya_data['signatureTimestamp']
-        except AssertionError:
-            pass
-        except KeyError:
-            self.logger.error('could not parse gigya auth response')
-            return {}
-        except Exception as e:
-            raise e
+        # make sure auth data is there
+        for key in ['UID', 'UIDSignature', 'signatureTimestamp']:
+            if not gigya_data.get(key):
+                self.logger.error('could not parse gigya auth response')
+                return {}
 
+        # now that we have our gigya keys, auth against GP servers
         data = self._gp_auth(username, password, gigya_data)
 
         return data
@@ -283,20 +276,14 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('login: server response is invalid')
+            self.logger.error('_gp_auth: server response is invalid')
             return {}
-        except Exception as e:
-            raise e
 
-        try:
-            # make sure some key data is here
-            assert data['access_token']
-            assert data['refresh_token']
-        except (KeyError, AssertionError):
-            self.logger.error('could not parse auth response')
-            return {}
-        except Exception as e:
-            raise e
+        # make sure auth data is there
+        for key in ['access_token', 'refresh_token']:
+            if not data.get(key):
+                self.logger.error('could not parse auth response')
+                return {}
 
         # TODO: check for status codes, just in case
         return data
@@ -332,23 +319,19 @@ class pigskin(object):
                 self.logger.debug('No need to login; the user already has access.')
                 return True
 
-
         for auth in [self._gp_auth, self._gigya_auth]:
             self.logger.debug('Trying {0} authentication.'.format(auth.__name__))
+            data = auth(username, password)
             try:
-                data = auth(username, password)
-                assert data['access_token']
-                assert data['refresh_token']
-            except (KeyError, AssertionError):
-                self.logger.error('Could not acquire GP tokens')
-            except Exception as e:
-                raise e
-            else:
                 self.username = username
                 # TODO: are these tokens provided for valid accounts without a subscription?
                 self.access_token = data['access_token']
                 self.refresh_token = data['refresh_token']
-
+            except KeyError:
+                self.logger.error('Could not acquire GP tokens')
+                self.access_token = None
+                self.refresh_token = None
+            else:
                 self.logger.debug('login was successful')
                 return True
 
@@ -382,15 +365,15 @@ class pigskin(object):
             data = r.json()
         except ValueError:
             self.logger.error('check_for_subscription: unable to parse server response')
-            return False
+            return None
 
         try:
-            assert data['subscriptions']
-        except (KeyError, AssertionError):
+            # TODO: if multiple subscriptions are found, return a list of them,
+            # though I have no idea if this actually happens in practice.
+            return data['subscriptions'][0]['productTag']
+        except KeyError:
             self.logger.error('No active NFL Game Pass Europe subscription was found.')
-            return False
-
-        return True
+            return None
 
 
     def refresh_tokens(self):
@@ -419,8 +402,6 @@ class pigskin(object):
         except ValueError:
             self.logger.error('token refresh: server response is invalid')
             return False
-        except Exception as e:
-            raise e
 
         try:
             self.access_token = data['access_token']
@@ -428,8 +409,6 @@ class pigskin(object):
         except KeyError:
             self.logger.error('could not find GP tokens to refresh')
             return False
-        except Exception as e:
-            raise e
 
         # TODO: check for status codes, just in case
 
