@@ -940,7 +940,7 @@ class pigskin(object):
         }
         for vs in akamai_xml.iter('videoSource'):
             try:
-                vs_format = vs.attrib['format'].lower()
+                vs_format = vs.attrib['name'].lower()
                 vs_url = vs.find('uri').text
             except (KeyError, AttributeError):
                 continue
