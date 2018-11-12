@@ -5,6 +5,7 @@ import uuid
 import sys
 import json
 import logging
+import time
 import xml.etree.ElementTree as ET
 try:
     from urllib.parse import urlencode
@@ -1165,6 +1166,8 @@ class pigskin(object):
 
         try:
             dt_utc = datetime.strptime(nfldate, nfldate_format)
+        except TypeError:
+            dt_utc = datetime.fromtimestamp(time.mktime(time.strptime(nfldate, nfldate_format)))
         except ValueError:
             self.logger.error('unable to parse the nfldate string')
             return None
