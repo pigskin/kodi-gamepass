@@ -1,3 +1,9 @@
+﻿2019.07.01 -- Pre-preseason edition
++ Now supports Leia
+-- updated xbmc.gui version to 5.14.0 (baardisk)
+-- updated xbmc.python version to 2.26.0 (baardisk)
+-- updated script.module.requests version to 2.22.0 (baardisk)
+
 2018.09.08 -- A Game of Inches Edition
 + Import the latest pigskin.py. Relevant changes are:
 -- support the new Game Pass (Gigya) authentication (thanks to 41john)
