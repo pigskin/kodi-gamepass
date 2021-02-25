@@ -7,16 +7,8 @@ import json
 import logging
 import time
 import xml.etree.ElementTree as ET
-try:
-    from urllib.parse import urlencode
-except ImportError:  # Python 2.7
-    from urllib import urlencode
-try:
-    from datetime import datetime, timezone
-except ImportError:  # Python 2.7
-    import calendar
-    from datetime import datetime, timedelta
-
+from urllib.parse import urlencode
+from datetime import datetime, timezone
 import requests
 import m3u8
 
@@ -174,7 +166,7 @@ class pigskin(object):
             response = req.content
 
         if isinstance(response, dict):
-            for key in response.keys():
+            for key in list(response.keys()):
                 if key.lower() == 'message':
                     if response[key]:  # raise all messages as GamePassError if message is not empty
                         raise self.GamePassError(response[key])
@@ -739,7 +731,7 @@ class pigskin(object):
         except Exception as e:
             raise e
 
-        self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(versions.keys())))
+        self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(list(versions.keys()))))
         return versions
 
 
@@ -1125,7 +1117,7 @@ class pigskin(object):
         """Return a list of all shows for a season."""
         seasons_shows = []
 
-        for show_name, years in self.nfln_shows.items():
+        for show_name, years in list(self.nfln_shows.items()):
             if season in years:
                 seasons_shows.append(show_name)
 
@@ -1138,9 +1130,9 @@ class pigskin(object):
         # The returning List contains episode name, episode id and episode thumbnail
         episodes_data = []
         for episode in self.episode_list:
-            for dict_show_name, episode_season_dict in episode.items():
+            for dict_show_name, episode_season_dict in list(episode.items()):
                 if dict_show_name == show_name:
-                    for episode_season, episode_id_dict in episode_season_dict.items():
+                    for episode_season, episode_id_dict in list(episode_season_dict.items()):
                         if episode_season == season:
                             episodes_data.append(episode_id_dict)
 
