@@ -16,8 +16,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from .resources.lib.pigskin.pigskin import pigskin
-from .resources.lib import kodilogging
+from resources.lib.pigskin.pigskin import pigskin
+from resources.lib import kodilogging
 
 # Show busy dialog until loading is done
 dialog = xbmcgui.Dialog()
