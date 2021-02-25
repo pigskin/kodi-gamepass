@@ -17,7 +17,7 @@ LONG_DESCRIPTION = DESCRIPTION
 URL = 'https://github.com/aqw/pigskin'
 EMAIL = 'alex@waite.eu'
 AUTHOR = 'Alex Waite and many others'
-REQUIRES_PYTHON = ">2.7,!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+REQUIRES_PYTHON = ">=3.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -49,7 +49,7 @@ class UploadCommand(Command):
     @staticmethod
     def status(s):
         """Prints things in bold."""
-        print('\033[1m{0}\033[0m'.format(s))
+        print(('\033[1m{0}\033[0m'.format(s)))
 
     def initialize_options(self):
         pass
