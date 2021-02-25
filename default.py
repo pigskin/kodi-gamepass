@@ -5,7 +5,7 @@ A Kodi addon/skin for NFL Game Pass
 
 import sys
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from traceback import format_exc
 from datetime import timedelta
 import logging
@@ -16,8 +16,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from resources.lib.pigskin.pigskin import pigskin
-from resources.lib import kodilogging
+from .resources.lib.pigskin.pigskin import pigskin
+from .resources.lib import kodilogging
 
 # Show busy dialog until loading is done
 dialog = xbmcgui.Dialog()
@@ -83,7 +83,7 @@ def build_proxy_url():
             if not username or not password:
                 return ''
 
-            auth = '%s:%s@' % (urllib.quote(username), urllib.quote(password))
+            auth = '%s:%s@' % (urllib.parse.quote(username), urllib.parse.quote(password))
 
         host = addon.getSetting('proxy_host').strip()
         if not host:
@@ -141,7 +141,7 @@ def select_version(game_versions):
     # user wants to be asked to select version
     # bring up selection when preferred game version is unavailable
     if not selected_version or selected_version not in game_versions:
-        versions = game_versions.keys()
+        versions = list(game_versions.keys())
         hide_busy_dialog()
         answer = dialog.select(language(30016), versions)
         if answer > -1:
@@ -362,7 +362,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 isPlayable = 'false'
                 isBlackedOut = 'false'
             elif game['videoStatus'] == 'LIVE':
-                game_info += u'[CR]» Live «'
+                game_info += '[CR]» Live «'
                 video_id = str(game['video']['videoId'])
                 isPlayable = 'true'
                 isBlackedOut = 'false'
@@ -413,9 +413,9 @@ class GamepassGUI(xbmcgui.WindowXML):
         for episode in episodes:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
-                for episode_title, episode_videoId_thumbnail in episode.items():
+                for episode_title, episode_videoId_thumbnail in list(episode.items()):
                     listitem.setProperty('game_info', episode_title)
-                    for episode_videoId, episode_thumbnail in episode_videoId_thumbnail.items():
+                    for episode_videoId, episode_thumbnail in list(episode_videoId_thumbnail.items()):
                         listitem.setProperty('id', episode_videoId)
                         listitem.setProperty('away_thumb',
                                              episode_thumbnail.replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
@@ -512,7 +512,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         else:  # choose a specific bitrate
             try:
                 m3u8_streams = self.gp.m3u8_to_dict(url)
-                bitrate = select_bitrate(m3u8_streams.keys())
+                bitrate = select_bitrate(list(m3u8_streams.keys()))
                 if bitrate:
                     return m3u8_streams[bitrate]
                 else:  # bitrate dialog was canceled
