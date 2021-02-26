@@ -413,7 +413,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
-            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            playitem.setProperty('inputstream', 'inputstream.adaptive')
             playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
             playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
 
