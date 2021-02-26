@@ -19,10 +19,7 @@ import xbmcvfs
 from resources.lib.pigskin.pigskin import pigskin
 from resources.lib import kodilogging
 
-# Show busy dialog until loading is done
 dialog = xbmcgui.Dialog()
-busydialog = xbmcgui.DialogBusy()
-busydialog.create()
 
 # Addon Init
 addon = xbmcaddon.Addon()
@@ -32,7 +29,6 @@ ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
 
 # Default Window IDs
 WINDOW_FULLSCREEN_VIDEO = 12005
-WINDOW_DIALOG_BUSY = 10138
 
 # Logging Init
 logger = logging.getLogger(addon.getAddonInfo('id'))
@@ -58,17 +54,6 @@ def get_credentials():
             sys.exit(0)
 
     return username, password
-
-
-def show_busy_dialog():
-    busydialog.create()
-
-
-def hide_busy_dialog():
-    try:
-        busydialog.close()
-    except RuntimeError as e:
-        logger.error('Error closing busy dialog: %s' % e.message)
 
 
 def build_proxy_url():
@@ -142,7 +127,6 @@ def select_version(game_versions):
     # bring up selection when preferred game version is unavailable
     if not selected_version or selected_version not in game_versions:
         versions = list(game_versions.keys())
-        hide_busy_dialog()
         answer = dialog.select(language(30016), versions)
         if answer > -1:
             selected_version = versions[answer]
@@ -161,7 +145,6 @@ def ask_bitrate(bitrates):
     options = []
     for bitrate in bitrates:
         options.append(str(bitrate) + ' Kbps')
-    hide_busy_dialog()
     ret = dialog.select(language(30003), options)
     if ret > -1:
         return bitrates[ret]
@@ -251,7 +234,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         except Exception as e:
             logger.exception(e)
             dialog.ok('Epic Failure', language(30024))
-            hide_busy_dialog()
             sys.exit(0)
 
     def onInit(self):  # pylint: disable=invalid-name
@@ -278,8 +260,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.pigskin_login()
 
         self.seasons = self.gp.get_seasons()
-
-        hide_busy_dialog()
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -430,15 +410,12 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
-        hide_busy_dialog()
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
             playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
             playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
             playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
-
-        # Busy dialog until player starts
 
         xbmc.Player().play(item=url, listitem=playitem)
 
@@ -451,9 +428,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         while True:
             if xbmcgui.getCurrentWindowId() == WINDOW_FULLSCREEN_VIDEO:
                 break
-            elif xbmcgui.getCurrentWindowId() != WINDOW_DIALOG_BUSY:
-                # Needed since inputadaptive disables busy dialog too early
-                show_busy_dialog()
 
             if time.time() > calculatedTimeout:
                 logger.error('Player took too long to start')
@@ -461,8 +435,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             # Sleep to avoid hogging CPU
             xbmc.sleep(100)
-
-        hide_busy_dialog()
 
     def init(self, level):
         if level == 'season':
@@ -530,7 +502,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
-            show_busy_dialog()
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -577,7 +548,6 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
 
-                hide_busy_dialog()
                 return
 
             if self.main_selection == 'GamePass':
@@ -641,9 +611,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                         stream_url = self.select_stream_url(streams)
 
                         self.play_url(stream_url)
-            hide_busy_dialog()
         except Exception as e:  # catch anything that might fail
-            hide_busy_dialog()
             logger.exception(e)
 
             if self.main_selection == 'NFL Network' and controlId == 230:  # episode
