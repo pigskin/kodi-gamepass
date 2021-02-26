@@ -22,7 +22,7 @@ def show_settings():
 
 
 def get_setting(setting):
-    return ADDON.getSetting(setting).strip().decode('utf-8')
+    return ADDON.getSetting(setting).strip()
 
 
 def set_setting(setting, value):
