@@ -154,16 +154,16 @@ class pigskin(object):
                 pass
 
         self.logger.debug('Response code: %s' % req.status_code)
-        self.logger.debug('Response: %s' % req.content)
+        self.logger.debug('Response: %s' % req.text)
 
         return self.parse_response(req)
 
     def parse_response(self, req):
         """Try to load JSON data into dict and raise potential errors."""
         try:
-            response = json.loads(req.content)
+            response = json.loads(req.text)
         except ValueError:  # if response is not json
-            response = req.content
+            response = req.text
 
         if isinstance(response, dict):
             for key in list(response.keys()):
