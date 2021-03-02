@@ -31,9 +31,9 @@ recommended method of installing this addon.
 If you install from GitHub (either by download the .zip archive or using
 ``git``), you will need to install some dependencies:
 
- * Requests >= 2.22.0+matrix.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests/)
- * m3u8 >= 0.5.4+matrix.2 (http://mirrors.kodi.tv/addons/krypton/script.module.m3u8/)
-   * which needs iso8601 (http://mirrors.kodi.tv/addons/krypton/script.module.iso8601/)
+ * Requests >= 2.22.0+matrix.1 (https://mirrors.kodi.tv/addons/matrix/script.module.requests/)
+ * m3u8 >= 0.5.4+matrix.2 (https://mirrors.kodi.tv/addons/matrix/script.module.m3u8/)
+   * which needs iso8601 (https://mirrors.kodi.tv/addons/matrix/script.module.iso8601/)
 
 ## What is NFL Game Pass? ##
 
