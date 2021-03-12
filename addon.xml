@@ -6,7 +6,7 @@
 <addon id="plugin.video.nfl.gamepass"
        name="NFL Game Pass"
        version="2021.03.02+matrix.1"
-       provider-name="Alexqw,divingmule,BaumSchorle,eriksoderblom,kaileu,emilsvennesson">
+       provider-name="Alexqw,divingmule,BaumSchorle,eriksoderblom,kaileu,emilsvennesson,baardisk,Duke">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.m3u8" version="0.5.4+matrix.2"/>
