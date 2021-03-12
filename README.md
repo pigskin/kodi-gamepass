@@ -19,7 +19,7 @@ request. Patches and (constructive) input are always welcome.
 
 ## How to Install ##
 
-This addon requires Kodi Krypton or later.
+This addon requires Kodi Leia or later.
 
 ### Kodi Repository ###
 
