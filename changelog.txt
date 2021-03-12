@@ -1,3 +1,19 @@
+2021.03.02+matrix.1 -- Taysom Hill Edition
++ Now supports Kodi 19 aka Matrix
+-- Remove busy dialog, it's deprecated (jm-duke)
+-- Replace inputstreamaddon, it's deprecated (jm-duke)
+-- Update string and list handling in scripts (jm-duke)
+-- Bump versions of required addons (jm-duke)
+-- Bump addon version to reflect that it's compatible with Kodi 19 (jm-duke)
+-- Fix open of settings dialog from within the addon (jm-duke)
++ Converted settings.xml to the new format (jm-duke)
+
+﻿2019.07.01 -- Pre-preseason edition
++ Now supports Leia
+-- updated xbmc.gui version to 5.14.0 (baardisk)
+-- updated xbmc.python version to 2.26.0 (baardisk)
+-- updated script.module.requests version to 2.22.0 (baardisk)
+
 2018.09.08 -- A Game of Inches Edition
 + Import the latest pigskin.py. Relevant changes are:
 -- support the new Game Pass (Gigya) authentication (thanks to 41john)
