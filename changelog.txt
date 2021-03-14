@@ -1,4 +1,4 @@
-2021.03.02+matrix.1 -- Taysom Hill Edition
+2021.03.14+matrix.1 -- Taysom Hill Edition
 + Now supports Kodi 19 aka Matrix
 -- Remove busy dialog, it's deprecated (jm-duke)
 -- Replace inputstreamaddon, it's deprecated (jm-duke)
