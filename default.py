@@ -24,8 +24,8 @@ dialog = xbmcgui.Dialog()
 # Addon Init
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
-ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
-ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
+ADDON_PATH = xbmcvfs.translatePath(addon.getAddonInfo('path'))
+ADDON_PROFILE = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
 
 # Default Window IDs
 WINDOW_FULLSCREEN_VIDEO = 12005
