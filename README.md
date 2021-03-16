@@ -4,7 +4,7 @@ Currently, only Game Pass Europe is supported, as none of the developers have a
 Game Pass International subscription. If you're a developer interested in
 getting International support working again, we'd love to have your help.
 
-Check out issue aqw/pigskin#1 for more information.
+Check out issue pigskin/pigskin#1 for more information.
 
 # NFL Game Pass Kodi Plugin #
 
