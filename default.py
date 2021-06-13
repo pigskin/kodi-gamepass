@@ -89,18 +89,9 @@ def build_proxy_url():
 
 def has_inputstream_adaptive():
     """Checks if InputStream Adaptive is installed and enabled."""
-    payload = {
-        'jsonrpc': '2.0',
-        'id': 1,
-        'method': 'Addons.GetAddonDetails',
-        'params': {
-            'addonid': 'inputstream.adaptive',
-            'properties': ['enabled']
-        }
-    }
-    response = xbmc.executeJSONRPC(json.dumps(payload))
-    data = json.loads(response)
-    if 'error' not in data and data['result']['addon']['enabled']:
+    adaptive_available = xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")')
+
+    if adaptive_available:
         logger.debug('InputStream Adaptive is installed and enabled.')
         return True
     else:
