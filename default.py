@@ -333,7 +333,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 isPlayable = 'false'
                 isBlackedOut = 'false'
             elif game['videoStatus'] == 'LIVE':
-                game_info += '[CR]» Live «'
+                game_info += ("[CR]» Live «").encode('utf-8')
                 video_id = str(game['video']['videoId'])
                 isPlayable = 'true'
                 isBlackedOut = 'false'
