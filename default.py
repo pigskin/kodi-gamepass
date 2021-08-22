@@ -296,12 +296,9 @@ class GamepassGUI(xbmcgui.WindowXML):
                 game['visitorNickName'].lower(),
                 game['homeNickName'].lower(),
                 str(game['gameId']))
-            game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
-            game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (
-                game['visitorCityState'],
-                game['visitorNickName'],
-                game['homeCityState'],
-                game['homeNickName'])
+            game_name_shrt = '[B]%s @ %s[/B]' % (
+                game['visitorNickName'], game['homeNickName'])
+            game_name_full = '[B]%s[/B]' % (game['video']['title'])
 
             listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
 
