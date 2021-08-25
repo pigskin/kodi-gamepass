@@ -346,12 +346,20 @@ class GamepassGUI(xbmcgui.WindowXML):
             listitem.setProperty('isBlackedOut', isBlackedOut)
             listitem.setProperty('game_id', game_id)
             listitem.setProperty('game_info', game_info)
-            listitem.setProperty('away_thumb',
-                                 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' %
-                                 game['visitorTeamAbbr'])
-            listitem.setProperty('home_thumb',
-                                 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png'
-                                 % game['homeTeamAbbr'])
+            if game['visitorTeamAbbr'] == 'LV':
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/OAK.png')
+            else:
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' %
+                                     game['visitorTeamAbbr'])
+            if game['homeTeamAbbr'] == 'LV':
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/OAK.png')
+            else:
+                listitem.setProperty('home_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png'
+                                     % game['homeTeamAbbr'])
             self.games_items.append(listitem)
         self.games_list.addItems(self.games_items)
 
