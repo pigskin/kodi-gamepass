@@ -327,7 +327,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     datetime_format = '%A, %b %d - %H:%M'
 
                 datetime_obj = self.gp.nfldate_to_datetime(game['gameDateTimeUtc'], True)
-                game_info = datetime_obj.strftime(datetime_format).encode('utf-8')
+                game_info = datetime_obj.strftime(datetime_format)
 
             if game['videoStatus'] == 'SCHEDULED':
                 isPlayable = 'false'
