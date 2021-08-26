@@ -1,5 +1,5 @@
 ﻿Files: *
-Copyright: 2012-2018, see git log for respective authors
+Copyright: 2012-2021, see git log for respective authors
 License: GPL-2
  		    GNU GENERAL PUBLIC LICENSE
  		       Version 2, June 1991
@@ -502,4 +502,3 @@ License: MIT
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-

@@ -5,7 +5,7 @@ A Kodi addon/skin for NFL Game Pass
 
 import sys
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from traceback import format_exc
 from datetime import timedelta
 import logging
@@ -19,20 +19,16 @@ import xbmcvfs
 from resources.lib.pigskin.pigskin import pigskin
 from resources.lib import kodilogging
 
-# Show busy dialog until loading is done
 dialog = xbmcgui.Dialog()
-busydialog = xbmcgui.DialogBusy()
-busydialog.create()
 
 # Addon Init
 addon = xbmcaddon.Addon()
 language = addon.getLocalizedString
-ADDON_PATH = xbmc.translatePath(addon.getAddonInfo('path'))
-ADDON_PROFILE = xbmc.translatePath(addon.getAddonInfo('profile'))
+ADDON_PATH = xbmcvfs.translatePath(addon.getAddonInfo('path'))
+ADDON_PROFILE = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
 
 # Default Window IDs
 WINDOW_FULLSCREEN_VIDEO = 12005
-WINDOW_DIALOG_BUSY = 10138
 
 # Logging Init
 logger = logging.getLogger(addon.getAddonInfo('id'))
@@ -60,17 +56,6 @@ def get_credentials():
     return username, password
 
 
-def show_busy_dialog():
-    busydialog.create()
-
-
-def hide_busy_dialog():
-    try:
-        busydialog.close()
-    except RuntimeError as e:
-        logger.error('Error closing busy dialog: %s' % e.message)
-
-
 def build_proxy_url():
     try:
         protocol = addon.getSetting('proxy_scheme') + '://'
@@ -83,7 +68,7 @@ def build_proxy_url():
             if not username or not password:
                 return ''
 
-            auth = '%s:%s@' % (urllib.quote(username), urllib.quote(password))
+            auth = '%s:%s@' % (urllib.parse.quote(username), urllib.parse.quote(password))
 
         host = addon.getSetting('proxy_host').strip()
         if not host:
@@ -104,18 +89,9 @@ def build_proxy_url():
 
 def has_inputstream_adaptive():
     """Checks if InputStream Adaptive is installed and enabled."""
-    payload = {
-        'jsonrpc': '2.0',
-        'id': 1,
-        'method': 'Addons.GetAddonDetails',
-        'params': {
-            'addonid': 'inputstream.adaptive',
-            'properties': ['enabled']
-        }
-    }
-    response = xbmc.executeJSONRPC(json.dumps(payload))
-    data = json.loads(response)
-    if 'error' not in data and data['result']['addon']['enabled']:
+    adaptive_available = xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")')
+
+    if adaptive_available:
         logger.debug('InputStream Adaptive is installed and enabled.')
         return True
     else:
@@ -141,8 +117,7 @@ def select_version(game_versions):
     # user wants to be asked to select version
     # bring up selection when preferred game version is unavailable
     if not selected_version or selected_version not in game_versions:
-        versions = game_versions.keys()
-        hide_busy_dialog()
+        versions = list(game_versions.keys())
         answer = dialog.select(language(30016), versions)
         if answer > -1:
             selected_version = versions[answer]
@@ -161,7 +136,6 @@ def ask_bitrate(bitrates):
     options = []
     for bitrate in bitrates:
         options.append(str(bitrate) + ' Kbps')
-    hide_busy_dialog()
     ret = dialog.select(language(30003), options)
     if ret > -1:
         return bitrates[ret]
@@ -251,7 +225,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         except Exception as e:
             logger.exception(e)
             dialog.ok('Epic Failure', language(30024))
-            hide_busy_dialog()
             sys.exit(0)
 
     def onInit(self):  # pylint: disable=invalid-name
@@ -278,8 +251,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.pigskin_login()
 
         self.seasons = self.gp.get_seasons()
-
-        hide_busy_dialog()
 
         try:
             self.setFocus(self.window.getControl(self.focusId))
@@ -356,13 +327,13 @@ class GamepassGUI(xbmcgui.WindowXML):
                     datetime_format = '%A, %b %d - %H:%M'
 
                 datetime_obj = self.gp.nfldate_to_datetime(game['gameDateTimeUtc'], True)
-                game_info = datetime_obj.strftime(datetime_format).encode('utf-8')
+                game_info = datetime_obj.strftime(datetime_format)
 
             if game['videoStatus'] == 'SCHEDULED':
                 isPlayable = 'false'
                 isBlackedOut = 'false'
             elif game['videoStatus'] == 'LIVE':
-                game_info += u'[CR]» Live «'
+                game_info += '[CR]» Live «'
                 video_id = str(game['video']['videoId'])
                 isPlayable = 'true'
                 isBlackedOut = 'false'
@@ -375,12 +346,20 @@ class GamepassGUI(xbmcgui.WindowXML):
             listitem.setProperty('isBlackedOut', isBlackedOut)
             listitem.setProperty('game_id', game_id)
             listitem.setProperty('game_info', game_info)
-            listitem.setProperty('away_thumb',
-                                 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' %
-                                 game['visitorTeamAbbr'])
-            listitem.setProperty('home_thumb',
-                                 'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png'
-                                 % game['homeTeamAbbr'])
+            if game['visitorTeamAbbr'] == 'LV':
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/OAK.png')
+            else:
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' %
+                                     game['visitorTeamAbbr'])
+            if game['homeTeamAbbr'] == 'LV':
+                listitem.setProperty('away_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/OAK.png')
+            else:
+                listitem.setProperty('home_thumb',
+                                     'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png'
+                                     % game['homeTeamAbbr'])
             self.games_items.append(listitem)
         self.games_list.addItems(self.games_items)
 
@@ -413,9 +392,9 @@ class GamepassGUI(xbmcgui.WindowXML):
         for episode in episodes:
             try:
                 listitem = xbmcgui.ListItem('[B]%s[/B]' % show_name)
-                for episode_title, episode_videoId_thumbnail in episode.items():
+                for episode_title, episode_videoId_thumbnail in list(episode.items()):
                     listitem.setProperty('game_info', episode_title)
-                    for episode_videoId, episode_thumbnail in episode_videoId_thumbnail.items():
+                    for episode_videoId, episode_thumbnail in list(episode_videoId_thumbnail.items()):
                         listitem.setProperty('id', episode_videoId)
                         listitem.setProperty('away_thumb',
                                              episode_thumbnail.replace('{formatInstructions}', 'c_thumb,q_auto,f_png'))
@@ -430,15 +409,12 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
-        hide_busy_dialog()
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
         if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
-            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            playitem.setProperty('inputstream', 'inputstream.adaptive')
             playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
             playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
-
-        # Busy dialog until player starts
 
         xbmc.Player().play(item=url, listitem=playitem)
 
@@ -451,9 +427,6 @@ class GamepassGUI(xbmcgui.WindowXML):
         while True:
             if xbmcgui.getCurrentWindowId() == WINDOW_FULLSCREEN_VIDEO:
                 break
-            elif xbmcgui.getCurrentWindowId() != WINDOW_DIALOG_BUSY:
-                # Needed since inputadaptive disables busy dialog too early
-                show_busy_dialog()
 
             if time.time() > calculatedTimeout:
                 logger.error('Player took too long to start')
@@ -461,8 +434,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             # Sleep to avoid hogging CPU
             xbmc.sleep(100)
-
-        hide_busy_dialog()
 
     def init(self, level):
         if level == 'season':
@@ -512,7 +483,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         else:  # choose a specific bitrate
             try:
                 m3u8_streams = self.gp.m3u8_to_dict(url)
-                bitrate = select_bitrate(m3u8_streams.keys())
+                bitrate = select_bitrate(list(m3u8_streams.keys()))
                 if bitrate:
                     return m3u8_streams[bitrate]
                 else:  # bitrate dialog was canceled
@@ -530,7 +501,6 @@ class GamepassGUI(xbmcgui.WindowXML):
 
     def onClick(self, controlId):  # pylint: disable=invalid-name
         try:
-            show_busy_dialog()
             if controlId in [110, 120, 130]:
                 self.games_list.reset()
                 self.weeks_list.reset()
@@ -577,7 +547,6 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.live_list.addItems(self.live_items)
                     self.display_nfln_seasons()
 
-                hide_busy_dialog()
                 return
 
             if self.main_selection == 'GamePass':
@@ -641,9 +610,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                         stream_url = self.select_stream_url(streams)
 
                         self.play_url(stream_url)
-            hide_busy_dialog()
         except Exception as e:  # catch anything that might fail
-            hide_busy_dialog()
             logger.exception(e)
 
             if self.main_selection == 'NFL Network' and controlId == 230:  # episode
