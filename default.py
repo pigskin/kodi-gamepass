@@ -354,7 +354,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                                      'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/%s.png' %
                                      game['visitorTeamAbbr'])
             if game['homeTeamAbbr'] == 'LV':
-                listitem.setProperty('away_thumb',
+                listitem.setProperty('home_thumb',
                                      'http://i.nflcdn.com/static/site/7.4/img/logos/teams-matte-144x96/OAK.png')
             else:
                 listitem.setProperty('home_thumb',
