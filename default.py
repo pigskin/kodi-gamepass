@@ -292,16 +292,24 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_items = []
         games = self.gp.get_games(self.selected_season, self.selected_season_type, self.selected_week)
         for game in games:
+            if not game['visitorCityState']:
+                game['visitorCityState'] = self.get_team_citystate(game,game['visitorTeamAbbr'])
+            if not game['homeCityState']:
+                game['homeCityState'] = self.get_team_citystate(game,game['homeTeamAbbr'])
+
             game_id = '{0}-{1}-{2}'.format(
                 game['visitorNickName'].lower(),
                 game['homeNickName'].lower(),
                 str(game['gameId']))
             game_name_shrt = '[B]%s[/B] at [B]%s[/B]' % (game['visitorNickName'], game['homeNickName'])
-            game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (
-                game['visitorCityState'],
-                game['visitorNickName'],
-                game['homeCityState'],
-                game['homeNickName'])
+            if game['visitorCityState'] == '' or game['homeCityState'] == '':
+                game_name_full = game_name_shrt
+            else:
+                game_name_full = '[B]%s %s[/B] at [B]%s %s[/B]' % (
+                    game['visitorCityState'],
+                    game['visitorNickName'],
+                    game['homeCityState'],
+                    game['homeNickName'])
 
             listitem = xbmcgui.ListItem(game_name_shrt, game_name_full)
 
@@ -362,6 +370,20 @@ class GamepassGUI(xbmcgui.WindowXML):
                                      % game['homeTeamAbbr'])
             self.games_items.append(listitem)
         self.games_list.addItems(self.games_items)
+
+    def get_team_citystate(self,game,team_abbr):
+        """Parse video tags and retrieve team city/state"""
+        citystate = ''
+        if isinstance(game['video'], dict) and 'tags' in game['video']:
+            for tag in game['video']['tags']:
+                try:
+                    if tag['extraData']['abbr'] == team_abbr:
+                        citystate = tag['extraData']['cityState']
+                        break
+                except:
+                    continue
+
+        return citystate
 
     def display_seasons_weeks(self):
         """List weeks for a given season"""
