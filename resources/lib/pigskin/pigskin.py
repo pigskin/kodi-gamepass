@@ -312,14 +312,14 @@ class pigskin(object):
                     self.logger.debug('No need to login; the user already has access.')
                     return True
             except Exception:
-                self.logger.warn('subscription check failed; continuing on.')
+                self.logger.warning('subscription check failed; continuing on.')
 
         for auth in [self._gp_auth, self._gigya_auth]:
             self.logger.debug('Trying {0} authentication.'.format(auth.__name__))
             try:
                 data = auth(username, password)
             except Exception:
-                self.logger.warn('Auth failed, trying the next auth type.')
+                self.logger.warning('Auth failed, trying the next auth type.')
                 continue
 
             try:
