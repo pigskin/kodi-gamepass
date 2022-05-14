@@ -46,12 +46,10 @@ class pigskin(object):
         def __str__(self):
             return repr(self.value)
 
-
     def populate_config(self):
         url = self.base_url + '/api/en/content/v1/web/config'
         r = self.http_session.get(url)
         return r.json()
-
 
     def _log_request(self, r):
         """Log (at the debug level) everything about a provided HTTP request.
@@ -108,7 +106,6 @@ class pigskin(object):
             self.logger.debug(json.dumps(response_dict, sort_keys=True, indent=4))
 
         return True
-
 
     def make_request(self, url, method, params=None, payload=None, headers=None):
         """Make an HTTP request. Return the response."""
@@ -174,7 +171,6 @@ class pigskin(object):
 
         return response
 
-
     def _gigya_auth(self, username, password):
         """Authenticate to Game Pass by first going through Gigya's
         authentication servers.
@@ -199,10 +195,10 @@ class pigskin(object):
         url = self.gigya_auth_url
         api_key = self.config['modules']['GIGYA']['JAVASCRIPT_API_URL'].split('apiKey=')[1]
         post_data = {
-            'apiKey' : api_key,
-            'loginID' : username,
+            'apiKey': api_key,
+            'loginID': username,
             'includeUserInfo': 'false',
-            'password' : password
+            'password': password
         }
 
         try:
@@ -223,7 +219,6 @@ class pigskin(object):
         data = self._gp_auth(username, password, gigya_data)
 
         return data
-
 
     def _gp_auth(self, username, password, gigya_data=False):
         """Authenticate to the Game Pass servers.
@@ -255,13 +250,13 @@ class pigskin(object):
         if gigya_data:
             # TODO: audit if in fact all these fields are needed
             post_data = {
-                'client_id' : self.config['modules']['API']['CLIENT_ID'],
-                'uuid' : gigya_data['UID'],
-                'signature' : gigya_data['UIDSignature'],
-                'ts' : gigya_data['signatureTimestamp'],
-                'device_type' : 'web',
-                'username' : username,
-                'grant_type' : 'shield_authentication',
+                'client_id': self.config['modules']['API']['CLIENT_ID'],
+                'uuid': gigya_data['UID'],
+                'signature': gigya_data['UIDSignature'],
+                'ts': gigya_data['signatureTimestamp'],
+                'device_type': 'web',
+                'username': username,
+                'grant_type': 'shield_authentication',
             }
 
         try:
@@ -280,7 +275,6 @@ class pigskin(object):
 
         # TODO: check for status codes, just in case
         return data
-
 
     def login(self, username, password, force=False):
         """Login to NFL Game Pass.
@@ -339,7 +333,6 @@ class pigskin(object):
         self.logger.error('login failed')
         return False
 
-
     def check_for_subscription(self):
         """Check if the user has a valid subscription.
 
@@ -375,7 +368,6 @@ class pigskin(object):
         except KeyError:
             self.logger.error('No active NFL Game Pass Europe subscription was found.')
             return None
-
 
     def refresh_tokens(self):
         """Refresh the ``access`` and ``refresh`` tokens to access content.
@@ -416,7 +408,6 @@ class pigskin(object):
         self.logger.debug('successfully refreshed tokens')
         return True
 
-
     def get_seasons(self):
         """Get a list of available seasons.
 
@@ -442,7 +433,7 @@ class pigskin(object):
         try:
             self.logger.debug('parsing seasons')
             giga_list = data['modules']['mainMenu']['seasonStructureList']
-            seasons = [str(x['season']) for x in giga_list if x.get('season') != None]
+            seasons = [str(x['season']) for x in giga_list if x.get('season') is not None]
             seasons.sort(reverse=True)
         except KeyError:
             self.logger.error('unable to find the seasons list')
@@ -451,7 +442,6 @@ class pigskin(object):
             raise e
 
         return seasons
-
 
     def get_weeks(self, season):
         """Get the weeks of a given season.
@@ -498,11 +488,11 @@ class pigskin(object):
 
             for st in season_types_list:
                 if st['seasonType'] == 'pre':
-                    weeks['pre'] = { str(w['number']) : w['weekNameAbbr'] for w in st['weeks'] }
+                    weeks['pre'] = {str(w['number']): w['weekNameAbbr'] for w in st['weeks']}
                 elif st['seasonType'] == 'reg':
-                    weeks['reg'] = { str(w['number']) : w['weekNameAbbr'] for w in st['weeks'] }
+                    weeks['reg'] = {str(w['number']): w['weekNameAbbr'] for w in st['weeks']}
                 elif st['seasonType'] == 'post':
-                    weeks['post'] = { str(w['number']) : w['weekNameAbbr'] for w in st['weeks'] }
+                    weeks['post'] = {str(w['number']): w['weekNameAbbr'] for w in st['weeks']}
                 else:
                     self.logger.warning('found an unexpected season type')
         except KeyError:
@@ -512,7 +502,6 @@ class pigskin(object):
             raise e
 
         return weeks
-
 
     def get_current_season_and_week(self):
         """Get the current season (year), season type, and week.
@@ -549,7 +538,6 @@ class pigskin(object):
             raise e
 
         return current
-
 
     def get_games(self, season, season_type, week):
         """Get the raw game data for a given season (year), season type, and week.
@@ -596,7 +584,8 @@ class pigskin(object):
             raise e
 
         try:
-            games = [g for x in data['modules'] if data['modules'][x].get('content') for g in data['modules'][x]['content']]
+            games = [g for x in data['modules'] if data['modules'][x].get('content') for g in
+                     data['modules'][x]['content']]
             games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
         except KeyError:
             self.logger.error('could not parse/build the games list')
@@ -606,7 +595,6 @@ class pigskin(object):
             raise e
 
         return games
-
 
     def get_team_games(self, season, team):
         """Get the raw game data for a given season (year) and team.
@@ -668,7 +656,6 @@ class pigskin(object):
             raise e
 
         return games
-
 
     def get_game_versions(self, game_id, season):
         """Return a dict of available game versions (full, condensed, coaches,
@@ -735,7 +722,6 @@ class pigskin(object):
         self.logger.debug('Game versions found for {0}: {1}'.format(game_id, ', '.join(list(versions.keys()))))
         return versions
 
-
     def get_nfl_network_streams(self):
         """Return a dict of available stream formats and their URLs for NFL
         Network Live.
@@ -773,7 +759,6 @@ class pigskin(object):
         streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
         return streams
 
-
     def get_redzone_streams(self):
         """Return a dict of available stream formats and their URLs for NFL Red
         Zone.
@@ -810,7 +795,6 @@ class pigskin(object):
         streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
         return streams
 
-
     def get_game_streams(self, video_id, live=False):
         """Return a dict of available stream formats and their URLs for a game.
 
@@ -845,7 +829,6 @@ class pigskin(object):
 
         streams = self._get_diva_streams(video_id=video_id, diva_config_url=diva_config_url)
         return streams
-
 
     def _get_diva_config(self, diva_config_url):
         """Return the parsed DIVA config.
@@ -885,7 +868,6 @@ class pigskin(object):
 
         return diva_config
 
-
     def _get_diva_streams(self, video_id, diva_config_url):
         """Return a dict of available stream formats and their URLs.
 
@@ -903,7 +885,7 @@ class pigskin(object):
             stream content_url as the value.
         """
         streams = {}
-        self.refresh_tokens() # determine when we actually need this. I'm guessing when we post
+        self.refresh_tokens()  # determine when we actually need this. I'm guessing when we post
 
         diva_config = self._get_diva_config(diva_config_url)
         try:
@@ -950,14 +932,13 @@ class pigskin(object):
             payload = self._build_processing_url_payload(video_id, vs_url)
 
             try:
-                data = self.make_request(url=processing_url,method='post',payload=payload,headers=diva_header)
+                data = self.make_request(url=processing_url, method='post', payload=payload, headers=diva_header)
             except Exception as e:
                 raise e
 
             streams[vs_format] = data['ContentUrl'] + '|' + urlencode(m3u8_header)
 
         return streams
-
 
     def _build_processing_url_payload(self, video_id, vs_url):
         """Return the payload needed to request a content URL from a
@@ -999,7 +980,6 @@ class pigskin(object):
         payload = json.dumps(post_data)
         return payload
 
-
     def m3u8_to_dict(self, manifest_url):
         """Return a dict of available bitrates and their respective stream. This
         is especially useful if you need to pass a URL to a player that doesn't
@@ -1014,7 +994,8 @@ class pigskin(object):
         m3u8_obj = m3u8.loads(m3u8_manifest)
         for playlist in m3u8_obj.playlists:
             bitrate = int(playlist.stream_info.bandwidth) / 1000
-            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + manifest_url.split('?')[1] + '|' + urlencode(m3u8_header)
+            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + \
+                               manifest_url.split('?')[1] + '|' + urlencode(m3u8_header)
 
         return streams
 
@@ -1142,7 +1123,6 @@ class pigskin(object):
 
         return episodes_data
 
-
     def nfldate_to_datetime(self, nfldate, localize=False):
         """Return a datetime object from an NFL Game Pass date string.
 
@@ -1178,7 +1158,6 @@ class pigskin(object):
                 return None
 
         return dt_utc
-
 
     @staticmethod
     def utc_to_local(dt_utc):
