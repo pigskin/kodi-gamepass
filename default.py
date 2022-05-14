@@ -371,7 +371,8 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.games_items.append(listitem)
         self.games_list.addItems(self.games_items)
 
-    def get_team_citystate(self,game,team_abbr):
+    @staticmethod
+    def get_team_citystate(game, team_abbr):
         """Parse video tags and retrieve team city/state"""
         citystate = ''
         if isinstance(game['video'], dict) and 'tags' in game['video']:
