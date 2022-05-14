@@ -293,9 +293,9 @@ class GamepassGUI(xbmcgui.WindowXML):
         games = self.gp.get_games(self.selected_season, self.selected_season_type, self.selected_week)
         for game in games:
             if not game['visitorCityState']:
-                game['visitorCityState'] = self.get_team_citystate(game,game['visitorTeamAbbr'])
+                game['visitorCityState'] = self.get_team_citystate(game, game['visitorTeamAbbr'])
             if not game['homeCityState']:
-                game['homeCityState'] = self.get_team_citystate(game,game['homeTeamAbbr'])
+                game['homeCityState'] = self.get_team_citystate(game, game['homeTeamAbbr'])
 
             game_id = '{0}-{1}-{2}'.format(
                 game['visitorNickName'].lower(),
@@ -381,7 +381,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if tag['extraData']['abbr'] == team_abbr:
                         citystate = tag['extraData']['cityState']
                         break
-                except:
+                except KeyError:
                     continue
 
         return citystate
@@ -398,6 +398,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                     title = language(30048).format(week_num)
                 elif season_type == 'post':
                     title = weeks_dict[season_type][week_num].upper()
+                else:
+                    raise RuntimeError(f'Unsupported season type {season_type} detected.')
 
                 future = 'false'
                 listitem = xbmcgui.ListItem(title)
@@ -411,6 +413,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         """Show episodes for a given season/show"""
         self.games_items = []
         episodes = self.gp.get_shows_episodes(show_name, season)
+        episode_title = ''
 
         for episode in episodes:
             try:
@@ -577,7 +580,11 @@ class GamepassGUI(xbmcgui.WindowXML):
                     self.init('season')
                     self.selected_season = self.season_list.getSelectedItem().getLabel()
 
-                    self.display_seasons_weeks()
+                    try:
+                        self.display_seasons_weeks()
+                    except Exception as e:
+                        logger.error('Error while reading seasons weeks and games')
+                        logger.exception(e)
                 elif controlId == 220:  # week is clicked
                     self.init('week')
                     self.selected_week = self.weeks_list.getSelectedItem().getProperty('week')
