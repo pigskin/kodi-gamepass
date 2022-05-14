@@ -1,3 +1,10 @@
+2022.05.14 -- Drew Brees Edition
++ Adapt to API changes implemented by Diva (jm-duke)
++ Fix issue with LV Raiders logo (jm-duke)
++ Fix display of 'None' for focused games in game week view (jm-duke)
++ Implemented some improvements highlighted by Bas Rieter (jm-duke)
++ Minor refactorings (jm-duke)
+
 2021.03.14+matrix.1 -- Taysom Hill Edition
 + Now supports Kodi 19 aka Matrix
 -- Remove busy dialog, it's deprecated (jm-duke)
@@ -8,7 +15,7 @@
 -- Fix open of settings dialog from within the addon (jm-duke)
 + Converted settings.xml to the new format (jm-duke)
 
-﻿2019.07.01 -- Pre-preseason edition
+2019.07.01 -- Pre-preseason edition
 + Now supports Leia
 -- updated xbmc.gui version to 5.14.0 (baardisk)
 -- updated xbmc.python version to 2.26.0 (baardisk)
