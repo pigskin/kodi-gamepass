@@ -8,9 +8,10 @@ import logging
 import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import requests
 import m3u8
+import calendar
 
 
 class pigskin(object):
