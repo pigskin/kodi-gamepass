@@ -32,7 +32,7 @@
             <width>970</width>
             <height>550</height>
             <aspectratio>stretch</aspectratio>
-            <texture border="8">GamePass/shadowbox.png</texture>
+            <texture border="8">gamepass/shadowbox.png</texture>
             <visible>Control.IsVisible(100) + Player.HasMedia</visible>
         </control>
         <control type="videowindow" id="100">
@@ -50,9 +50,9 @@
                 <top>630</top>
                 <width>968</width>
                 <height>20</height>
-                <texturebg border="8" colordiffuse="66CCCCCC">GamePass/progressbg.png</texturebg>
+                <texturebg border="8" colordiffuse="66CCCCCC">gamepass/progressbg.png</texturebg>
                 <lefttexture>-</lefttexture>
-                <midtexture border="8" colordiffuse="CCFFFFFF">GamePass/progress.png</midtexture>
+                <midtexture border="8" colordiffuse="CCFFFFFF">gamepass/progress.png</midtexture>
                 <righttexture>-</righttexture>
                 <overlaytexture>-</overlaytexture>
                 <info>Player.Progress</info>   
@@ -89,7 +89,7 @@
                 <control type="image">
                     <width>280</width>
                     <height>40</height>
-                    <texture>GamePass/week_bg.png</texture>
+                    <texture>gamepass/week_bg.png</texture>
                 </control>
                 <control type="label">
                     <description>Clip description, not focused</description>
@@ -110,13 +110,13 @@
                 <control type="image">
                     <width>280</width>
                     <height>40</height>
-                    <texture>GamePass/week_focus.png</texture>
+                    <texture>gamepass/week_focus.png</texture>
                     <visible>Control.HasFocus(110)</visible>
                 </control>
                 <control type="image">
                     <width>280</width>
                     <height>40</height>
-                    <texture>GamePass/week_focus2.png</texture>
+                    <texture>gamepass/week_focus2.png</texture>
                     <visible>!Control.HasFocus(110)</visible>
                 </control>
                 <control type="label">
@@ -161,8 +161,8 @@
             <onleft>110</onleft>
             <onright>110</onright>
             <texturesliderbackground>-</texturesliderbackground>
-            <texturesliderbar border="1" flipx="true">GamePass/texturesliderbar.png</texturesliderbar>
-            <texturesliderbarfocus border="1" flipx="true">GamePass/texturesliderbar2.png</texturesliderbarfocus>
+            <texturesliderbar border="1" flipx="true">gamepass/texturesliderbar.png</texturesliderbar>
+            <texturesliderbarfocus border="1" flipx="true">gamepass/texturesliderbar2.png</texturesliderbarfocus>
             <showonepage>false</showonepage>
             <orientation>vertical</orientation>
             <visible>![Player.HasMedia + Control.IsVisible(101)]</visible>

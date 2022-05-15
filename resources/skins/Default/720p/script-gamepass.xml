@@ -14,7 +14,7 @@
             <width>1280</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/menubar.png</texture>
+            <texture>gamepass/menubar.png</texture>
         </control>
         <control type="image">
             <description>SubMenubar background</description>
@@ -22,7 +22,7 @@
             <width>1280</width>
             <height>36</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/submenubar.png</texture>
+            <texture>gamepass/submenubar.png</texture>
         </control>
         <control type="group" id="100">
               <description>Top row button group</description>
@@ -39,8 +39,8 @@
                   <ondown>210</ondown>
                   <onleft>90</onleft>
                   <onright>130</onright>
-                  <texturefocus>GamePass/gp_int_focus.png</texturefocus>
-                  <texturenofocus>GamePass/gp_int_normal.png</texturenofocus>
+                  <texturefocus>gamepass/gp_int_focus.png</texturefocus>
+                  <texturenofocus>gamepass/gp_int_normal.png</texturenofocus>
             </control>
             <control type="button" id="110">
                   <description>Domestic Gamepass button</description>
@@ -51,8 +51,8 @@
                   <ondown>210</ondown>
                   <onleft>90</onleft>
                   <onright>130</onright>
-                  <texturefocus>GamePass/gp_dom_focus.png</texturefocus>
-                  <texturenofocus>GamePass/gp_dom_normal.png</texturenofocus>
+                  <texturefocus>gamepass/gp_dom_focus.png</texturefocus>
+                  <texturenofocus>gamepass/gp_dom_normal.png</texturenofocus>
             </control>
             <control type="button" id="130">
                   <description>Network button</description>
@@ -62,8 +62,8 @@
                   <ondown>240</ondown>
                   <onleft>110</onleft>
                   <onright>90</onright>
-                  <texturefocus>GamePass/network_focus.png</texturefocus>
-                  <texturenofocus>GamePass/network_bg.png</texturenofocus>
+                  <texturefocus>gamepass/network_focus.png</texturefocus>
+                  <texturenofocus>gamepass/network_bg.png</texturenofocus>
             </control>
         </control>
 
@@ -74,7 +74,7 @@
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/gp_int_selected.png</texture>
+            <texture>gamepass/gp_int_selected.png</texture>
             <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
         </control>
         <control type="image">
@@ -84,7 +84,7 @@
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/gp_dom_selected.png</texture>
+            <texture>gamepass/gp_dom_selected.png</texture>
             <visible>!Control.HasFocus(110) + SubString(Window.Property(GP_clicked),true) + Control.IsVisible(110)</visible>
         </control>
         <control type="image">
@@ -93,7 +93,7 @@
             <width>375</width>
             <height>56</height>
             <aspectratio>stretch</aspectratio>
-            <texture>GamePass/network_focus2.png</texture>
+            <texture>gamepass/network_focus2.png</texture>
             <visible>!Control.HasFocus(130) + SubString(Window.Property(NW_clicked),true)</visible>
         </control>
 
@@ -105,8 +105,8 @@
             <ondown>210</ondown>
             <onleft>130</onleft>
             <onright>110</onright>
-            <texturefocus>GamePass/settings_focus.png</texturefocus>
-            <texturenofocus>GamePass/settings.png</texturenofocus>
+            <texturefocus>gamepass/settings_focus.png</texturefocus>
+            <texturenofocus>gamepass/settings.png</texturenofocus>
             <onclick>Addon.OpenSettings(plugin.video.nfl.gamepass)</onclick>
         </control>
 
@@ -126,7 +126,7 @@
                     <width>100</width>
                     <height>36</height>
                     <aspectratio>stretch</aspectratio>
-                    <texture>GamePass/submenubar_focus2.png</texture>
+                    <texture>gamepass/submenubar_focus2.png</texture>
                     <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="label">
@@ -151,14 +151,14 @@
                         <width>100</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
-                        <texture>GamePass/submenubar_focus2.png</texture>
+                        <texture>gamepass/submenubar_focus2.png</texture>
                         <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="image">
                         <width>100</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
-                        <texture>GamePass/submenubar_focus.png</texture>
+                        <texture>gamepass/submenubar_focus.png</texture>
                         <visible>Control.HasFocus(210)</visible>
                 </control>
                 <control type="label">
@@ -215,7 +215,7 @@
                     <width>200</width>
                     <height>36</height>
                     <aspectratio>stretch</aspectratio>
-                    <texture>GamePass/submenuwide_focus2.png</texture>
+                    <texture>gamepass/submenuwide_focus2.png</texture>
                     <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="label">
@@ -240,14 +240,14 @@
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
-                        <texture>GamePass/submenuwide_focus2.png</texture>
+                        <texture>gamepass/submenuwide_focus2.png</texture>
                         <visible>ListItem.Property(clicked)</visible>
                 </control>
                 <control type="image">
                         <width>200</width>
                         <height>36</height>
                         <aspectratio>stretch</aspectratio>
-                        <texture>GamePass/submenuwide_focus.png</texture>
+                        <texture>gamepass/submenuwide_focus.png</texture>
                         <visible>Control.HasFocus(240)</visible>
                 </control>
                 <control type="label">
@@ -304,26 +304,26 @@
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_bg.png</texture>
+                        <texture>gamepass/week_bg.png</texture>
                         <visible>!ListItem.Property(clicked) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_bg.png</texture>
+                        <texture>gamepass/week_bg.png</texture>
                         <colordiffuse>99CCCCCC</colordiffuse>
                         <visible>!ListItem.Property(clicked) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus2.png</texture>
+                        <texture>gamepass/week_focus2.png</texture>
                         <visible>ListItem.Property(clicked) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus2.png</texture>
+                        <texture>gamepass/week_focus2.png</texture>
                         <colordiffuse>AAAAAAAA</colordiffuse>
                         <visible>ListItem.Property(clicked) + ListItem.Property(future)</visible>
                 </control>
@@ -347,39 +347,39 @@
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_bg.png</texture>
+                        <texture>gamepass/week_bg.png</texture>
                         <visible>!Control.HasFocus(220) + !ListItem.Property(clicked) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_bg.png</texture>
+                        <texture>gamepass/week_bg.png</texture>
                         <colordiffuse>99CCCCCC</colordiffuse>
                         <visible>!Control.HasFocus(220) + !ListItem.Property(clicked) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus2.png</texture>
+                        <texture>gamepass/week_focus2.png</texture>
                         <visible>!Control.HasFocus(220) + ListItem.Property(clicked) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus2.png</texture>
+                        <texture>gamepass/week_focus2.png</texture>
                         <colordiffuse>AAAAAAAA</colordiffuse>
                         <visible>!Control.HasFocus(220) + ListItem.Property(clicked) + ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus.png</texture>
+                        <texture>gamepass/week_focus.png</texture>
                         <visible>Control.HasFocus(220) + !ListItem.Property(future)</visible>
                 </control>
                 <control type="image">
                         <width>280</width>
                         <height>40</height>
-                        <texture>GamePass/week_focus.png</texture>
+                        <texture>gamepass/week_focus.png</texture>
                         <colordiffuse>BBFFFFFF</colordiffuse>
                         <visible>Control.HasFocus(220) + ListItem.Property(future)</visible>
                 </control>
@@ -433,14 +433,14 @@
                         <left>10</left>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_bg.png</texture>
+                        <texture>gamepass/game_bg.png</texture>
                         <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>10</left>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_bg.png</texture>
+                        <texture>gamepass/game_bg.png</texture>
                         <colordiffuse>AAFFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
@@ -564,14 +564,14 @@
                         <left>10</left>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_focus.png</texture>
+                        <texture>gamepass/game_focus.png</texture>
                         <visible>ListItem.Property(isPlayable)</visible>
                 </control>
                 <control type="image">
                         <left>10</left>
                         <width>440</width>
                         <height>80</height>
-                        <texture>GamePass/game_focus.png</texture>
+                        <texture>gamepass/game_focus.png</texture>
                         <colordiffuse>CCFFFFFF</colordiffuse>
                         <visible>!ListItem.Property(isPlayable)</visible>
                 </control>
@@ -701,8 +701,8 @@
             <onleft>220</onleft>
             <onright>220</onright>
             <texturesliderbackground>-</texturesliderbackground>
-            <texturesliderbar border="1">GamePass/texturesliderbar.png</texturesliderbar>
-            <texturesliderbarfocus border="1">GamePass/texturesliderbar2.png</texturesliderbarfocus>
+            <texturesliderbar border="1">gamepass/texturesliderbar.png</texturesliderbar>
+            <texturesliderbarfocus border="1">gamepass/texturesliderbar2.png</texturesliderbarfocus>
             <showonepage>false</showonepage>
             <orientation>vertical</orientation>
         </control>
@@ -716,8 +716,8 @@
             <onleft>230</onleft>
             <onright>220</onright>
             <texturesliderbackground>-</texturesliderbackground>
-            <texturesliderbar border="1" flipx="true">GamePass/texturesliderbar.png</texturesliderbar>
-            <texturesliderbarfocus border="1" flipx="true">GamePass/texturesliderbar2.png</texturesliderbarfocus>
+            <texturesliderbar border="1" flipx="true">gamepass/texturesliderbar.png</texturesliderbar>
+            <texturesliderbarfocus border="1" flipx="true">gamepass/texturesliderbar2.png</texturesliderbarfocus>
             <showonepage>false</showonepage>
             <orientation>vertical</orientation>
         </control>
