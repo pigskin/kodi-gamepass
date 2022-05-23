@@ -382,7 +382,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     if tag['extraData']['abbr'] == team_abbr:
                         citystate = tag['extraData']['cityState']
                         break
-                except KeyError:
+                except (KeyError, TypeError):
                     continue
 
         return citystate
