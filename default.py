@@ -4,8 +4,9 @@ A Kodi addon/skin for NFL Game Pass
 """
 
 import sys
-import json
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 from traceback import format_exc
 from datetime import timedelta
 import logging
