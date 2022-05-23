@@ -18,11 +18,8 @@ class pigskin(object):
     def __init__(
             self,
             proxy_url=None
-        ):
+    ):
         self.logger = logging.getLogger(__name__)
-        self.ch = logging.StreamHandler()
-        self.ch.setLevel(logging.INFO)
-        self.logger.addHandler(self.ch)
 
         self.base_url = 'https://www.nflgamepass.com'
         self.user_agent = 'Firefox'
@@ -139,7 +136,7 @@ class pigskin(object):
                 # We made it without error, exit the loop
                 break
             except requests.Timeout:
-                self.logger.warning('Timeout condition occurred after %i seconds' % t)
+                self.logger.debug('Timeout condition occurred after %i seconds' % t)
                 if failed:
                     # failed twice while sending request
                     # TODO: this should be raised so the user can be informed.
@@ -206,13 +203,13 @@ class pigskin(object):
             self._log_request(r)
             gigya_data = r.json()
         except ValueError:
-            self.logger.error('_gigya_auth: server response is invalid')
+            self.logger.debug('_gigya_auth: server response is invalid')
             return {}
 
         # make sure auth data is there
         for key in ['UID', 'UIDSignature', 'signatureTimestamp']:
             if not gigya_data.get(key):
-                self.logger.error('could not parse gigya auth response')
+                self.logger.debug('could not parse gigya auth response')
                 return {}
 
         # now that we have our gigya keys, auth against GP servers
@@ -264,13 +261,13 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('_gp_auth: server response is invalid')
+            self.logger.debug('_gp_auth: server response is invalid')
             return {}
 
         # make sure auth data is there
         for key in ['access_token', 'refresh_token']:
             if not data.get(key):
-                self.logger.error('could not parse auth response')
+                self.logger.debug('could not parse auth response')
                 return {}
 
         # TODO: check for status codes, just in case
@@ -307,14 +304,14 @@ class pigskin(object):
                     self.logger.debug('No need to login; the user already has access.')
                     return True
             except Exception:
-                self.logger.warning('subscription check failed; continuing on.')
+                self.logger.debug('subscription check failed; continuing on.')
 
         for auth in [self._gp_auth, self._gigya_auth]:
             self.logger.debug('Trying {0} authentication.'.format(auth.__name__))
             try:
                 data = auth(username, password)
             except Exception:
-                self.logger.warning('Auth failed, trying the next auth type.')
+                self.logger.debug('Auth failed, trying the next auth type.')
                 continue
 
             try:
@@ -323,14 +320,14 @@ class pigskin(object):
                 self.access_token = data['access_token']
                 self.refresh_token = data['refresh_token']
             except KeyError:
-                self.logger.error('Could not acquire GP tokens')
+                self.logger.debug('Could not acquire GP tokens')
                 self.access_token = None
                 self.refresh_token = None
             else:
                 self.logger.debug('login was successful')
                 return True
 
-        self.logger.error('login failed')
+        self.logger.debug('login failed')
         return False
 
     def check_for_subscription(self):
@@ -358,7 +355,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('check_for_subscription: unable to parse server response')
+            self.logger.debug('check_for_subscription: unable to parse server response')
             return None
 
         try:
@@ -366,7 +363,7 @@ class pigskin(object):
             # though I have no idea if this actually happens in practice.
             return data['subscriptions'][0]['productTag']
         except KeyError:
-            self.logger.error('No active NFL Game Pass Europe subscription was found.')
+            self.logger.debug('No active NFL Game Pass Europe subscription was found.')
             return None
 
     def refresh_tokens(self):
@@ -393,14 +390,14 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('token refresh: server response is invalid')
+            self.logger.debug('token refresh: server response is invalid')
             return False
 
         try:
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
         except KeyError:
-            self.logger.error('could not find GP tokens to refresh')
+            self.logger.debug('could not find GP tokens to refresh')
             return False
 
         # TODO: check for status codes, just in case
@@ -425,7 +422,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('')
+            self.logger.debug('')
             return []
         except Exception as e:
             raise e
@@ -436,7 +433,7 @@ class pigskin(object):
             seasons = [str(x['season']) for x in giga_list if x.get('season') is not None]
             seasons.sort(reverse=True)
         except KeyError:
-            self.logger.error('unable to find the seasons list')
+            self.logger.debug('unable to find the seasons list')
             return []
         except Exception as e:
             raise e
@@ -475,7 +472,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('')
+            self.logger.debug('')
             return []
         except Exception as e:
             raise e
@@ -494,9 +491,9 @@ class pigskin(object):
                 elif st['seasonType'] == 'post':
                     weeks['post'] = {str(w['number']): w['weekNameAbbr'] for w in st['weeks']}
                 else:
-                    self.logger.warning('found an unexpected season type')
+                    self.logger.debug('found an unexpected season type')
         except KeyError:
-            self.logger.error("unable to find the season's week-list")
+            self.logger.debug("unable to find the season's week-list")
             return {}
         except Exception as e:
             raise e
@@ -520,7 +517,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('current_season_and_week: server response is invalid')
+            self.logger.debug('current_season_and_week: server response is invalid')
             return {}
         except Exception as e:
             raise e
@@ -532,7 +529,7 @@ class pigskin(object):
                 'week': str(data['modules']['meta']['currentContext']['currentWeek'])
             }
         except KeyError:
-            self.logger.error('could not determine the current season and week')
+            self.logger.debug('could not determine the current season and week')
             return {}
         except Exception as e:
             raise e
@@ -578,7 +575,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('get_games: server response is invalid')
+            self.logger.debug('get_games: server response is invalid')
             return []
         except Exception as e:
             raise e
@@ -588,8 +585,8 @@ class pigskin(object):
                      data['modules'][x]['content']]
             games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
         except KeyError:
-            self.logger.error('could not parse/build the games list')
-            self.logger.error('')
+            self.logger.debug('could not parse/build the games list')
+            self.logger.debug('')
             return []
         except Exception as e:
             raise e
@@ -640,7 +637,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('get_team_games: server response is invalid')
+            self.logger.debug('get_team_games: server response is invalid')
             return []
         except Exception as e:
             raise e
@@ -650,7 +647,7 @@ class pigskin(object):
             games = [x for x in data['modules']['gamesCurrentSeason']['content']]
             games = sorted(games, key=lambda x: x['gameDateTimeUtc'])
         except KeyError:
-            self.logger.error('could not parse/build the team_games list')
+            self.logger.debug('could not parse/build the team_games list')
             return []
         except Exception as e:
             raise e
@@ -701,7 +698,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('get_game_versions: server response is invalid')
+            self.logger.debug('get_game_versions: server response is invalid')
             return {}
         except Exception as e:
             raise e
@@ -714,7 +711,7 @@ class pigskin(object):
                 except (KeyError, TypeError):
                     pass
         except KeyError:
-            self.logger.error('could not parse/build the game versions data')
+            self.logger.debug('could not parse/build the game versions data')
             return {}
         except Exception as e:
             raise e
@@ -742,7 +739,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('get_nfl_network_streams: server response is invalid')
+            self.logger.debug('get_nfl_network_streams: server response is invalid')
             return {}
         except Exception as e:
             raise e
@@ -751,7 +748,7 @@ class pigskin(object):
             video_id = data['modules']['networkLiveVideo']['content'][0]['videoId']
         except KeyError:
             # TODO: move refresh_tokens() here and retry
-            self.logger.error('could not parse the nfl network video_id data')
+            self.logger.debug('could not parse the nfl network video_id data')
             return {}
         except Exception as e:
             raise e
@@ -779,7 +776,7 @@ class pigskin(object):
             self._log_request(r)
             data = r.json()
         except ValueError:
-            self.logger.error('get_redzone_streams: server response is invalid')
+            self.logger.debug('get_redzone_streams: server response is invalid')
             return {}
         except Exception as e:
             raise e
@@ -787,7 +784,7 @@ class pigskin(object):
         try:
             video_id = data['modules']['redZoneLive']['content'][0]['videoId']
         except (KeyError, IndexError):
-            self.logger.error('could not parse the redzone video_id data')
+            self.logger.debug('could not parse the redzone video_id data')
             return {}
         except Exception as e:
             raise e
@@ -856,14 +853,14 @@ class pigskin(object):
         try:
             data_xml = ET.fromstring(data)
         except (ET.ParseError, TypeError):
-            self.logger.error('_get_diva_config: server response is invalid')
+            self.logger.debug('_get_diva_config: server response is invalid')
             return {}
 
         try:
             diva_config['processing_url'] = data_xml.find(".//parameter[@name='processingUrlCallPath']").get('value')
             diva_config['video_data_url'] = data_xml.find(".//parameter[@name='videoDataPath']").get('value')
         except AttributeError:
-            self.logger.error('_get_diva_config: unable to parse the diva XML')
+            self.logger.debug('_get_diva_config: unable to parse the diva XML')
             return {}
 
         return diva_config
@@ -892,7 +889,7 @@ class pigskin(object):
             video_data_url = diva_config['video_data_url'].replace('{V.ID}', video_id)
             processing_url = diva_config['processing_url']
         except KeyError:
-            self.logger.error('_get_diva_streams: diva config was not set!')
+            self.logger.debug('_get_diva_streams: diva config was not set!')
             return {}
 
         try:
@@ -905,7 +902,7 @@ class pigskin(object):
         try:
             akamai_xml = ET.fromstring(akamai_data)
         except (ET.ParseError, TypeError):
-            self.logger.error('_get_diva_streams: server response is invalid')
+            self.logger.debug('_get_diva_streams: server response is invalid')
             return {}
 
         # TODO: is this how the service even works anymore? It seems arcane.
@@ -1145,7 +1142,7 @@ class pigskin(object):
         except TypeError:
             dt_utc = datetime.fromtimestamp(time.mktime(time.strptime(nfldate, nfldate_format)))
         except ValueError:
-            self.logger.error('unable to parse the nfldate string')
+            self.logger.debug('unable to parse the nfldate string')
             return None
 
         if localize:
@@ -1154,7 +1151,7 @@ class pigskin(object):
             except NameError:  # Python 2.7
                 return self.utc_to_local(dt_utc)
             except Exception:
-                self.logger.error('unable to localize the nfl datetime object')
+                self.logger.debug('unable to localize the nfl datetime object')
                 return None
 
         return dt_utc

@@ -84,7 +84,7 @@ def build_proxy_url():
         return proxy_url
     except Exception as e:
         logger.debug('Failed building proxy url, using none')
-        logger.exception(e)
+        logger.debug('Trace Message:\n{}'.format(format_exc()))
         return None
 
 
@@ -98,7 +98,7 @@ def has_inputstream_adaptive():
     else:
         logger.debug('InputStream Adaptive is not installed and/or enabled.')
         if addon.getSetting('use_inputstream_adaptive') == 'true':
-            logger.info('Disabling InputStream Adaptive.')
+            logger.debug('Disabling InputStream Adaptive.')
             addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
         return False
 
@@ -224,7 +224,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 dialog.ok(language(30021), language(30023))
                 sys.exit(0)
         except Exception as e:
-            logger.exception(e)
+            logger.debug('Trace Message:\n{}'.format(format_exc()))
             dialog.ok('Epic Failure', language(30024))
             sys.exit(0)
 
@@ -248,7 +248,7 @@ class GamepassGUI(xbmcgui.WindowXML):
             self.window.setProperty('NW_clicked', 'false')
             self.window.setProperty('GP_clicked', 'false')
 
-        logger.info('Initiate Game Pass Login')
+        logger.debug('Initiate Game Pass Login')
         self.pigskin_login()
 
         self.seasons = self.gp.get_seasons()
@@ -256,8 +256,8 @@ class GamepassGUI(xbmcgui.WindowXML):
         try:
             self.setFocus(self.window.getControl(self.focusId))
         except Exception as e:
-            logger.error('Focus not possible: %s' % self.focusId)
-            logger.exception(e)
+            logger.debug('Focus not possible: %s' % self.focusId)
+            logger.debug('Trace Message:\n{}'.format(format_exc()))
 
     def display_seasons(self):
         """List seasons"""
@@ -430,9 +430,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                 listitem.setProperty('isPlayable', 'true')
                 self.games_items.append(listitem)
             except Exception as e:
-                logger.error('Exception adding archive directory: %s' % format_exc())
-                logger.error('Directory name: %s' % episode_title)
-                logger.exception(e)
+                logger.debug(f'Exception adding archive directory: {episode_title}')
+                logger.debug('Trace Message:\n{}'.format(format_exc()))
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
@@ -456,7 +455,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                 break
 
             if time.time() > calculatedTimeout:
-                logger.error('Player took too long to start')
+                logger.debug('Player took too long to start')
                 break
 
             # Sleep to avoid hogging CPU
@@ -494,7 +493,7 @@ class GamepassGUI(xbmcgui.WindowXML):
     def select_stream_url(self, streams):
         """Determine which stream URL to use."""
         if not streams:
-            logger.warning('no streams list was provided!')
+            logger.debug('no streams list was provided!')
             dialog.ok(language(30043), language(30045))
             return False
 
@@ -516,8 +515,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                 else:  # bitrate dialog was canceled
                     return None
             except Exception as e:
-                logger.error('unable to parse the m3u8 manifest.')
-                logger.exception(e)
+                logger.debug('unable to parse the m3u8 manifest.')
+                logger.debug('Trace Message:\n{}'.format(format_exc()))
                 dialog.ok(language(30043), language(30045))
                 return False
 
@@ -556,8 +555,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                         self.display_seasons_weeks()
                         self.display_weeks_games()
                     except Exception as e:
-                        logger.error('Error while reading seasons weeks and games')
-                        logger.exception(e)
+                        logger.debug('Error while reading seasons weeks and games')
+                        logger.debug('Trace Message:\n{}'.format(format_exc()))
                 elif controlId == 130:
                     self.main_selection = 'NFL Network'
                     self.window.setProperty('NW_clicked', 'true')
@@ -584,8 +583,8 @@ class GamepassGUI(xbmcgui.WindowXML):
                     try:
                         self.display_seasons_weeks()
                     except Exception as e:
-                        logger.error('Error while reading seasons weeks and games')
-                        logger.exception(e)
+                        logger.debug('Error while reading seasons weeks and games')
+                        logger.debug('Trace Message:\n{}'.format(format_exc()))
                 elif controlId == 220:  # week is clicked
                     self.init('week')
                     self.selected_week = self.weeks_list.getSelectedItem().getProperty('week')
@@ -642,7 +641,7 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                         self.play_url(stream_url)
         except Exception as e:  # catch anything that might fail
-            logger.exception(e)
+            logger.debug('Trace Message:\n{}'.format(format_exc()))
 
             if self.main_selection == 'NFL Network' and controlId == 230:  # episode
                 # inform that not all shows will work

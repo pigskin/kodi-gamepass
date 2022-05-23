@@ -65,5 +65,5 @@ def kodi_json_request(params):
             return response['result']
         return None
     except KeyError:
-        logger.warning("[%s] %s" % (params['method'], response['error']['message']))
+        logger.debug("[%s] %s" % (params['method'], response['error']['message']))
         return None
