@@ -107,7 +107,7 @@
             <onright>110</onright>
             <texturefocus>gamepass/settings_focus.png</texturefocus>
             <texturenofocus>gamepass/settings.png</texturenofocus>
-            <onclick>Addon.OpenSettings(plugin.video.nfl.gamepass)</onclick>
+            <onclick>Addon.OpenSettings(script.video.nfl.gamepass)</onclick>
         </control>
 
         <control type="list" id="210">
