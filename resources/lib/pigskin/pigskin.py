@@ -363,7 +363,7 @@ class pigskin(object):
             # though I have no idea if this actually happens in practice.
             return data['subscriptions'][0]['productTag']
         except KeyError:
-            self.logger.debug('No active NFL Game Pass Europe subscription was found.')
+            self.logger.debug('No active NFL Game Pass International subscription was found.')
             return None
 
     def refresh_tokens(self):
