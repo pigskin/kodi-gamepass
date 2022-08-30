@@ -1,8 +1,8 @@
 # Kodi NFL Game Pass language file
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-GamePass\n"
-"Report-Msgid-Bugs-To: https://github.com/aqw/xbmc-gamepass\n"
+"Project-Id-Version: Kodi-GamePass\n"
+"Report-Msgid-Bugs-To: https://github.com/pigskin/kodi-gamepass/\n"
 "POT-Creation-Date: 2013-11-18 16:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Igor Davydenko <iam@igordavydenko.com>\n"
