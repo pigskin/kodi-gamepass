@@ -427,12 +427,17 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
+        if not self.has_inputstream_adaptive:
+            logger.debug('Fatal: Inputstream Adaptive is not installed or enabled. Please install and/or enable the '
+                         'inputstream.adaptive add-on!')
+            dialog.ok(language(30021), language(30051))
+            return
+
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
-        if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
-            playitem.setProperty('inputstream', 'inputstream.adaptive')
-            playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
-            playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
+        playitem.setProperty('inputstream', 'inputstream.adaptive')
+        playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
 
         xbmc.Player().play(item=url, listitem=playitem)
 
