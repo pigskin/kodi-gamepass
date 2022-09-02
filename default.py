@@ -496,21 +496,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         except KeyError:
             url = streams['hls']
 
-        if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
-            return url
-        else:  # choose a specific bitrate
-            try:
-                m3u8_streams = self.gp.m3u8_to_dict(url)
-                bitrate = select_bitrate(list(m3u8_streams.keys()))
-                if bitrate:
-                    return m3u8_streams[bitrate]
-                else:  # bitrate dialog was canceled
-                    return None
-            except Exception as e:
-                logger.debug('unable to parse the m3u8 manifest.')
-                logger.debug('Trace Message:\n{}'.format(format_exc()))
-                dialog.ok(language(30043), language(30045))
-                return False
+        return url
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list
