@@ -127,20 +127,6 @@ def select_version(game_versions):
     return game_versions[selected_version]
 
 
-def ask_bitrate(bitrates):
-    """Presents a dialog for user to select from a list of bitrates.
-    Returns the value of the selected bitrate.
-    """
-    options = []
-    for bitrate in bitrates:
-        options.append(str(bitrate) + ' Kbps')
-    ret = dialog.select(language(30003), options)
-    if ret > -1:
-        return bitrates[ret]
-    else:
-        return None
-
-
 def coloring(text, meaning):
     """Return the text wrapped in appropriate color markup."""
     if meaning == "disabled":
@@ -149,35 +135,6 @@ def coloring(text, meaning):
         color = "FF111111"
     colored_text = "[COLOR=%s]%s[/COLOR]" % (color, text)
     return colored_text
-
-
-def select_bitrate(manifest_bitrates=None):
-    """Returns a bitrate, while honoring the user's /preference/."""
-    bitrate_setting = int(addon.getSetting('preferred_bitrate'))
-    bitrate_values = ['3671533', '2394274', '1577316', '1117771', '760027', '555799', '402512']
-
-    highest = False
-    preferred_bitrate = None
-    if bitrate_setting == 0:  # 0 === "highest"
-        highest = True
-    elif 0 < bitrate_setting < 8:  # a specific bitrate. '8' === "ask"
-        preferred_bitrate = bitrate_values[bitrate_setting - 1]
-
-    if manifest_bitrates:
-        manifest_bitrates.sort(key=int, reverse=True)
-        if highest:
-            return manifest_bitrates[0]
-        elif preferred_bitrate and preferred_bitrate in manifest_bitrates:
-            return preferred_bitrate
-        else:  # ask user
-            return ask_bitrate(manifest_bitrates)
-    else:
-        if highest:
-            return bitrate_values[0]
-        elif preferred_bitrate:
-            return preferred_bitrate
-        else:  # ask user
-            return ask_bitrate(bitrate_values)
 
 
 class GamepassGUI(xbmcgui.WindowXML):
