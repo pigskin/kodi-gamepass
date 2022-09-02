@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <settings version="1">
-  <section id="plugin.video.nfl.gamepass">
+  <section id="script.video.nfl.gamepass">
     <category help="" id="general" label="30029">
       <group id="1">
         <setting help="" id="email" label="30001" type="string">
