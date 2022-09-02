@@ -1,10 +1,9 @@
 # NOTE #
 
-Currently, only Game Pass Europe is supported, as none of the developers have a
-Game Pass International subscription. If you're a developer interested in
-getting International support working again, we'd love to have your help.
-
-Check out issue pigskin/pigskin#1 for more information.
+This addon supports NFL Game Pass, which is a merger of previous
+services called Game Pass Europe and Game Pass International.
+NFL Game Pass is available in these countries:
+https://support.nflgamepass.com/hc/en-gb/articles/360004691153
 
 # NFL Game Pass Kodi Plugin #
 
@@ -19,7 +18,8 @@ request. Patches and (constructive) input are always welcome.
 
 ## How to Install ##
 
-This addon requires Kodi Matrix or later.
+This addon requires Kodi Matrix or later. Please ensure that Inputstream Adaptive
+is installed and enabled (Addon: inputstream.adaptive).
 
 ### Kodi Repository ###
 
@@ -34,27 +34,33 @@ If you install from GitHub (either by download the .zip archive or using
  * Requests >= 2.22.0+matrix.1 (https://mirrors.kodi.tv/addons/matrix/script.module.requests/)
  * m3u8 >= 0.5.4+matrix.2 (https://mirrors.kodi.tv/addons/matrix/script.module.m3u8/)
    * which needs iso8601 (https://mirrors.kodi.tv/addons/matrix/script.module.iso8601/)
+ * inputstream.adaptive >= 19.0 (https://kodi.tv/addons/matrix/inputstream.adaptive)
 
 ## What is NFL Game Pass? ##
 
-NFL Game Pass is service that allows those with subscriptions to watch NFL
+NFL Game Pass is a service which allows those with subscriptions to watch NFL
 games. Live games, archives of old games, NFL TV shows, NFL Network, and coaches
 tape (22 man view) are available. Overall, it is a sweet service offered by the
 NFL for those of us who must have our American Football fix.
 
 ### What is Game Pass Europe? ###
 
-Game Pass Europe uses WPP/Bruin as its streaming provider(s), and is currently
-the only service this addon supports.
+NFL Game Pass Europe was the original NFL Game Pass service supported by this addon.
+NFL Game Pass Europe later was merged with NFL Game Pass International and became
+NFL Game Pass.
 
 ### What is Game Pass International? ###
 
-Game Pass International uses NeuLion as its streaming partner.
+Game Pass International was an older service providing access to NFL offerings
+outside of US and Europe. Game Pass International was merged with NFL Game Pass
+Europe and became NFL Game Pass.
 
-As all of the current developers are located outside of the "International"
-regions, testing, bug reports, and patches from Game Pass International
-subscribers is most appreciated. Please checkout issue #313 if you're interested
-in helping out.
+### What is NFL Game Pass Domestic? ###
+
+The "original" NFL Game Pass was renamed to NFL Game Pass Domestic and was only
+available in US. The NFL retired NFL Game Pass Domestic in 2022 and replaced it
+with their own streaming solution called NFL+. This addon is not compatible with
+NFL+.
 
 ## Supported Features ##
 
