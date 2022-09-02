@@ -97,9 +97,6 @@ def has_inputstream_adaptive():
         return True
     else:
         logger.debug('InputStream Adaptive is not installed and/or enabled.')
-        if addon.getSetting('use_inputstream_adaptive') == 'true':
-            logger.debug('Disabling InputStream Adaptive.')
-            addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
         return False
 
 
