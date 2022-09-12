@@ -97,9 +97,6 @@ def has_inputstream_adaptive():
         return True
     else:
         logger.debug('InputStream Adaptive is not installed and/or enabled.')
-        if addon.getSetting('use_inputstream_adaptive') == 'true':
-            logger.debug('Disabling InputStream Adaptive.')
-            addon.setSetting('use_inputstream_adaptive', 'false')  # reset setting
         return False
 
 
@@ -130,20 +127,6 @@ def select_version(game_versions):
     return game_versions[selected_version]
 
 
-def ask_bitrate(bitrates):
-    """Presents a dialog for user to select from a list of bitrates.
-    Returns the value of the selected bitrate.
-    """
-    options = []
-    for bitrate in bitrates:
-        options.append(str(bitrate) + ' Kbps')
-    ret = dialog.select(language(30003), options)
-    if ret > -1:
-        return bitrates[ret]
-    else:
-        return None
-
-
 def coloring(text, meaning):
     """Return the text wrapped in appropriate color markup."""
     if meaning == "disabled":
@@ -152,35 +135,6 @@ def coloring(text, meaning):
         color = "FF111111"
     colored_text = "[COLOR=%s]%s[/COLOR]" % (color, text)
     return colored_text
-
-
-def select_bitrate(manifest_bitrates=None):
-    """Returns a bitrate, while honoring the user's /preference/."""
-    bitrate_setting = int(addon.getSetting('preferred_bitrate'))
-    bitrate_values = ['3671533', '2394274', '1577316', '1117771', '760027', '555799', '402512']
-
-    highest = False
-    preferred_bitrate = None
-    if bitrate_setting == 0:  # 0 === "highest"
-        highest = True
-    elif 0 < bitrate_setting < 8:  # a specific bitrate. '8' === "ask"
-        preferred_bitrate = bitrate_values[bitrate_setting - 1]
-
-    if manifest_bitrates:
-        manifest_bitrates.sort(key=int, reverse=True)
-        if highest:
-            return manifest_bitrates[0]
-        elif preferred_bitrate and preferred_bitrate in manifest_bitrates:
-            return preferred_bitrate
-        else:  # ask user
-            return ask_bitrate(manifest_bitrates)
-    else:
-        if highest:
-            return bitrate_values[0]
-        elif preferred_bitrate:
-            return preferred_bitrate
-        else:  # ask user
-            return ask_bitrate(bitrate_values)
 
 
 class GamepassGUI(xbmcgui.WindowXML):
@@ -427,12 +381,17 @@ class GamepassGUI(xbmcgui.WindowXML):
         self.games_list.addItems(self.games_items)
 
     def play_url(self, url):
+        if not self.has_inputstream_adaptive:
+            logger.debug('Fatal: Inputstream Adaptive is not installed or enabled. Please install and/or enable the '
+                         'inputstream.adaptive add-on!')
+            dialog.ok(language(30021), language(30051))
+            return
+
         self.list_refill = True
         playitem = xbmcgui.ListItem(path=url)
-        if self.has_inputstream_adaptive and addon.getSetting('use_inputstream_adaptive') == 'true':
-            playitem.setProperty('inputstream', 'inputstream.adaptive')
-            playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
-            playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
+        playitem.setProperty('inputstream', 'inputstream.adaptive')
+        playitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        playitem.setProperty('inputstream.adaptive.stream_headers', url.split('|')[1])
 
         xbmc.Player().play(item=url, listitem=playitem)
 
@@ -496,21 +455,7 @@ class GamepassGUI(xbmcgui.WindowXML):
         except KeyError:
             url = streams['hls']
 
-        if addon.getSetting('use_inputstream_adaptive') == 'true' and self.has_inputstream_adaptive:
-            return url
-        else:  # choose a specific bitrate
-            try:
-                m3u8_streams = self.gp.m3u8_to_dict(url)
-                bitrate = select_bitrate(list(m3u8_streams.keys()))
-                if bitrate:
-                    return m3u8_streams[bitrate]
-                else:  # bitrate dialog was canceled
-                    return None
-            except Exception as e:
-                logger.debug('unable to parse the m3u8 manifest.')
-                logger.debug('Trace Message:\n{}'.format(format_exc()))
-                dialog.ok(language(30043), language(30045))
-                return False
+        return url
 
     def onFocus(self, controlId):  # pylint: disable=invalid-name
         # save currently focused list

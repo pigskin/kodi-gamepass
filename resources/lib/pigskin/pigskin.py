@@ -977,25 +977,6 @@ class pigskin(object):
         payload = json.dumps(post_data)
         return payload
 
-    def m3u8_to_dict(self, manifest_url):
-        """Return a dict of available bitrates and their respective stream. This
-        is especially useful if you need to pass a URL to a player that doesn't
-        support adaptive streaming."""
-        streams = {}
-        m3u8_header = {
-            'Connection': 'keep-alive',
-            'User-Agent': self.user_agent
-        }
-
-        m3u8_manifest = self.make_request(manifest_url, 'get')
-        m3u8_obj = m3u8.loads(m3u8_manifest)
-        for playlist in m3u8_obj.playlists:
-            bitrate = int(playlist.stream_info.bandwidth) / 1000
-            streams[bitrate] = manifest_url[:manifest_url.rfind('/manifest') + 1] + playlist.uri + '?' + \
-                               manifest_url.split('?')[1] + '|' + urlencode(m3u8_header)
-
-        return streams
-
     def redzone_on_air(self):
         """Return whether RedZone Live is currently broadcasting."""
         url = self.config['modules']['ROUTES_DATA_PROVIDERS']['redzone']
