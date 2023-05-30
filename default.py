@@ -490,7 +490,8 @@ class GamepassGUI(xbmcgui.WindowXML):
 
                     try:
                         self.display_seasons_weeks()
-                        self.display_weeks_games()
+                        if addon.getSetting('display_current_week') == 'true':
+                            self.display_weeks_games()
                     except Exception as e:
                         logger.debug('Error while reading seasons weeks and games')
                         logger.debug('Trace Message:\n{}'.format(format_exc()))
