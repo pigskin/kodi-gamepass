@@ -67,6 +67,11 @@
           <default>false</default>
           <control type="toggle"/>
         </setting>
+        <setting help="" id="display_current_week" label="30031" type="boolean">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
       </group>
     </category>
     <category help="" id="proxy settings" label="30033">
