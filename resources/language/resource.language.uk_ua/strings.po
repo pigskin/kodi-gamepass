@@ -86,8 +86,8 @@ msgid "Display/Video"
 msgstr "Відображення/Відео"
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Просунуті"
+msgid "Load and display games of current week"
+msgstr ""
 
 msgctxt "#30032"
 msgid "Coaches Film"

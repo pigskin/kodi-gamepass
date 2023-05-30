@@ -85,6 +85,10 @@ msgctxt "#30030"
 msgid "Display/Video"
 msgstr "Anzeige"
 
+msgctxt "#30031"
+msgid "Load and display games of current week"
+msgstr "Zeige die Spiele der aktuellen Woche"
+
 msgctxt "#30032"
 msgid "Coaches Film"
 msgstr ""

@@ -86,6 +86,10 @@ msgctxt "#30030"
 msgid "Display/Video"
 msgstr "デイスプレイ・ビデオ"
 
+msgctxt "#30031"
+msgid "Load and display games of current week"
+msgstr ""
+
 msgctxt "#30032"
 msgid "Coaches Film"
 msgstr "監督フィルム集"
