@@ -287,7 +287,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                         game['phase'],
                         str(timedelta(seconds=int(float(game['video']['videoDuration'].replace(',', '.'))))))
                 else:
-                    game_info = game['phase'] + '(' + datetime_obj.strftime(datetime_format) +')'
+                    game_info = game['phase'] + \n + '(' + datetime_obj.strftime(datetime_format) +')'
                     if addon.getSetting('hide_game_length') == 'true' and game_info == 'FINAL_OVERTIME':
                         game_info = 'FINAL (%s)' % (datetime_obj.strftime(datetime_format))
             else:
