@@ -72,7 +72,7 @@
           <default>true</default>
           <control type="toggle"/>
         </setting>
-        <setting help="" id="display_datetime" label="30032" type="boolean">
+        <setting help="" id="display_datetime" label="30050" type="boolean">
           <level>0</level>
           <default>true</default>
           <control type="toggle"/>
