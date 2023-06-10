@@ -145,6 +145,10 @@ msgctxt "#30047"
 msgid "PRESEASON WEEK {0}"
 msgstr ""
 
+msgctxt "#30047"
+msgid "PRESEASON WEEK {0}"
+msgstr ""
+
 msgctxt "#30048"
 msgid "WEEK {0}"
 msgstr ""
@@ -154,5 +158,5 @@ msgid "Please enter the username and password for your NFL Game Pass subscriptio
 msgstr ""
 
 msgctxt "#30051"
-msgid "Inputstream Adaptive is not installed or is disabled."
+msgid "Display date and time of game"
 msgstr ""
