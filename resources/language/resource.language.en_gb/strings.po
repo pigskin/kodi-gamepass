@@ -158,5 +158,9 @@ msgid "Please enter the username and password for your NFL Game Pass subscriptio
 msgstr ""
 
 msgctxt "#30051"
+msgid "Inputstream Adaptive is not installed or is disabled."
+msgstr ""
+
+msgctxt "#30052"
 msgid "Display date and time of game"
 msgstr ""
