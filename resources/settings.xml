@@ -67,7 +67,7 @@
           <default>false</default>
           <control type="toggle"/>
           <dependencies>
-            <dependency type="disable" setting="display_datetime"</dependency>
+            <dependency type="disable" setting="display_datetime"></dependency>
           </dependencies>
         </setting>
         <setting help="" id="display_current_week" label="30031" type="boolean">
@@ -80,7 +80,7 @@
           <default>true</default>
           <control type="toggle"/>
           <dependencies>
-            <dependency type="enable" setting="hide_game_length"</dependency>
+            <dependency type="enable" setting="hide_game_length"></dependency>
           </dependencies>
         </setting>
       </group>
