@@ -80,7 +80,7 @@
           <default>true</default>
           <control type="toggle"/>
           <dependencies>
-            <dependency type="enable" operator="!is" setting="hide_game_length">true</dependency>
+            <dependency type="enable" operator="!is" setting="hide_game_length">false</dependency>
           </dependencies>
         </setting>
       </group>
