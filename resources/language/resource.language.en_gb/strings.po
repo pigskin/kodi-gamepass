@@ -145,10 +145,6 @@ msgctxt "#30047"
 msgid "PRESEASON WEEK {0}"
 msgstr ""
 
-msgctxt "#30047"
-msgid "PRESEASON WEEK {0}"
-msgstr ""
-
 msgctxt "#30048"
 msgid "WEEK {0}"
 msgstr ""
