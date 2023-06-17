@@ -295,7 +295,7 @@ class GamepassGUI(xbmcgui.WindowXML):
                     else:
                         game_info = game['phase']
                         if addon.getSetting('hide_game_length') == 'true' and game['phase'] != 'FINAL':
-                            game_info = 'FINAL' + '\n' + '(' + datetime_obj.strftime(datetime_format) +')'
+                            game_info = 'FINAL'
             else:
                 game_info = datetime_obj.strftime(datetime_format)
 
