@@ -158,5 +158,5 @@ msgid "Inputstream Adaptive is not installed or is disabled."
 msgstr ""
 
 msgctxt "#30052"
-msgid "Display date and time of game"
+msgid "Display date and time of kickoff"
 msgstr ""
