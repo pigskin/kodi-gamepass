@@ -270,12 +270,12 @@ class GamepassGUI(xbmcgui.WindowXML):
 
             listitem.setProperty('is_game', 'true')
             listitem.setProperty('is_show', 'false')
-            
+
             if addon.getSetting('time_notation') == '0':  # 12-hour clock
                 datetime_format = '%A, %b %d - %I:%M %p'
             else:  # 24-hour clock
                 datetime_format = '%A, %b %d - %H:%M'
-                
+
             datetime_obj = self.gp.nfldate_to_datetime(game['gameDateTimeUtc'], True)
 
             if game['phase'] == 'FINAL' or game['phase'] == 'FINAL_OVERTIME':
