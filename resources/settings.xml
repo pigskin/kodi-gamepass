@@ -77,10 +77,10 @@
         </setting>
         <setting help="" id="display_datetime" label="30052" type="boolean">
           <level>0</level>
-          <default>true</default>
+          <default>false</default>
           <control type="toggle"/>
           <dependencies>
-            <dependency type="enable" operator="!is" setting="hide_game_length">false</dependency>
+            <dependency type="enable" operator="is" setting="hide_game_length">true</dependency>
           </dependencies>
         </setting>
       </group>
