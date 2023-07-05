@@ -15,12 +15,12 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">NFL Game Pass</summary>
     <description lang="en_GB">Watch NFL Game Pass streams.</description>
-    <lifecyclestate type="broken" lang="en_GB">The NFL canceled the NFL Gamepass service, rendering this add-on obsolte.</lifecyclestate>
+    <lifecyclestate type="broken" lang="en_GB">The NFL canceled the NFL Gamepass service, rendering this add-on obsolete.</lifecyclestate>
     <platform>all</platform>
     <language>en</language>
     <license>GPL-2.0-only</license>
     <source>https://github.com/pigskin/kodi-gamepass</source>
-    <disclaimer lang="en_GB">The NFL canceled the NFL Gamepass service, rendering this add-on obsolte.</disclaimer>
+    <disclaimer lang="en_GB">The NFL canceled the NFL Gamepass service, rendering this add-on obsolete.</disclaimer>
     <news>2023.07.05
       + Mark add-on as broken, NFL has canceled the Gamepass service (jm-duke)
       + Show date (or weekday) of game (AleXSR700)
