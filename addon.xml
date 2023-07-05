@@ -15,7 +15,7 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">NFL Game Pass</summary>
     <description lang="en_GB">Watch NFL Game Pass streams.</description>
-    <lifecyclestate>broken</lifecyclestate>
+    <lifecyclestate type="broken" lang="en_GB">The NFL canceled the NFL Gamepass service, rendering this add-on obsolte.</lifecyclestate>
     <platform>all</platform>
     <language>en</language>
     <license>GPL-2.0-only</license>
