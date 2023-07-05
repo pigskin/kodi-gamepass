@@ -1,3 +1,9 @@
+2023.07.05 -- Farewell Edition
++ Mark add-on as broken, NFL has canceled the Gamepass service (jm-duke)
++ Show date (or weekday) of game (AleXSR700)
++ Toggle display of current week's games (jm-duke)
++ Implement workaround for failed content URL retrieval (jm-duke)
+
 2022.11.14 -- Aaron Rodgers Edition
 + Fix open settings from app bug (ohhmyy)
 + Use updated team logos (ohhmyy)
